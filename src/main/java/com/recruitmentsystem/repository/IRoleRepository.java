@@ -1,9 +1,10 @@
 package com.recruitmentsystem.repository;
 
-import com.recruitmentsystem.entity.User;
+import com.recruitmentsystem.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface IUserRepository extends JpaRepository<User, Integer> {
+public interface IRoleRepository extends JpaRepository<Role, Integer> {
+    Role findRoleByRoleName(String roleName);
 }

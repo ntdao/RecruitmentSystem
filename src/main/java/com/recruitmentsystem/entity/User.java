@@ -7,13 +7,15 @@ import lombok.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "user")
 @Data
+@Entity
+@Table
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
+@ToString
 public class User extends Audit implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +31,7 @@ public class User extends Audit implements Serializable {
     private String lastName;
     private String phoneNumber;
     private String address;
+//    @Enumerated(EnumType.STRING)
     private Gender gender;
     private String imgUrl;
     private LocalDate birthday;
@@ -36,22 +39,27 @@ public class User extends Audit implements Serializable {
     @JoinColumn(name = "roleId")
     private Role role;
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", address='" + address + '\'' +
-                ", gender=" + gender +
-                ", imgUrl='" + imgUrl + '\'' +
-                ", birthday=" + birthday +
-                ", role=" + role +
-                super.toString() +
-                '}';
+    public User(String username,
+                String password,
+                String email,
+                String firstName,
+                String lastName,
+                String phoneNumber,
+                String address,
+                Gender gender,
+                String imgUrl,
+                LocalDate birthday,
+                Role role) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.gender = gender;
+        this.imgUrl = imgUrl;
+        this.birthday = birthday;
+        this.role = role;
     }
 }

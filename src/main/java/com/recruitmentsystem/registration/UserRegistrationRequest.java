@@ -1,13 +1,12 @@
-package com.recruitmentsystem.dto;
+package com.recruitmentsystem.registration;
 
-import com.recruitmentsystem.entity.Role;
 import com.recruitmentsystem.myEnum.Gender;
 
 import java.time.LocalDate;
 
-public record UserDTO(
-        Integer id,
+public record UserRegistrationRequest (
         String username,
+        String password,
         String email,
         String firstName,
         String lastName,
@@ -16,7 +15,6 @@ public record UserDTO(
         Gender gender,
         LocalDate birthday,
         String imgUrl,
-        LocalDate createdAt,
-        LocalDate updatedAt
-) {
+        String roleName
+){
 }

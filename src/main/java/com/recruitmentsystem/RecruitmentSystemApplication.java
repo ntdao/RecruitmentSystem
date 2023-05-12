@@ -4,10 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ApplicationSystemApplication {
-
+public class RecruitmentSystemApplication {
     public static void main(String[] args) {
-        SpringApplication.run(ApplicationSystemApplication.class, args);
+        SpringApplication.run(RecruitmentSystemApplication.class, args);
     }
-
 }
