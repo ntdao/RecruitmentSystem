@@ -1,65 +1,109 @@
 package com.recruitmentsystem.entity;
 
-import com.recruitmentsystem.myEnum.Gender;
+import com.recruitmentsystem.common.myEnum.Gender;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-
-import java.io.Serializable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
+import java.util.*;
 
-@Data
-@Entity
+@Entity // khai báo với Spring Boot rằng đây là 1 entity biểu diễn table trong db
 @Table
+@Data // tự động khai báo getter và setter cho class
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@EqualsAndHashCode
 @ToString
-public class User extends Audit implements Serializable {
+@Builder // builder pattern:
+public class User extends Audit implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
     private Integer id;
-    @Column(nullable = false, unique = true, length = 255)
+    @Column(nullable = false, unique = true)
+//    @Size(min=2, max=255)
     private String username;
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
+//    @Size(min=4, max=30)
     private String password;
-    @Column(nullable = false, unique = true, length = 255)
+    @Column(nullable = false, unique = true)
+//    @Size(min=2, max=255)
     private String email;
     private String firstName;
     private String lastName;
     private String phoneNumber;
     private String address;
-//    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private Gender gender;
     private String imgUrl;
     private LocalDate birthday;
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "roleId")
     private Role role;
+    private Boolean enabled = false;
 
-    public User(String username,
-                String password,
-                String email,
-                String firstName,
-                String lastName,
-                String phoneNumber,
-                String address,
-                Gender gender,
-                String imgUrl,
-                LocalDate birthday,
-                Role role) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phoneNumber = phoneNumber;
-        this.address = address;
-        this.gender = gender;
-        this.imgUrl = imgUrl;
-        this.birthday = birthday;
-        this.role = role;
+//    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//    @JoinTable(
+//            name = "users_roles",
+//            joinColumns = @JoinColumn(name = "user_id"),
+//            inverseJoinColumns = @JoinColumn(name = "role_id")
+//    )
+//    private Set<Role> roles = new HashSet<>();
+
+//    public void addRole(Role role) {
+//        this.roles.add(role);
+//    }
+
+    public User(User user, Integer oldId, boolean deleteFlag) {
+        super(user.getCreatedAt(),
+                user.getUpdatedAt(),
+                user.getCreatedBy(),
+                user.getUpdatedBy(),
+                deleteFlag,
+                oldId);
+        this.username = user.getUsername();
+        this.password = user.getPassword();
+        this.email = user.getEmail();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.phoneNumber = user.getPhoneNumber();
+        this.address = user.getAddress();
+        this.gender = user.getGender();
+        this.imgUrl = user.getImgUrl();
+        this.birthday = user.getBirthday();
+        this.role = user.getRole();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+//        for (Role role : roles) {
+//            authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
+//        }
+//        return authorities;
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(this.role.getRoleName());
+        return Collections.singletonList(authority);
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
     }
 }

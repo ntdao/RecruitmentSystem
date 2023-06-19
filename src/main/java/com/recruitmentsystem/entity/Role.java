@@ -7,16 +7,26 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
 @Entity
 @Table
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Data
+@ToString
+@Builder
 public class Role extends Audit implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer roleId;
+    @Column(nullable = false)
     private String roleName;
+
+    public Role(String roleName) {
+        this.roleName = roleName;
+    }
+
+    @Override
+    public String toString() {
+        return this.roleName;
+    }
 }

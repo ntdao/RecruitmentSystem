@@ -1,10 +1,10 @@
-package com.recruitmentsystem.registration;
+package com.recruitmentsystem.model.user;
 
-import com.recruitmentsystem.myEnum.Gender;
+import com.recruitmentsystem.common.myEnum.Gender;
 
 import java.time.LocalDate;
 
-public record UserRegistrationRequest (
+public record UserRequestModel(
         String username,
         String password,
         String email,
@@ -15,6 +15,8 @@ public record UserRegistrationRequest (
         Gender gender,
         LocalDate birthday,
         String imgUrl,
-        String roleName
+        String roleName,
+        LocalDate createdAt,
+        LocalDate updatedAt
 ){
 }

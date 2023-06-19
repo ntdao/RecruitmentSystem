@@ -1,11 +1,13 @@
-package com.recruitmentsystem.dto;
+package com.recruitmentsystem.model.user;
 
-import com.recruitmentsystem.entity.Role;
-import com.recruitmentsystem.myEnum.Gender;
+import com.recruitmentsystem.common.myEnum.Gender;
+import lombok.Builder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public record UserDTO(
+@Builder
+public record UserDisplayModel(
         Integer id,
         String username,
         String email,
@@ -16,7 +18,7 @@ public record UserDTO(
         Gender gender,
         LocalDate birthday,
         String imgUrl,
-        LocalDate createdAt,
-        LocalDate updatedAt
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
 ) {
 }
