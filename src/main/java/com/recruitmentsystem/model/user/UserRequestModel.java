@@ -1,7 +1,9 @@
 package com.recruitmentsystem.model.user;
 
 import com.recruitmentsystem.common.myEnum.Gender;
+import jakarta.annotation.Nullable;
 
+import java.time.Instant;
 import java.time.LocalDate;
 
 public record UserRequestModel(
@@ -11,12 +13,12 @@ public record UserRequestModel(
         String firstName,
         String lastName,
         String phoneNumber,
-        String address,
+        @Nullable String address,
         Gender gender,
         LocalDate birthday,
-        String imgUrl,
+        @Nullable String imgUrl,
         String roleName,
-        LocalDate createdAt,
-        LocalDate updatedAt
+        @Nullable Instant createdAt,
+        @Nullable Instant updatedAt
 ){
 }

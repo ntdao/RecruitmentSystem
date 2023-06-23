@@ -45,9 +45,9 @@ public class ApplicationConfiguration {
     public UserDetailsService userDetailsService() {
         return new UserDetailsService() {
             @Override
-            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-                return userRepository.findUserByUsername(username)
-                        .orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
+            public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+                return userRepository.findTopByEmail(email)
+                        .orElseThrow(() -> new UsernameNotFoundException("User with email " + email + " not found"));
             }
         };
     }

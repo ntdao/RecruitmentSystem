@@ -1,4 +1,10 @@
 package com.recruitmentsystem.model.role;
 
-public record RoleRequestModel() {
+import java.time.Instant;
+
+public record RoleRequestModel(
+        String name,
+        Instant createdAt,
+        Instant updatedAt
+) {
 }

@@ -1,5 +1,6 @@
 package com.recruitmentsystem.controller;
 
+import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.security.auth.AuthenticationRequest;
 import com.recruitmentsystem.model.user.UserRequestModel;
 import com.recruitmentsystem.service.IAuthenticationService;
@@ -15,7 +16,13 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<?> register(
             @RequestBody UserRequestModel request) {
-        return ResponseEntity.ok().body(authenticationService.register(request));
+//        try {
+            return ResponseEntity.ok().body(authenticationService.register(request));
+//        }
+//        catch (ResourceAlreadyExistsException e){
+//            System.out.println(e.getMessage());
+//            return new ResponseEntity<>()
+//        }
     }
 
     @GetMapping(path = "/register/confirm")

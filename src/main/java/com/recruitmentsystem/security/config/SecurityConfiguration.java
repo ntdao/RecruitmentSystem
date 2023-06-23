@@ -27,8 +27,8 @@ public class SecurityConfiguration {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
-				.csrf()
-				.disable()
+				.csrf().disable()
+
 				.authorizeHttpRequests()
 
 				// Cho phép tất cả mọi người truy cập vào địa chỉ này
@@ -45,10 +45,11 @@ public class SecurityConfiguration {
 					.permitAll()
 
 				.requestMatchers("/api/v*/users/**").hasRole("ADMIN")
+				.requestMatchers("/api/v*/roles/**").hasRole("ADMIN")
+				.requestMatchers("/api/v*/companies/**").hasAnyRole("ADMIN","HR")
 
 				// Tất cả các request khác đều cần phải xác thực mới được truy cập
-				.anyRequest()
-					.authenticated()
+				.anyRequest().authenticated()
 				.and()
 					// disable session
 					.sessionManagement()
@@ -57,6 +58,8 @@ public class SecurityConfiguration {
 					.authenticationProvider(authenticationProvider)
 				.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
+//				.logout().permitAll();
+//				.and()
 //				.exceptionHandling()
 //				.authenticationEntryPoint(
 //					(request, response, ex) -> {
@@ -65,7 +68,7 @@ public class SecurityConfiguration {
 //							ex.getMessage()
 //						);
 //					}
-//				)
+//				);
 
 
 		return http.build();

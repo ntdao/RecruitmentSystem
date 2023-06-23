@@ -31,19 +31,35 @@ public class UserMapper {
                 .build();
     }
     public User userRequestModelToUser (UserRequestModel request) {
-        return User
-                .builder()
-                .username(request.username())
-                .firstName(request.firstName())
-                .lastName(request.lastName())
-                .email(request.email())
-                .password(passwordEncoder.encode(request.password()))
-                .phoneNumber(request.phoneNumber())
-                .address(request.address())
-                .gender(request.gender())
-                .birthday(request.birthday())
-                .imgUrl(request.imgUrl())
-                .role(roleService.findByRoleName(request.roleName()))
-                .build();
+        if(request.address() == null && request.imgUrl() == null){
+            return User
+                    .builder()
+                    .username(request.username())
+                    .firstName(request.firstName())
+                    .lastName(request.lastName())
+                    .email(request.email())
+                    .password(passwordEncoder.encode(request.password()))
+                    .phoneNumber(request.phoneNumber())
+                    .gender(request.gender())
+                    .birthday(request.birthday())
+                    .role(roleService.findByRoleName(request.roleName()))
+                    .build();
+        }
+        else {
+            return User
+                    .builder()
+                    .username(request.username())
+                    .firstName(request.firstName())
+                    .lastName(request.lastName())
+                    .email(request.email())
+                    .password(passwordEncoder.encode(request.password()))
+                    .phoneNumber(request.phoneNumber())
+                    .address(request.address())
+                    .gender(request.gender())
+                    .birthday(request.birthday())
+                    .imgUrl(request.imgUrl())
+                    .role(roleService.findByRoleName(request.roleName()))
+                    .build();
+        }
     }
 }

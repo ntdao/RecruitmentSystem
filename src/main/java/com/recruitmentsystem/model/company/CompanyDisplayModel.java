@@ -1,11 +1,11 @@
-package com.recruitmentsystem.model.role;
+package com.recruitmentsystem.model.company;
 
 import lombok.Builder;
 
 import java.time.Instant;
 
 @Builder
-public record RoleDisplayModel (
+public record CompanyDisplayModel (
         Integer id,
         String name,
         String imgUrl,

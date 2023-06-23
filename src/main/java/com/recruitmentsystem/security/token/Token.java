@@ -4,7 +4,7 @@ import com.recruitmentsystem.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @Builder
@@ -12,16 +12,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 public class Token {
-
-//    @SequenceGenerator(
-//            name = "token_sequence",
-//            sequenceName = "token_sequence",
-//            allocationSize = 1
-//    )
     @Id
     @GeneratedValue(
             strategy = GenerationType.IDENTITY
-//            generator = "token_sequence"
     )
     private Integer id;
 
@@ -29,17 +22,17 @@ public class Token {
     private String token;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(nullable = false)
-    private LocalDateTime expiresAt;
+    private Instant expiresAt;
 
-    private LocalDateTime confirmedAt;
+    private Instant confirmedAt;
 
     @ManyToOne
     @JoinColumn(
             nullable = false,
-            name = "app_user_id"
+            name = "user_id"
     )
     private User user;
 

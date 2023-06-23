@@ -46,7 +46,7 @@ public class JwtTokenUtil {
 		return Jwts
 				.builder()
 				.setClaims(extraClaims)
-				.setSubject(user.getUsername())
+				.setSubject(user.getEmail())
 				.claim("roles", user.getRole().toString())
 				.setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + expiration))
@@ -56,7 +56,7 @@ public class JwtTokenUtil {
 
 
 
-	public String extractUsername(String token){
+	public String extractEmail(String token){
 		return extractClaim(token, Claims::getSubject);
 	}
 
@@ -85,8 +85,8 @@ public class JwtTokenUtil {
 		return extractExpiration(token).before(new Date());
 	}
 	public Boolean isTokenValid(String token, UserDetails userDetails) {
-		final String username = extractUsername(token);
-		return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+		final String email = extractEmail(token);
+		return (email.equals(userDetails.getUsername())) && !isTokenExpired(token);
 	}
 	
 //	public boolean validateAccessToken(String token) {

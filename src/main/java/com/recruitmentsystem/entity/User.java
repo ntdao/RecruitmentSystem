@@ -2,13 +2,13 @@ package com.recruitmentsystem.entity;
 
 import com.recruitmentsystem.common.myEnum.Gender;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.Collection;
 
 @Entity // khai báo với Spring Boot rằng đây là 1 entity biểu diễn table trong db
 @Table
@@ -23,13 +23,10 @@ public class User extends Audit implements UserDetails {
     @Column(updatable = false)
     private Integer id;
     @Column(nullable = false, unique = true)
-//    @Size(min=2, max=255)
     private String username;
     @Column(nullable = false)
-//    @Size(min=4, max=30)
     private String password;
     @Column(nullable = false, unique = true)
-//    @Size(min=2, max=255)
     private String email;
     private String firstName;
     private String lastName;
@@ -40,9 +37,17 @@ public class User extends Audit implements UserDetails {
     private String imgUrl;
     private LocalDate birthday;
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "roleId")
+    @JoinColumn(name = "role_id")
     private Role role;
     private Boolean enabled = false;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "HR_branch",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "branch_id")
+    )
+    private Set<CompanyBranch> branches = new HashSet<>();
 
 //    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 //    @JoinTable(
@@ -74,6 +79,11 @@ public class User extends Audit implements UserDetails {
         this.imgUrl = user.getImgUrl();
         this.birthday = user.getBirthday();
         this.role = user.getRole();
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 
     @Override

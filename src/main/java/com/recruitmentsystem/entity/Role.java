@@ -12,17 +12,27 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@ToString
 @Builder
 public class Role extends Audit implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(updatable = false)
     private Integer roleId;
     @Column(nullable = false)
     private String roleName;
 
     public Role(String roleName) {
         this.roleName = roleName;
+    }
+
+    public Role(Role role, Integer oldId, boolean deleteFlag) {
+        super(role.getCreatedAt(),
+                role.getUpdatedAt(),
+                role.getCreatedBy(),
+                role.getUpdatedBy(),
+                deleteFlag,
+                oldId);
+        this.roleName = role.getRoleName();
     }
 
     @Override

@@ -7,7 +7,6 @@ import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.security.jwt.JwtTokenUtil;
 import com.recruitmentsystem.security.token.TokenService;
 import com.recruitmentsystem.service.IAuthenticationService;
-import com.recruitmentsystem.service.IUserService;
 import com.recruitmentsystem.entity.User;
 import com.recruitmentsystem.mapper.UserMapper;
 import com.recruitmentsystem.model.user.UserRequestModel;
@@ -22,7 +21,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +35,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final EmailSender emailSender;
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
-    private final IUserService userService;
+    private final UserService userService;
     private final TokenService tokenService;
 
     @Override
@@ -51,15 +53,15 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         }
 
         User user = userMapper.userRequestModelToUser(request);
-        user.setCreatedAt(LocalDateTime.now());
+        user.setCreatedAt(Instant.now());
         User savedUser = userRepository.save(user);
         String accessToken = jwtTokenUtil.generateToken(user);
 
         Token token = Token
                 .builder()
                 .token(accessToken)
-                .createdAt(LocalDateTime.now())
-                .expiresAt(LocalDateTime.now().plusMinutes(15))
+                .createdAt(Instant.now())
+                .expiresAt(Instant.now().plus(15, ChronoUnit.MINUTES))
                 .user(user)
                 .build();
         tokenService.saveToken(token);
@@ -87,9 +89,9 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             throw new IllegalStateException("email already confirmed");
         }
 
-        LocalDateTime expiredAt = confirmationToken.getExpiresAt();
+        Instant expiredAt = confirmationToken.getExpiresAt();
 
-        if (expiredAt.isBefore(LocalDateTime.now())) {
+        if (expiredAt.isBefore(Instant.now())) {
             throw new IllegalStateException("token expired");
         }
 
@@ -102,7 +104,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     public AuthenticationResponse login(AuthenticationRequest request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(), request.getPassword())
+                        request.getEmail(), request.getPassword())
         );
 
         User user = (User) authentication.getPrincipal();
@@ -124,8 +126,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         Token token = Token
                         .builder()
                         .token(accessToken)
-                        .createdAt(LocalDateTime.now())
-                        .expiresAt(LocalDateTime.now().plusMinutes(15))
+                        .createdAt(Instant.now())
+                        .expiresAt(Instant.now().plus(15, ChronoUnit.MINUTES))
                         .user(user)
                         .build();
         tokenService.saveToken(token);
@@ -140,7 +142,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     }
 
     private User getUserByToken(String token) {
-        String username = jwtTokenUtil.extractUsername(token);
+        String username = jwtTokenUtil.extractEmail(token);
         return userService.findUserByUsername(username);
     }
 
@@ -154,7 +156,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         // update user
         user.setPassword(passwordEncoder.encode(newPassword));
-        user.setUpdatedAt(LocalDateTime.now());
+        user.setUpdatedAt(Instant.now());
 //        updateUser.setUpdatedBy();
 
         // luu thong tin vao database

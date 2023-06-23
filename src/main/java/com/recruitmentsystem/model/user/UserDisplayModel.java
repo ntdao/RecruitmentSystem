@@ -4,7 +4,7 @@ import com.recruitmentsystem.common.myEnum.Gender;
 import lombok.Builder;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Builder
 public record UserDisplayModel(
@@ -18,7 +18,7 @@ public record UserDisplayModel(
         Gender gender,
         LocalDate birthday,
         String imgUrl,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        Instant createdAt,
+        Instant updatedAt
 ) {
 }

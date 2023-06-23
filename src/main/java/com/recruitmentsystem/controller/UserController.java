@@ -1,10 +1,11 @@
 package com.recruitmentsystem.controller;
 
+import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
+import com.recruitmentsystem.common.exception.ResourceNotFoundException;
+import com.recruitmentsystem.model.TestResponse;
 import com.recruitmentsystem.model.user.UserRequestModel;
 import com.recruitmentsystem.model.user.UserDisplayModel;
-import com.recruitmentsystem.service.IUserService;
-import jakarta.annotation.security.RolesAllowed;
-import lombok.AllArgsConstructor;
+import com.recruitmentsystem.service.impl.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,44 +18,76 @@ import java.util.stream.Stream;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class UserController {
-    private final IUserService userService;
+    private final UserService userService;
 
     @GetMapping("/all")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<UserDisplayModel>> getAllUsers() {
+    public TestResponse<List<UserDisplayModel>> getAllUsers() {
         List<UserDisplayModel> users = userService.findAllUsers();
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        return new TestResponse(0, "OK", users);
     }
 
+    /*
+        phần path URL bạn muốn lấy thông tin sẽ để trong ngoặc kép {}
+     */
     @GetMapping("/find/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserDisplayModel> getUserById(@PathVariable("id") Integer id) {
-        UserDisplayModel user = userService.findById(id);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    // @PathVariable lấy ra thông tin trong URL
+    // dựa vào tên của thuộc tính đã định nghĩa trong ngoặc kép /find/{id}
+    public TestResponse<UserDisplayModel> getUserById(@PathVariable("id") Integer id) {
+        UserDisplayModel user;
+        try {
+            user = userService.findById(id);
+        }
+        catch (ResourceNotFoundException e) {
+            return new TestResponse(-1,e.getMessage());
+        }
+        return new TestResponse(0, "OK", user);
     }
 
     @PostMapping("/add")
-    @PreAuthorize("hasRole('ADMIN')")
-    public void registerUser(@RequestBody UserRequestModel request) {
-        userService.addUser(request);
+    public TestResponse addUser(@RequestBody UserRequestModel request) {
+        try {
+            userService.addUser(request);
+           return new TestResponse(0, "success");
+        }
+        catch (ResourceAlreadyExistsException e) {
+            return new TestResponse(-1,e.getMessage());
+        }
     }
 
+    /*
+        @RequestBody nói với Spring Boot rằng hãy chuyển Json trong request body
+        thành đối tượng UserRequestModel
+    */
     @PutMapping("/update/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public void updateUser(@PathVariable("id") Integer id, @RequestBody UserRequestModel request) {
-        userService.updateUser(id, request);
+    public TestResponse updateUser(@PathVariable("id") Integer id, @RequestBody UserRequestModel request) {
+        try {
+            userService.updateUser(id, request);
+            return new TestResponse(0, "success");
+        }
+        catch (ResourceNotFoundException e) {
+            return new TestResponse(-1,e.getMessage());
+        }
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public void deleteUser(@PathVariable("id") Integer id) {
-        userService.deleteUser(id);
+    public TestResponse deleteUser(@PathVariable("id") Integer id) {
+        try {
+            userService.deleteUser(id);
+            return new TestResponse(0, "success");
+        }
+        catch (ResourceNotFoundException e) {
+            return new TestResponse(-1,e.getMessage());
+        }
     }
 
-    @DeleteMapping("/delete")
-    @PreAuthorize("hasRole('ADMIN')")
-    public void deleteUser(@RequestBody Integer[] ids) {
-        Stream.of(ids).forEach(id -> userService.deleteUser(id));
-    }
+//    @DeleteMapping("/delete")
+//    public void deleteUser(@RequestBody Integer[] ids) {
+//        Stream
+//                .of(ids)
+//                .forEach(
+//                        id -> userService.deleteUser(id)
+//                );
+//    }
 }
