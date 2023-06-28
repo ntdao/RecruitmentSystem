@@ -11,7 +11,6 @@ import com.recruitmentsystem.security.auth.AuthenticationRequest;
 import com.recruitmentsystem.security.auth.AuthenticationResponse;
 import com.recruitmentsystem.security.email.EmailSender;
 import com.recruitmentsystem.security.jwt.JwtTokenUtil;
-import com.recruitmentsystem.security.token.ITokenRepository;
 import com.recruitmentsystem.security.token.Token;
 import com.recruitmentsystem.security.token.TokenService;
 import com.recruitmentsystem.security.token.TokenType;
@@ -29,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,8 +41,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final UserMapper userMapper;
     private final UserService userService;
     private final TokenService tokenService;
-
-    private final ITokenRepository tokenRepository;
+    private final long EMAIL_EXPIRATION = 15 * 60 * 1000;
 
     @Override
     public AuthenticationResponse register(UserRequestModel request) {
@@ -60,8 +59,9 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         User user = userMapper.userRequestModelToUser(request);
         user.setCreatedAt(Instant.now());
+        user.setDeleteFlag(true);
         User savedUser = userRepository.save(user);
-        String accessToken = jwtTokenUtil.generateToken(user);
+
 //        String refreshToken = jwtTokenUtil.generateRefreshToken(user);
 //        Token token = Token
 //                .builder()
@@ -71,10 +71,10 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 //                .user(user)
 //                .build();
 //        tokenService.saveToken(token);
+        String accessToken = jwtTokenUtil.generateToken(user);
+        saveUserToken(savedUser, accessToken, EMAIL_EXPIRATION);
 
-        saveUserToken(savedUser, accessToken, 15 * 60 * 60);
-
-        String link = "http://localhost:8080/api/v1/auth/register/confirm?token=" + accessToken;
+        String link = "http://localhost:3000/register/confirm?token=" + accessToken;
         emailSender.sendConfirmEmail(request.email(), link);
 
         return AuthenticationResponse.builder()
@@ -93,17 +93,14 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         if (confirmationToken.getConfirmedAt() != null) {
             throw new IllegalStateException("email already confirmed");
         }
-
 //        Instant expiredAt = confirmationToken.getExpiresAt();
 //
 //        if (expiredAt.isBefore(Instant.now())) {
 //            throw new IllegalStateException("token expired");
 //        }
-
         if (confirmationToken.isExpired()) {
             throw new IllegalStateException("token expired");
         }
-
         tokenService.setConfirmedAt(token);
         userRepository.enableUser(confirmationToken.getUser().getEmail());
     }
@@ -118,8 +115,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         User user = (User) authentication.getPrincipal();
         String accessToken = jwtTokenUtil.generateToken(user);
         String refreshToken = jwtTokenUtil.generateRefreshToken(user);
-        saveUserToken(user, accessToken, 24 * 60 * 60 * 60);
-        saveUserToken(user, refreshToken, 7 * 24 * 60 * 60 * 60);
+        saveUserToken(user, accessToken, jwtTokenUtil.extractExpiration(accessToken).getTime());
+        saveUserToken(user, refreshToken, jwtTokenUtil.extractExpiration(refreshToken).getTime());
 
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
@@ -131,8 +128,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     public AuthenticationResponse forgotPassword(String email) {
         User user = userService.findUserByEmail(email);
         String accessToken = jwtTokenUtil.generateToken(user);
-//        String refreshToken = jwtTokenUtil.generateRefreshToken(user);
-        saveUserToken(user, accessToken, 15 * 60 * 60);
+        saveUserToken(user, accessToken, EMAIL_EXPIRATION);
 //        Token token = Token
 //                        .builder()
 //                        .token(accessToken)
@@ -153,8 +149,16 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
     @Override
     public void updatePassword(String token, String newPassword) {
-        User user = userService.getUserByToken(token);
+        try {
+            confirmEmail(token);
+        } catch (ResourceNotFoundException e){
+            throw new ResourceNotFoundException(e.getMessage());
+        } catch (IllegalStateException e){
+            throw new IllegalStateException(e.getMessage());
+        }
 
+        User user = userService.getUserByToken(token);
+        System.out.println("Find user by token: " + user);
         // tao ban ghi luu thong tin cu cua user
         User oldUser = new User(user, user.getId(), true);
         userRepository.save(oldUser);
@@ -179,18 +183,18 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 .expired(false)
                 .revoked(false)
                 .build();
-        tokenRepository.save(token);
+        tokenService.saveToken(token);
     }
 
     private void revokeAllUserTokens(User user) {
-        var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
+        List<Token> validUserTokens = tokenService.findAllValidTokenByUser(user.getId());
         if (validUserTokens.isEmpty())
             return;
         validUserTokens.forEach(token -> {
             token.setExpired(true);
             token.setRevoked(true);
         });
-        tokenRepository.saveAll(validUserTokens);
+        tokenService.saveAll(validUserTokens);
     }
 
     public void refreshToken(

@@ -18,19 +18,17 @@ import java.time.temporal.ChronoUnit;
 public class Token {
     @Enumerated(EnumType.STRING)
     public TokenType tokenType = TokenType.BEARER;
-    public boolean revoked;
-    public boolean expired;
+    public boolean revoked = false;
+    public boolean expired = false;
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(nullable = false, unique = true)
     private String token;
     @Column(nullable = false)
     private Instant createdAt;
     @Column(nullable = false)
-    private Instant expiresAt = Instant.now().plus(1, ChronoUnit.HOURS);
+    private Instant expiresAt = Instant.now().plus(15, ChronoUnit.MINUTES);
     private Instant confirmedAt;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "user_id")

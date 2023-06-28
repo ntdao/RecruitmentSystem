@@ -1,14 +1,16 @@
 package com.recruitmentsystem.controller;
 
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
-import com.recruitmentsystem.model.TestResponse;
 import com.recruitmentsystem.model.user.UserRequestModel;
 import com.recruitmentsystem.security.auth.AuthenticationRequest;
 import com.recruitmentsystem.security.auth.AuthenticationResponse;
 import com.recruitmentsystem.service.IAuthenticationService;
+import io.swagger.v3.core.util.Json;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -20,80 +22,84 @@ public class AuthenticationController {
     private final IAuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public TestResponse<?> register(
+    public ResponseEntity<?> register(
             @RequestBody UserRequestModel request) {
         AuthenticationResponse response;
+        System.out.println(request);
         try {
             response = authenticationService.register(request);
         } catch (ResourceAlreadyExistsException e) {
-            return new TestResponse<>(-1, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return new TestResponse(0, response);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(path = "/register/confirm")
-    public TestResponse<?> confirm(@RequestParam("token") String token) {
+    public ResponseEntity<?> confirm(@RequestParam("token") String token) {
         try {
             authenticationService.confirmEmail(token);
         } catch (Exception e) {
-            return new TestResponse<>(1, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return new TestResponse<>(0);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/login")
-    public TestResponse<?> login(@RequestBody AuthenticationRequest request) {
+    public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) {
         AuthenticationResponse response;
         try {
             response = authenticationService.login(request);
         } catch (ResourceAlreadyExistsException e) {
-            return new TestResponse<>(-1, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return new TestResponse(0, response);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh-token")
-    public TestResponse<?> refreshToken(
+    public ResponseEntity<?> refreshToken(
             HttpServletRequest request,
             HttpServletResponse response
     ) {
         try {
             authenticationService.refreshToken(request, response);
         } catch (IOException e) {
-            return new TestResponse<>(1, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+
         }
-        return new TestResponse<>(0);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/forgot_password")
-    public TestResponse<?> forgotPassword(@RequestBody String email) {
+    public ResponseEntity<?> forgotPassword(@RequestBody Object request) {
         AuthenticationResponse response;
+        String email = request.toString().substring(7, request.toString().length() - 1);
         try {
             response = authenticationService.forgotPassword(email);
         } catch (Exception e) {
-            return new TestResponse(1, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return new TestResponse<>(0, response);
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/forgot_password/confirm")
-    public TestResponse<?> processForgotPassword(@RequestParam("token") String token) {
-        try {
-            authenticationService.confirmEmail(token);
-        } catch (Exception e) {
-            return new TestResponse<>(1, e.getMessage());
-        }
-        return new TestResponse<>(0);
-    }
+//    @GetMapping("/forgot_password/confirm")
+//    public ResponseEntity<?> processForgotPassword(@RequestParam("token") String token) {
+//        try {
+//            authenticationService.confirmEmail(token);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+//        }
+//        return ResponseEntity.ok().build();
+//    }
 
     @PostMapping("/reset_password")
-    public TestResponse<?> processResetPassword(@RequestParam("token") String token,
-                                                @RequestBody String newPassword) {
+    public ResponseEntity<?> processResetPassword(@RequestParam("token") String token,
+                                                @RequestBody Object newPassword) {
         try {
-            authenticationService.updatePassword(token, newPassword);
+            String password = newPassword.toString().substring(10, newPassword.toString().length()-1);
+            authenticationService.updatePassword(token, password);
         } catch (Exception e) {
-            return new TestResponse<>(1, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return new TestResponse<>(0);
+        return ResponseEntity.ok().build();
     }
 }

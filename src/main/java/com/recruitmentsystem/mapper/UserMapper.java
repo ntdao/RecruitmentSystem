@@ -45,7 +45,7 @@ public class UserMapper {
                     .phoneNumber(request.phoneNumber())
                     .gender(request.gender())
                     .birthday(request.birthday())
-                    .role(roleService.findByRoleName("ROLE_USER"))
+                    .role(roleService.findByRoleName("ROLE_ADMIN"))
                     .build();
         } else {
             return User

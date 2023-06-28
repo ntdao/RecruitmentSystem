@@ -3,7 +3,9 @@ package com.recruitmentsystem.security.token;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,6 +24,14 @@ public class TokenService {
 
     public void setConfirmedAt(String token) {
         tokenRepository.updateConfirmedAt(
-                token, LocalDateTime.now());
+                token, Instant.now());
+    }
+
+    public List<Token> findAllValidTokenByUser(Integer id) {
+        return tokenRepository.findAllValidTokenByUser(id);
+    }
+
+    public void saveAll(List<Token> validUserTokens) {
+        tokenRepository.saveAll(validUserTokens);
     }
 }

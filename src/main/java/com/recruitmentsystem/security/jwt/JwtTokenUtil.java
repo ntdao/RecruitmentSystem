@@ -18,13 +18,11 @@ import java.util.function.Function;
 
 @Component
 public class JwtTokenUtil {
-//	private static final long EXPIRE_DURATION = 24 * 60 * 60 * 1000; // 24 hour
-
     @Value("${app.jwt.secret}")
     private String SECRET_KEY;
     @Value("${app.jwt.expiration}")
     private long jwtExpiration;
-    @Value("${app.jwt.refresh-token.expiration}")
+    @Value("${app.jwt.refresh_token.expiration}")
     private long refreshExpiration;
 
     public String generateToken(User user) {
@@ -111,13 +109,5 @@ public class JwtTokenUtil {
 //		}
 //
 //		return false;
-//	}
-
-
-//	public Claims parseClaims(String token) {
-//		return Jwts.parser()
-//				.setSigningKey(getSignInKey())
-//				.parseClaimsJws(token)
-//				.getBody();
 //	}
 }
