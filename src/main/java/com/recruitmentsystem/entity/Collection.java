@@ -16,5 +16,5 @@ public class Collection extends Audit {
     @Column(updatable = false)
     private Integer collectionId;
     @Column(nullable = false)
-    private  String collectionName;
+    private String collectionName;
 }

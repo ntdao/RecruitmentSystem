@@ -2,9 +2,13 @@ package com.recruitmentsystem.security.token;
 
 import com.recruitmentsystem.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Data
 @Builder
@@ -12,29 +16,29 @@ import java.time.Instant;
 @AllArgsConstructor
 @Entity
 public class Token {
+    @Enumerated(EnumType.STRING)
+    public TokenType tokenType = TokenType.BEARER;
+    public boolean revoked;
+    public boolean expired;
     @Id
     @GeneratedValue(
             strategy = GenerationType.IDENTITY
     )
     private Integer id;
-
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String token;
-
     @Column(nullable = false)
     private Instant createdAt;
-
     @Column(nullable = false)
-    private Instant expiresAt;
-
+    private Instant expiresAt = Instant.now().plus(1, ChronoUnit.HOURS);
     private Instant confirmedAt;
-
-    @ManyToOne
-    @JoinColumn(
-            nullable = false,
-            name = "user_id"
-    )
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false, name = "user_id")
     private User user;
+
+    public boolean isExpired() {
+        return expiresAt.isBefore(Instant.now());
+    }
 
 //    public Token(String token,
 //                             LocalDateTime createdAt,

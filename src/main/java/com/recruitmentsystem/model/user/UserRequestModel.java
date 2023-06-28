@@ -19,6 +19,7 @@ public record UserRequestModel(
         @Nullable String imgUrl,
         String roleName,
         @Nullable Instant createdAt,
-        @Nullable Instant updatedAt
-){
+        @Nullable Instant updatedAt,
+        String token
+) {
 }

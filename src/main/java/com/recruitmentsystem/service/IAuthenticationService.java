@@ -1,8 +1,9 @@
 package com.recruitmentsystem.service;
 
+import com.recruitmentsystem.entity.User;
+import com.recruitmentsystem.model.user.UserRequestModel;
 import com.recruitmentsystem.security.auth.AuthenticationRequest;
 import com.recruitmentsystem.security.auth.AuthenticationResponse;
-import com.recruitmentsystem.model.user.UserRequestModel;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -15,9 +16,9 @@ public interface IAuthenticationService {
 
     AuthenticationResponse forgotPassword(String email);
 
-//    void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException;
+    void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException;
 
-    String confirmToken(String token);
+    void confirmEmail(String token);
 
     void updatePassword(String token, String newPassword);
 }

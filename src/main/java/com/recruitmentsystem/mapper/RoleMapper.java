@@ -16,7 +16,8 @@ public class RoleMapper {
                 .updatedAt(role.getUpdatedAt())
                 .build();
     }
-    public Role roleRequestModelToRole (RoleRequestModel request) {
+
+    public Role roleRequestModelToRole(RoleRequestModel request) {
         return Role
                 .builder()
                 .roleName(request.name())

@@ -10,18 +10,24 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebMvc
 public class MvcConfiguration {
 
-	@Bean
-	public WebMvcConfigurer webMvcConfigurer(){
-		return new WebMvcConfigurer() {
-			@Override
-			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**")
-				.allowedOrigins("http://localhost:3000")
-				.allowedMethods("GET","POST","PUT","DELETE")
-				.maxAge(5000);
-			}
-		};
-	}
+    @Bean
+    public WebMvcConfigurer webMvcConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+//				registry.addMapping("/**")
+//				.allowedOrigins("http://localhost:3000")
+//				.allowedMethods("GET","POST","PUT","DELETE")
+//				.maxAge(5000);
+                registry.addMapping("/api/**")
+                        .allowedOrigins("http://localhost:3000")
+                        .allowedMethods("*")
+                        .allowedHeaders("*")
+                        .allowCredentials(true)
+                        .maxAge(3600);
+            }
+        };
+    }
 
 
 }

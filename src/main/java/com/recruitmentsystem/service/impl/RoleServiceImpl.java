@@ -12,9 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +35,7 @@ public class RoleServiceImpl implements IRoleService {
     public void addRole(RoleRequestModel request) {
         // check rolename
         String roleName = request.name();
-        if(roleRepository.existsRoleByRoleName(roleName)){
+        if (roleRepository.existsRoleByRoleName(roleName)) {
             throw new ResourceAlreadyExistsException("role name already taken");
         }
 
@@ -55,6 +53,7 @@ public class RoleServiceImpl implements IRoleService {
                 .map(roleMapper::roleToDisplayModel)
                 .collect(Collectors.toList());
     }
+
     @Override
     public RoleDisplayModel findById(Integer id) {
         return roleRepository.findById(id)
@@ -73,9 +72,10 @@ public class RoleServiceImpl implements IRoleService {
     @Override
     public Role findByRoleName(String name) {
         return roleRepository.findByRoleName(name)
-                .filter(role -> !(role.isDeleteFlag() == true))
+                .filter(role -> !(role.isDeleteFlag()))
                 .orElseThrow(() -> new ResourceNotFoundException("Role with name " + name + " does not exist"));
     }
+
     @Override
     @Transactional
     public void updateRole(Integer id, RoleRequestModel request) {
@@ -96,6 +96,7 @@ public class RoleServiceImpl implements IRoleService {
 //        updateRole.setUpdatedBy();
         roleRepository.save(updateRole);
     }
+
     @Override
     public void deleteRole(Integer id) {
         Role role = findRoleById(id);

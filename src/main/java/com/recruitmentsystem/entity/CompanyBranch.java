@@ -16,7 +16,7 @@ public class CompanyBranch extends Audit {
     @Column(updatable = false)
     private Integer branchId;
     @Column(nullable = false)
-    private  String branchName;
+    private String branchName;
     @Column(nullable = false)
     private String branchImageUrl;
 

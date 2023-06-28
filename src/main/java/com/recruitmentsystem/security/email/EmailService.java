@@ -1,7 +1,7 @@
 package com.recruitmentsystem.security.email;
 
-import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class EmailService implements EmailSender{
+public class EmailService implements EmailSender {
 
     private final static Logger LOGGER = LoggerFactory
             .getLogger(EmailService.class);
@@ -26,7 +26,7 @@ public class EmailService implements EmailSender{
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
 
-            helper.setFrom("dao01701@gmail.com");
+            helper.setFrom("recruitmentsystemamj@gmail.com");
             helper.setTo(receipientEmail);
 
             String subject = "Confirm your email";
@@ -124,7 +124,7 @@ public class EmailService implements EmailSender{
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message);
 
-            helper.setFrom("dao01701@gmail.com");
+            helper.setFrom("recruitmentsystemamj@gmail.com");
             helper.setTo(recipientEmail);
 
             String subject = "Here's the link to reset your password";
@@ -138,7 +138,7 @@ public class EmailService implements EmailSender{
             helper.setSubject(subject);
             helper.setText(content, true);
             mailSender.send(message);
-        }catch (MessagingException e) {
+        } catch (MessagingException e) {
             LOGGER.error("failed to send email", e);
             throw new IllegalStateException("failed to send email");
         }

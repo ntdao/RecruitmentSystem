@@ -1,13 +1,8 @@
 package com.recruitmentsystem.controller;
 
-import com.recruitmentsystem.entity.Role;
-import com.recruitmentsystem.model.role.RoleDisplayModel;
-import com.recruitmentsystem.model.role.RoleRequestModel;
 import com.recruitmentsystem.model.role.RoleDisplayModel;
 import com.recruitmentsystem.model.role.RoleRequestModel;
 import com.recruitmentsystem.service.IRoleService;
-import com.recruitmentsystem.service.IRoleService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

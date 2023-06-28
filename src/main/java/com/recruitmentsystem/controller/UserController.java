@@ -3,8 +3,8 @@ package com.recruitmentsystem.controller;
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
 import com.recruitmentsystem.model.TestResponse;
-import com.recruitmentsystem.model.user.UserRequestModel;
 import com.recruitmentsystem.model.user.UserDisplayModel;
+import com.recruitmentsystem.model.user.UserRequestModel;
 import com.recruitmentsystem.service.impl.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -34,25 +33,32 @@ public class UserController {
     @GetMapping("/find/{id}")
     // @PathVariable lấy ra thông tin trong URL
     // dựa vào tên của thuộc tính đã định nghĩa trong ngoặc kép /find/{id}
-    public TestResponse<UserDisplayModel> getUserById(@PathVariable("id") Integer id) {
+//    public TestResponse<UserDisplayModel> getUserById(@PathVariable("id") Integer id) {
+//        UserDisplayModel user;
+//        try {
+//            user = userService.findById(id);
+//        } catch (ResourceNotFoundException e) {
+//            return new TestResponse(1, e.getMessage());
+//        }
+//        return new TestResponse(0, "OK", user);
+//    }
+    public ResponseEntity<?> getUserById(@PathVariable("id") Integer id) {
         UserDisplayModel user;
         try {
             user = userService.findById(id);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with ID: " + id);
         }
-        catch (ResourceNotFoundException e) {
-            return new TestResponse(-1,e.getMessage());
-        }
-        return new TestResponse(0, "OK", user);
+        return ResponseEntity.ok().body(user);
     }
 
     @PostMapping("/add")
     public TestResponse addUser(@RequestBody UserRequestModel request) {
         try {
             userService.addUser(request);
-           return new TestResponse(0, "success");
-        }
-        catch (ResourceAlreadyExistsException e) {
-            return new TestResponse(-1,e.getMessage());
+            return new TestResponse(0, "success");
+        } catch (ResourceAlreadyExistsException e) {
+            return new TestResponse(1, e.getMessage());
         }
     }
 
@@ -65,9 +71,8 @@ public class UserController {
         try {
             userService.updateUser(id, request);
             return new TestResponse(0, "success");
-        }
-        catch (ResourceNotFoundException e) {
-            return new TestResponse(-1,e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            return new TestResponse(1, e.getMessage());
         }
     }
 
@@ -76,9 +81,8 @@ public class UserController {
         try {
             userService.deleteUser(id);
             return new TestResponse(0, "success");
-        }
-        catch (ResourceNotFoundException e) {
-            return new TestResponse(-1,e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            return new TestResponse(1, e.getMessage());
         }
     }
 

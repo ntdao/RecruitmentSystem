@@ -14,13 +14,13 @@ import java.util.Objects;
 @Entity
 @Builder
 @ToString
-public class Application extends Audit{
+public class Application extends Audit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
     private Integer applicationId;
     @Column(nullable = false)
-    private  String fileSave;
+    private String fileSave;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")

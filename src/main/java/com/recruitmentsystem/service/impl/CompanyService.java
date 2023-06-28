@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,10 +20,11 @@ import java.util.stream.Collectors;
 public class CompanyService {
     private final ICompanyRepository companyRepository;
     private final CompanyMapper companyMapper;
+
     public void addCompany(CompanyRequestModel companyRegistrationRequest) {
         // check company name
         String companyName = companyRegistrationRequest.name();
-        if(companyRepository.existsCompanyByCompanyName(companyName)){
+        if (companyRepository.existsCompanyByCompanyName(companyName)) {
             throw new ResourceAlreadyExistsException("company name already taken");
         }
 
@@ -41,6 +41,7 @@ public class CompanyService {
                 .map(companyMapper::companyToDisplayModel)
                 .collect(Collectors.toList());
     }
+
     public CompanyDisplayModel findById(Integer id) {
         return companyRepository.findById(id)
                 .filter(company -> !company.isDeleteFlag())
@@ -79,6 +80,7 @@ public class CompanyService {
 //        updateCompany.setUpdatedBy();
         companyRepository.save(updateCompany);
     }
+
     public void deleteCompany(Integer id) {
         Company company = findCompanyById(id);
         company.setDeleteFlag(true);

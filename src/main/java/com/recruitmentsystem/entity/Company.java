@@ -16,7 +16,7 @@ public class Company extends Audit {
     @Column(updatable = false)
     private Integer companyId;
     @Column(nullable = false)
-    private  String companyName;
+    private String companyName;
     private String companyImageUrl;
 
     @Column(nullable = false)

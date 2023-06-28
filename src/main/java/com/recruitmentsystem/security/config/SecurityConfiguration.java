@@ -15,48 +15,49 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
-		prePostEnabled = true
+        prePostEnabled = true
 //		securedEnabled = true,
 //		jsr250Enabled = true
 )
 @RequiredArgsConstructor
 public class SecurityConfiguration {
-	private final JwtTokenFilter jwtTokenFilter;
-	private final AuthenticationProvider authenticationProvider;
+    private final JwtTokenFilter jwtTokenFilter;
+    private final AuthenticationProvider authenticationProvider;
 
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http
-				.csrf().disable()
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .cors().and()
+                .csrf().disable()
 
-				.authorizeHttpRequests()
+                .authorizeHttpRequests()
 
-				// Cho phép tất cả mọi người truy cập vào địa chỉ này
-				.requestMatchers("/api/v*/auth/**",
-						"/v*/api-docs",
-						"/v*/api-docs/**",
-						"/swagger-resources",
-						"/swagger-resources/**",
-						"/configuration/ui",
-						"/configuration/security",
-						"/swagger-ui/**",
-						"/webjars/**",
-						"/swagger-ui.html")
-					.permitAll()
+                // Cho phép tất cả mọi người truy cập vào địa chỉ này
+                .requestMatchers("/api/v*/auth/**",
+                        "/v*/api-docs",
+                        "/v*/api-docs/**",
+                        "/swagger-resources",
+                        "/swagger-resources/**",
+                        "/configuration/ui",
+                        "/configuration/security",
+                        "/swagger-ui/**",
+                        "/webjars/**",
+                        "/swagger-ui.html")
+                .permitAll()
 
-				.requestMatchers("/api/v*/users/**").hasRole("ADMIN")
-				.requestMatchers("/api/v*/roles/**").hasRole("ADMIN")
-				.requestMatchers("/api/v*/companies/**").hasAnyRole("ADMIN","HR")
+                .requestMatchers("/api/v*/users/**").hasRole("ADMIN")
+                .requestMatchers("/api/v*/roles/**").hasRole("ADMIN")
+                .requestMatchers("/api/v*/companies/**").hasAnyRole("ADMIN", "HR")
 
-				// Tất cả các request khác đều cần phải xác thực mới được truy cập
-				.anyRequest().authenticated()
-				.and()
-					// disable session
-					.sessionManagement()
-					.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				.and()
-					.authenticationProvider(authenticationProvider)
-				.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+                // Tất cả các request khác đều cần phải xác thực mới được truy cập
+                .anyRequest().authenticated()
+                .and()
+                // disable session
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
 //				.logout().permitAll();
 //				.and()
@@ -71,6 +72,6 @@ public class SecurityConfiguration {
 //				);
 
 
-		return http.build();
-	}
+        return http.build();
+    }
 }

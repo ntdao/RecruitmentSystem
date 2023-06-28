@@ -17,7 +17,8 @@ public class CompanyMapper {
                 .updatedAt(company.getUpdatedAt())
                 .build();
     }
-    public Company companyRequestModelToCompany (CompanyRequestModel request) {
+
+    public Company companyRequestModelToCompany(CompanyRequestModel request) {
         return Company
                 .builder()
                 .companyName(request.name())

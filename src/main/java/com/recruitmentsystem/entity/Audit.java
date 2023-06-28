@@ -21,6 +21,6 @@ public class Audit implements Serializable {
     private Integer oldId;
 
     public boolean isDeleteFlag() {
-        return (deleteFlag == true) ? true : false;
+        return deleteFlag;
     }
 }

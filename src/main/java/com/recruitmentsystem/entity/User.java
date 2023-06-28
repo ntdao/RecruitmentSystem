@@ -6,9 +6,12 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDate;
-import java.util.*;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity // khai báo với Spring Boot rằng đây là 1 entity biểu diễn table trong db
 @Table
@@ -81,10 +84,10 @@ public class User extends Audit implements UserDetails {
         this.role = user.getRole();
     }
 
-    @Override
-    public String getUsername() {
-        return email;
-    }
+//    @Override
+//    public String getUsername() {
+//        return email;
+//    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

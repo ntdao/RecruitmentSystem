@@ -3,8 +3,8 @@ package com.recruitmentsystem.model.user;
 import com.recruitmentsystem.common.myEnum.Gender;
 import lombok.Builder;
 
-import java.time.LocalDate;
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Builder
 public record UserDisplayModel(
@@ -19,6 +19,7 @@ public record UserDisplayModel(
         LocalDate birthday,
         String imgUrl,
         Instant createdAt,
-        Instant updatedAt
+        Instant updatedAt,
+        String roleName
 ) {
 }
