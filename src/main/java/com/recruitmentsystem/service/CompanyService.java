@@ -1,4 +1,4 @@
-package com.recruitmentsystem.service.impl;
+package com.recruitmentsystem.service;
 
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
@@ -55,10 +55,10 @@ public class CompanyService {
                 .orElseThrow(() -> new ResourceNotFoundException("Company with id " + id + " does not exist"));
     }
 
-    public Company findCompanyByCompanyName(String companyname) {
-        return companyRepository.findCompanyByCompanyName(companyname)
+    public Company findCompanyByCompanyName(String name) {
+        return companyRepository.findCompanyByCompanyName(name)
                 .filter(company -> !company.isDeleteFlag())
-                .orElseThrow(() -> new ResourceNotFoundException("Company with companyname " + companyname + " does not exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("Company with name " + name + " does not exist"));
     }
 
     @Transactional

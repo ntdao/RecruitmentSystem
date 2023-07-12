@@ -9,12 +9,13 @@ import com.recruitmentsystem.model.user.UserRequestModel;
 import com.recruitmentsystem.repository.IUserRepository;
 import com.recruitmentsystem.security.auth.AuthenticationRequest;
 import com.recruitmentsystem.security.auth.AuthenticationResponse;
-import com.recruitmentsystem.security.email.EmailSender;
 import com.recruitmentsystem.security.jwt.JwtTokenUtil;
 import com.recruitmentsystem.security.token.Token;
 import com.recruitmentsystem.security.token.TokenService;
 import com.recruitmentsystem.security.token.TokenType;
+import com.recruitmentsystem.service.EmailService;
 import com.recruitmentsystem.service.IAuthenticationService;
+import com.recruitmentsystem.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final IUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
-    private final EmailSender emailSender;
+    private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
     private final UserService userService;
@@ -59,7 +60,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         User user = userMapper.userRequestModelToUser(request);
         user.setCreatedAt(Instant.now());
-        user.setDeleteFlag(true);
         User savedUser = userRepository.save(user);
 
 //        String refreshToken = jwtTokenUtil.generateRefreshToken(user);
@@ -75,7 +75,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         saveUserToken(savedUser, accessToken, EMAIL_EXPIRATION);
 
         String link = "http://localhost:3000/register/confirm?token=" + accessToken;
-        emailSender.sendConfirmEmail(request.email(), link);
+        emailService.sendConfirmEmail(request.username(), request.email(), link);
 
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
@@ -113,6 +113,12 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         );
 
         User user = (User) authentication.getPrincipal();
+        System.out.println(user);
+        if (!user.isEnabled()) {
+            throw new IllegalStateException("Your account has not been verified!");
+        } else if (user.isDeleteFlag()) {
+            throw new IllegalStateException("Your account does not exist!");
+        }
         String accessToken = jwtTokenUtil.generateToken(user);
         String refreshToken = jwtTokenUtil.generateRefreshToken(user);
         saveUserToken(user, accessToken, jwtTokenUtil.extractExpiration(accessToken).getTime());
@@ -139,7 +145,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 //        tokenService.saveToken(token);
 
         String link = "http://localhost:3000/reset_password?token=" + accessToken;
-        emailSender.sendResetPasswordEmail(user.getEmail(), link);
+        emailService.sendResetPasswordEmail(user.getUsername(), user.getEmail(), link);
 
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)

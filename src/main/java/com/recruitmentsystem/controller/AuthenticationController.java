@@ -5,11 +5,11 @@ import com.recruitmentsystem.model.user.UserRequestModel;
 import com.recruitmentsystem.security.auth.AuthenticationRequest;
 import com.recruitmentsystem.security.auth.AuthenticationResponse;
 import com.recruitmentsystem.service.IAuthenticationService;
-import io.swagger.v3.core.util.Json;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,10 +25,9 @@ public class AuthenticationController {
     public ResponseEntity<?> register(
             @RequestBody UserRequestModel request) {
         AuthenticationResponse response;
-        System.out.println(request);
         try {
             response = authenticationService.register(request);
-        } catch (ResourceAlreadyExistsException e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         return ResponseEntity.ok(response);
@@ -49,7 +48,7 @@ public class AuthenticationController {
         AuthenticationResponse response;
         try {
             response = authenticationService.login(request);
-        } catch (ResourceAlreadyExistsException e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         return ResponseEntity.ok(response);
@@ -101,5 +100,11 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         return ResponseEntity.ok().build();
+    }
+    @GetMapping(value = "/welcome", produces = MediaType.TEXT_HTML_VALUE)
+    @ResponseBody
+    public String welcomeAsHTML() {
+        return "<html>\n" + "<header><title>Welcome</title></header>\n" +
+                "<body>\n" + "Hello world\n" + "</body>\n" + "</html>";
     }
 }

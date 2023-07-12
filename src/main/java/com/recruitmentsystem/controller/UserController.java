@@ -2,16 +2,16 @@ package com.recruitmentsystem.controller;
 
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
-import com.recruitmentsystem.model.TestResponse;
 import com.recruitmentsystem.model.user.UserDisplayModel;
 import com.recruitmentsystem.model.user.UserRequestModel;
-import com.recruitmentsystem.service.impl.UserService;
+import com.recruitmentsystem.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -22,9 +22,9 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/all")
-    public TestResponse<List<UserDisplayModel>> getAllUsers() {
+    public ResponseEntity<List<UserDisplayModel>> getAllUsers() {
         List<UserDisplayModel> users = userService.findAllUsers();
-        return new TestResponse(0, "OK", users);
+        return ResponseEntity.ok(users);
     }
 
     /*
@@ -33,15 +33,6 @@ public class UserController {
     @GetMapping("/find/{id}")
     // @PathVariable lấy ra thông tin trong URL
     // dựa vào tên của thuộc tính đã định nghĩa trong ngoặc kép /find/{id}
-//    public TestResponse<UserDisplayModel> getUserById(@PathVariable("id") Integer id) {
-//        UserDisplayModel user;
-//        try {
-//            user = userService.findById(id);
-//        } catch (ResourceNotFoundException e) {
-//            return new TestResponse(1, e.getMessage());
-//        }
-//        return new TestResponse(0, "OK", user);
-//    }
     public ResponseEntity<?> getUserById(@PathVariable("id") Integer id) {
         UserDisplayModel user;
         try {
@@ -49,16 +40,16 @@ public class UserController {
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with ID: " + id);
         }
-        return ResponseEntity.ok().body(user);
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/add")
-    public TestResponse addUser(@RequestBody UserRequestModel request) {
+    public ResponseEntity addUser(@RequestBody UserRequestModel request) {
         try {
             userService.addUser(request);
-            return new TestResponse(0, "success");
+            return ResponseEntity.ok().build();
         } catch (ResourceAlreadyExistsException e) {
-            return new TestResponse(1, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
@@ -66,23 +57,42 @@ public class UserController {
         @RequestBody nói với Spring Boot rằng hãy chuyển Json trong request body
         thành đối tượng UserRequestModel
     */
-    @PutMapping("/update/{id}")
-    public TestResponse updateUser(@PathVariable("id") Integer id, @RequestBody UserRequestModel request) {
+    @PostMapping("/update/{id}")
+    public ResponseEntity updateUser(@PathVariable("id") Integer id,
+                                   @RequestBody UserRequestModel request) {
         try {
             userService.updateUser(id, request);
-            return new TestResponse(0, "success");
         } catch (ResourceNotFoundException e) {
-            return new TestResponse(1, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+        return ResponseEntity.ok().build();
     }
 
+//    @PostMapping("/upload")
+//    public ResponseEntity uploadImage(@RequestParam("image") MultipartFile multipartFile) {
+//        try {
+//            System.out.println(multipartFile);
+//            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+//            System.out.println(fileName);
+//            String uploadDir = "user-photos";
+//            FileService.saveFile(uploadDir, fileName, multipartFile);
+//        } catch (ResourceNotFoundException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+//        } catch (IOException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+//        }
+//        return ResponseEntity.ok().build();
+//    }
+
     @DeleteMapping("/delete/{id}")
-    public TestResponse deleteUser(@PathVariable("id") Integer id) {
+    public ResponseEntity deleteUser(@PathVariable("id") Integer id) {
         try {
             userService.deleteUser(id);
-            return new TestResponse(0, "success");
+            return ResponseEntity.ok().build();
         } catch (ResourceNotFoundException e) {
-            return new TestResponse(1, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 

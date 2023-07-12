@@ -12,7 +12,8 @@ public class CompanyMapper {
                 .builder()
                 .id(company.getCompanyId())
                 .name(company.getCompanyName())
-                .imgUrl(company.getCompanyImageUrl())
+                .companyLogo(company.getCompanyLogo())
+                .companyInfo(company.getCompanyInfo())
                 .createdAt(company.getCreatedAt())
                 .updatedAt(company.getUpdatedAt())
                 .build();
@@ -22,7 +23,8 @@ public class CompanyMapper {
         return Company
                 .builder()
                 .companyName(request.name())
-                .companyImageUrl(request.imgUrl())
+                .companyLogo(request.companyLogo())
+                .companyInfo(request.companyInfo())
                 .build();
     }
 }

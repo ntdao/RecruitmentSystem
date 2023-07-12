@@ -1,4 +1,4 @@
-package com.recruitmentsystem.service.impl;
+package com.recruitmentsystem.service;
 
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
@@ -11,7 +11,10 @@ import com.recruitmentsystem.security.jwt.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,7 +41,7 @@ public class UserService {
         // add
         User user = userMapper.userRequestModelToUser(request);
         user.setCreatedAt(Instant.now());
-        user.setCreatedBy(getUserByToken(request.token()).getId());
+//        user.setCreatedBy(getUserByToken(request.token()).getId());
         userRepository.save(user);
         userRepository.enableUser(user.getEmail());
     }
@@ -82,7 +85,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(Integer id, UserRequestModel request) {
+    public void updateUser(Integer id, UserRequestModel request) throws IOException {
         User updateUser;
         // tim user theo id
         try {
@@ -101,7 +104,13 @@ public class UserService {
         updateUser.setCreatedAt(oldUser.getCreatedAt());
         updateUser.setCreatedBy(oldUser.getCreatedBy());
         updateUser.setUpdatedAt(oldUser.getUpdatedAt());
-        updateUser.setUpdatedBy(getUserByToken(request.token()).getId());
+//        updateUser.setUpdatedBy(getUserByToken(request.token()).getId());
+
+//        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+////        user.setPhotos(fileName);
+//        updateUser.setImgUrl(fileName);
+//        String uploadDir = "user-photos/" + id;
+//        FileService.saveFile(uploadDir, fileName, multipartFile);
         userRepository.save(updateUser);
     }
 

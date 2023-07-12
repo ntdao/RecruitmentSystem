@@ -28,7 +28,7 @@ public class Application extends Audit {
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "collection_id")
-    private Collection collection;
+    private Category collection;
 
     @Override
     public boolean equals(Object o) {

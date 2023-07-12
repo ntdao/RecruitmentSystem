@@ -1,15 +1,15 @@
-package com.recruitmentsystem.model.company;
+package com.recruitmentsystem.model.branch;
 
 import lombok.Builder;
 
 import java.time.Instant;
 
 @Builder
-public record CompanyDisplayModel(
+public record BranchDisplayModel(
         Integer id,
         String name,
         String companyLogo,
-        String companyInfo,
+        String branchAddress,
         Instant createdAt,
         Instant updatedAt
 ) {

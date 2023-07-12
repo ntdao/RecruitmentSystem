@@ -10,11 +10,17 @@ import lombok.*;
 @Entity
 @Builder
 @ToString
-public class Collection extends Audit {
+public class Category extends Audit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
-    private Integer collectionId;
+    private Integer categoryId;
     @Column(nullable = false)
-    private String collectionName;
+    private String categoryName;
+
+    private String category_icon;
+
+    private String category_url;
+
+    private Integer total;
 }

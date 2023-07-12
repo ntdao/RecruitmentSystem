@@ -18,9 +18,12 @@ public class CompanyBranch extends Audit {
     @Column(nullable = false)
     private String branchName;
     @Column(nullable = false)
-    private String branchImageUrl;
+    private String branchAddress;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "company_id")
     private Company company;
+
+    public CompanyBranch(CompanyBranch updateBranch, Integer id, boolean b) {
+    }
 }

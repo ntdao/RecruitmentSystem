@@ -3,7 +3,7 @@ package com.recruitmentsystem.mapper;
 import com.recruitmentsystem.entity.User;
 import com.recruitmentsystem.model.user.UserDisplayModel;
 import com.recruitmentsystem.model.user.UserRequestModel;
-import com.recruitmentsystem.service.IRoleService;
+import com.recruitmentsystem.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserMapper {
     private final PasswordEncoder passwordEncoder;
-    private final IRoleService roleService;
+    private final RoleService roleService;
 
     public UserDisplayModel userToDisplayModel(User user) {
         return UserDisplayModel
@@ -45,7 +45,7 @@ public class UserMapper {
                     .phoneNumber(request.phoneNumber())
                     .gender(request.gender())
                     .birthday(request.birthday())
-                    .role(roleService.findByRoleName("ROLE_ADMIN"))
+                    .role(roleService.findByRoleName("ROLE_USER"))
                     .build();
         } else {
             return User

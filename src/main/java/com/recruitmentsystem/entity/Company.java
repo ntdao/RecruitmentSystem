@@ -17,9 +17,9 @@ public class Company extends Audit {
     private Integer companyId;
     @Column(nullable = false)
     private String companyName;
-    private String companyImageUrl;
+    private String companyLogo;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private String companyInfo;
 
     public Company(Company company, Integer oldId, boolean deleteFlag) {
@@ -30,7 +30,7 @@ public class Company extends Audit {
                 deleteFlag,
                 oldId);
         this.companyName = company.getCompanyName();
-        this.companyImageUrl = company.getCompanyImageUrl();
+        this.companyLogo = company.getCompanyLogo();
         this.companyInfo = company.getCompanyInfo();
     }
 }

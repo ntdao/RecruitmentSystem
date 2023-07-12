@@ -1,4 +1,4 @@
-package com.recruitmentsystem.security.email;
+package com.recruitmentsystem.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -12,16 +12,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class EmailService implements EmailSender {
+public class EmailService {
 
     private final static Logger LOGGER = LoggerFactory
             .getLogger(EmailService.class);
 
     private final JavaMailSender mailSender;
 
-    @Override
     @Async
-    public void sendConfirmEmail(String receipientEmail, String link) {
+    public void sendConfirmEmail(String username, String receipientEmail, String link) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
@@ -32,9 +31,8 @@ public class EmailService implements EmailSender {
             String subject = "Confirm your email";
             helper.setSubject(subject);
 
-            String content = "<p>Hello,</p>"
+            String content = "<p>Hello " + username + ",</p>"
                     + "<p>Thank you for registering. Please click on the below link to activate your account:</p>"
-                    + "<p>Click the link below to change your password:</p>"
                     + "<p><a href=\"" + link + "\">Active Now</a></p>"
                     + "<br>"
                     + "<p>Link will expire in 15 minutes.</p>"
@@ -117,9 +115,8 @@ public class EmailService implements EmailSender {
 //                "</div></div>";
 //    }
 
-    @Override
     @Async
-    public void sendResetPasswordEmail(String recipientEmail, String link) {
+    public void sendResetPasswordEmail(String username, String recipientEmail, String link) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message);
@@ -128,11 +125,12 @@ public class EmailService implements EmailSender {
             helper.setTo(recipientEmail);
 
             String subject = "Here's the link to reset your password";
-            String content = "<p>Hello,</p>"
+            String content = "<p>Hello " + username + ",</p>"
                     + "<p>You have requested to reset your password.</p>"
                     + "<p>Click the link below to change your password:</p>"
                     + "<p><a href=\"" + link + "\">Change my password</a></p>"
                     + "<br>"
+                    + "<p>Link will expire in 15 minutes.</p>"
                     + "<p>Ignore this email if you do remember your password, "
                     + "or you have not made the request.</p>";
             helper.setSubject(subject);

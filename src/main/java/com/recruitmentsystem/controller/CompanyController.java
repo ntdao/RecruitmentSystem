@@ -1,8 +1,11 @@
 package com.recruitmentsystem.controller;
 
+import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
+import com.recruitmentsystem.common.exception.ResourceNotFoundException;
+import com.recruitmentsystem.entity.Company;
 import com.recruitmentsystem.model.company.CompanyDisplayModel;
 import com.recruitmentsystem.model.company.CompanyRequestModel;
-import com.recruitmentsystem.service.impl.CompanyService;
+import com.recruitmentsystem.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,45 +13,74 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/v1/companies")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('ADMIN','HR')")
 public class CompanyController {
     private final CompanyService companyService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<CompanyDisplayModel>> getAllCompanys() {
+//    @PreAuthorize("hasAnyRole('ADMIN','HR','USER')")
+    public ResponseEntity<List<CompanyDisplayModel>> getAllCompanies() {
         List<CompanyDisplayModel> companies = companyService.findAllCompanies();
-        return new ResponseEntity<>(companies, HttpStatus.OK);
+        return ResponseEntity.ok(companies);
     }
 
     @GetMapping("/find/{id}")
-    public ResponseEntity<CompanyDisplayModel> getCompanyById(@PathVariable("id") Integer id) {
-        CompanyDisplayModel company = companyService.findById(id);
-        return new ResponseEntity<>(company, HttpStatus.OK);
+    @PreAuthorize("hasAnyRole('ADMIN','HR')")
+    public ResponseEntity<?> getCompanyById(@PathVariable("id") Integer id) {
+        CompanyDisplayModel company;
+        try {
+            company = companyService.findById(id);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+        return ResponseEntity.ok(company);
+    }
+
+    @GetMapping("/find/{name}")
+    public ResponseEntity<?> getCompanyByName(@PathVariable("name") String name) {
+        Company company;
+        try {
+            company = companyService.findCompanyByCompanyName(name);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+        return ResponseEntity.ok(company);
     }
 
     @PostMapping("/add")
-    @PreAuthorize("hasRole('ADMIN')")
-    public void registerCompany(@RequestBody CompanyRequestModel request) {
-        companyService.addCompany(request);
+    @PreAuthorize("hasAnyRole('ADMIN','HR')")
+    public ResponseEntity<?> registerCompany(@RequestBody CompanyRequestModel request) {
+        try {
+            companyService.addCompany(request);
+        } catch (ResourceAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+        return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/update/{id}")
-    public void updateCompany(@PathVariable("id") Integer id, @RequestBody CompanyRequestModel request) {
-        companyService.updateCompany(id, request);
+    @PostMapping("/update/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','HR')")
+    public ResponseEntity<?> updateCompany(@PathVariable("id") Integer id,
+                                           @RequestBody CompanyRequestModel request) {
+        try {
+            companyService.updateCompany(id, request);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/delete/{id}")
-    public void deleteCompany(@PathVariable("id") Integer id) {
-        companyService.deleteCompany(id);
-    }
-
-    @DeleteMapping("/delete")
-    public void deleteCompany(@RequestBody Integer[] ids) {
-        Stream.of(ids).forEach(id -> companyService.deleteCompany(id));
+    @PreAuthorize("hasAnyRole('ADMIN','HR')")
+    public ResponseEntity deleteCompany(@PathVariable("id") Integer id) {
+        try {
+            companyService.deleteCompany(id);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+        return ResponseEntity.ok().build();
     }
 }
