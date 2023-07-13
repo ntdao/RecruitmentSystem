@@ -63,7 +63,7 @@ public class BranchController {
     @PostMapping("/update/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','HR')")
     public ResponseEntity<?> updateBranch(@PathVariable("id") Integer id,
-                                           @RequestBody BranchRequestModel request) {
+                                          @RequestBody BranchRequestModel request) {
         try {
             branchService.updateBranch(id, request);
         } catch (ResourceNotFoundException e) {

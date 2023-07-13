@@ -1,6 +1,5 @@
 package com.recruitmentsystem.controller;
 
-import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.model.user.UserRequestModel;
 import com.recruitmentsystem.security.auth.AuthenticationRequest;
 import com.recruitmentsystem.security.auth.AuthenticationResponse;
@@ -92,19 +91,20 @@ public class AuthenticationController {
 
     @PostMapping("/reset_password")
     public ResponseEntity<?> processResetPassword(@RequestParam("token") String token,
-                                                @RequestBody Object newPassword) {
+                                                  @RequestBody Object newPassword) {
         try {
-            String password = newPassword.toString().substring(10, newPassword.toString().length()-1);
+            String password = newPassword.toString().substring(10, newPassword.toString().length() - 1);
             authenticationService.updatePassword(token, password);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         return ResponseEntity.ok().build();
     }
-    @GetMapping(value = "/welcome", produces = MediaType.TEXT_HTML_VALUE)
-    @ResponseBody
-    public String welcomeAsHTML() {
-        return "<html>\n" + "<header><title>Welcome</title></header>\n" +
-                "<body>\n" + "Hello world\n" + "</body>\n" + "</html>";
-    }
+
+//    @GetMapping(value = "/welcome", produces = MediaType.TEXT_HTML_VALUE)
+//    @ResponseBody
+//    public String welcomeAsHTML() {
+//        return "<html>\n" + "<header><title>Welcome</title></header>\n" +
+//                "<body>\n" + "Hello world\n" + "</body>\n" + "</html>";
+//    }
 }

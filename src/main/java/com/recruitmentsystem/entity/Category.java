@@ -18,9 +18,22 @@ public class Category extends Audit {
     @Column(nullable = false)
     private String categoryName;
 
-    private String category_icon;
+    private String categoryIcon;
 
-    private String category_url;
+    private String categoryUrl;
 
     private Integer total;
+
+    public Category(Category category, Integer oldId, boolean deleteFlag) {
+        super(category.getCreatedAt(),
+                category.getUpdatedAt(),
+                category.getCreatedBy(),
+                category.getUpdatedBy(),
+                deleteFlag,
+                oldId);
+        this.categoryName = category.getCategoryName();
+        this.categoryIcon = category.getCategoryIcon();
+        this.categoryUrl = category.getCategoryUrl();
+        this.total = category.getTotal();
+    }
 }

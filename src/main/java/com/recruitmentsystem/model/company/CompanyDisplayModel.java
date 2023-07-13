@@ -9,7 +9,11 @@ public record CompanyDisplayModel(
         Integer id,
         String name,
         String companyLogo,
-        String companyInfo,
+        String companySlogan,
+
+        String companyMessage,
+
+        String companyImage,
         Instant createdAt,
         Instant updatedAt
 ) {

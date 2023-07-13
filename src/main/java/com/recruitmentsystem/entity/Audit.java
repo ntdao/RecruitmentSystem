@@ -17,7 +17,7 @@ public class Audit implements Serializable {
     private Instant updatedAt;
     private Integer createdBy;
     private Integer updatedBy;
-    private Boolean deleteFlag = false;
+    private boolean deleteFlag = false;
     private Integer oldId;
 
     public boolean isDeleteFlag() {

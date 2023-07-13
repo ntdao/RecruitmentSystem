@@ -5,12 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.stream.DoubleStream;
 
 @Repository
 public interface IBranchRepository extends JpaRepository<CompanyBranch, Integer> {
-    boolean existsBranchByName(String name);
+    boolean existsByBranchName(String name);
 
-    Optional<CompanyBranch> findBrandByName(String name);
+    Optional<CompanyBranch> findByBranchName(String name);
 
 }

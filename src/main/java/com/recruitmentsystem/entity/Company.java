@@ -20,7 +20,13 @@ public class Company extends Audit {
     private String companyLogo;
 
 //    @Column(nullable = false)
-    private String companyInfo;
+//    private String companyInfo;
+
+    private String companyMessage;
+
+    private String companySlogan;
+
+    private String companyImage;
 
     public Company(Company company, Integer oldId, boolean deleteFlag) {
         super(company.getCreatedAt(),
@@ -31,6 +37,8 @@ public class Company extends Audit {
                 oldId);
         this.companyName = company.getCompanyName();
         this.companyLogo = company.getCompanyLogo();
-        this.companyInfo = company.getCompanyInfo();
+        this.companyMessage = company.getCompanyMessage();
+        this.companyImage = company.getCompanyImage();
+        this.companySlogan = company.getCompanySlogan();
     }
 }

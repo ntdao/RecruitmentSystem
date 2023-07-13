@@ -157,9 +157,9 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     public void updatePassword(String token, String newPassword) {
         try {
             confirmEmail(token);
-        } catch (ResourceNotFoundException e){
+        } catch (ResourceNotFoundException e) {
             throw new ResourceNotFoundException(e.getMessage());
-        } catch (IllegalStateException e){
+        } catch (IllegalStateException e) {
             throw new IllegalStateException(e.getMessage());
         }
 

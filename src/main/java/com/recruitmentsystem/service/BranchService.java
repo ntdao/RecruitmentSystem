@@ -24,7 +24,7 @@ public class BranchService {
     public void addBranch(BranchRequestModel request) {
         // check branch name
         String branchName = request.name();
-        if (branchRepository.existsBranchByName(branchName)) {
+        if (branchRepository.existsByBranchName(branchName)) {
             throw new ResourceAlreadyExistsException("branch name already taken");
         }
 
@@ -56,7 +56,7 @@ public class BranchService {
     }
 
     public CompanyBranch findBranchByBranchName(String name) {
-        return branchRepository.findBrandByName(name)
+        return branchRepository.findByBranchName(name)
                 .filter(branch -> !branch.isDeleteFlag())
                 .orElseThrow(() -> new ResourceNotFoundException("Branch with name " + name + " does not exist"));
     }

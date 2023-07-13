@@ -1,6 +1,5 @@
 package com.recruitmentsystem.service;
 
-import com.recruitmentsystem.entity.User;
 import com.recruitmentsystem.model.user.UserRequestModel;
 import com.recruitmentsystem.security.auth.AuthenticationRequest;
 import com.recruitmentsystem.security.auth.AuthenticationResponse;

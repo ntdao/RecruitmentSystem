@@ -11,8 +11,6 @@ import com.recruitmentsystem.security.jwt.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -25,6 +23,7 @@ public class UserService {
     private final IUserRepository userRepository;
     private final UserMapper userMapper;
     private final JwtTokenUtil jwtTokenUtil;
+
     public void addUser(UserRequestModel request) {
         // check username
         String username = request.username();
@@ -76,6 +75,16 @@ public class UserService {
     public User getUserByToken(String token) {
         String email = jwtTokenUtil.extractEmail(token);
         return findUserByEmail(email);
+    }
+
+    public UserDisplayModel getUserDisplayByToken(String token) {
+        System.out.println(token);
+        String email = jwtTokenUtil.extractEmail(token);
+        System.out.println(email);
+        return userRepository.findTopByEmail(email)
+                .filter(user -> !user.isDeleteFlag())
+                .map(userMapper::userToDisplayModel)
+                .orElseThrow(() -> new ResourceNotFoundException("User with token " + token + " does not exist"));
     }
 
     public User findUserByEmail(String email) {

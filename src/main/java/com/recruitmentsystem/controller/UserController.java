@@ -11,39 +11,42 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class UserController {
     private final UserService userService;
 
     @GetMapping("/all")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<UserDisplayModel>> getAllUsers() {
         List<UserDisplayModel> users = userService.findAllUsers();
         return ResponseEntity.ok(users);
     }
 
-    /*
-        phần path URL bạn muốn lấy thông tin sẽ để trong ngoặc kép {}
-     */
+    @GetMapping("/getAccountInfo")
+    public ResponseEntity<UserDisplayModel> getUserProfile(@RequestParam("token") String token) {
+        UserDisplayModel userDisplayModel = userService
+                .getUserDisplayByToken(token);
+        return ResponseEntity.ok(userDisplayModel);
+    }
+
     @GetMapping("/find/{id}")
-    // @PathVariable lấy ra thông tin trong URL
-    // dựa vào tên của thuộc tính đã định nghĩa trong ngoặc kép /find/{id}
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getUserById(@PathVariable("id") Integer id) {
         UserDisplayModel user;
         try {
             user = userService.findById(id);
         } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with ID: " + id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
         return ResponseEntity.ok(user);
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity addUser(@RequestBody UserRequestModel request) {
         try {
             userService.addUser(request);
@@ -58,8 +61,9 @@ public class UserController {
         thành đối tượng UserRequestModel
     */
     @PostMapping("/update/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity updateUser(@PathVariable("id") Integer id,
-                                   @RequestBody UserRequestModel request) {
+                                     @RequestBody UserRequestModel request) {
         try {
             userService.updateUser(id, request);
         } catch (ResourceNotFoundException e) {
@@ -87,6 +91,7 @@ public class UserController {
 //    }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity deleteUser(@PathVariable("id") Integer id) {
         try {
             userService.deleteUser(id);

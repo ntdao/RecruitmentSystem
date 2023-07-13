@@ -42,12 +42,15 @@ public class SecurityConfiguration {
                         "/configuration/security",
                         "/swagger-ui/**",
                         "/webjars/**",
-                        "/swagger-ui.html")
+                        "/swagger-ui.html",
+                        "/api/v*/users/getAccountInfo",
+                        "/api/v*/categories")
                 .permitAll()
 
                 .requestMatchers("/api/v*/users/**").hasRole("ADMIN")
                 .requestMatchers("/api/v*/roles/**").hasRole("ADMIN")
                 .requestMatchers("/api/v*/companies/**").hasAnyRole("ADMIN", "HR")
+                .requestMatchers(("/api/v*/categories/**")).hasRole("ADMIN")
 
                 // Tất cả các request khác đều cần phải xác thực mới được truy cập
                 .anyRequest().authenticated()
