@@ -20,9 +20,15 @@ import java.util.List;
 public class BranchController {
     private final BranchService branchService;
 
-    @GetMapping("/all")
-    public ResponseEntity<List<BranchDisplayModel>> getAllBranches() {
-        List<BranchDisplayModel> companies = branchService.findAllCompanies();
+    @GetMapping()
+    public ResponseEntity<?> getAllBranches() {
+        List<BranchDisplayModel> companies = branchService.findAllBranches();
+        return ResponseEntity.ok(companies);
+    }
+
+    @GetMapping("/company")
+    public ResponseEntity<?> getAllBranchesByCompany(@RequestParam("name") String name) {
+        List<BranchDisplayModel> companies = branchService.findAllBranchesByCompany(name);
         return ResponseEntity.ok(companies);
     }
 
@@ -40,13 +46,14 @@ public class BranchController {
 
     @GetMapping("/find/{name}")
     public ResponseEntity<?> getBranchByName(@PathVariable("name") String name) {
-        CompanyBranch branch;
-        try {
-            branch = branchService.findBranchByBranchName(name);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-        return ResponseEntity.ok(branch);
+//        CompanyBranch branch;
+//        try {
+//            branch = branchService.findBranchByBranchName(name);
+//        } catch (ResourceNotFoundException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+//        }
+//        return ResponseEntity.ok(branch);
+        return ResponseEntity.ok(branchService.findBranchByBranchName(name));
     }
 
     @PostMapping("/add")

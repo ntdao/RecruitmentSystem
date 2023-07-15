@@ -34,10 +34,20 @@ public class BranchService {
         branchRepository.save(branch);
     }
 
-    public List<BranchDisplayModel> findAllCompanies() {
+    public List<BranchDisplayModel> findAllBranches() {
         List<CompanyBranch> branchs = branchRepository.findAll();
         return branchs.stream()
                 .filter(branch -> !branch.isDeleteFlag())
+                .map(branchMapper::branchToDisplayModel)
+                .collect(Collectors.toList());
+    }
+
+    public List<BranchDisplayModel> findAllBranchesByCompany(String name) {
+        List<CompanyBranch> branchs = branchRepository.findAll();
+        return branchs.stream()
+                .filter(branch ->
+                        (!branch.isDeleteFlag() &&
+                        branch.getCompany().getCompanyName().equals(name)))
                 .map(branchMapper::branchToDisplayModel)
                 .collect(Collectors.toList());
     }
@@ -55,10 +65,15 @@ public class BranchService {
                 .orElseThrow(() -> new ResourceNotFoundException("Branch with id " + id + " does not exist"));
     }
 
-    public CompanyBranch findBranchByBranchName(String name) {
-        return branchRepository.findByBranchName(name)
-                .filter(branch -> !branch.isDeleteFlag())
-                .orElseThrow(() -> new ResourceNotFoundException("Branch with name " + name + " does not exist"));
+    public List<BranchDisplayModel> findBranchByBranchName(String name) {
+//        return branchRepository.findByBranchName(name)
+//                .filter(branch -> !branch.isDeleteFlag())
+//                .orElseThrow(() -> new ResourceNotFoundException("Branch with name " + name + " does not exist"));
+        return branchRepository.findAll()
+                .stream()
+                .filter(b -> (!b.isDeleteFlag() && b.getBranchName().contains(name)))
+                .map(branchMapper::branchToDisplayModel)
+                .collect(Collectors.toList());
     }
 
     @Transactional

@@ -64,13 +64,13 @@ public class User extends Audit implements UserDetails {
 //        this.roles.add(role);
 //    }
 
-    public User(User user, Integer oldId, boolean deleteFlag) {
+    public User(User user, boolean deleteFlag) {
         super(user.getCreatedAt(),
                 user.getUpdatedAt(),
                 user.getCreatedBy(),
                 user.getUpdatedBy(),
                 deleteFlag,
-                oldId);
+                user.getId());
         this.username = user.getUsername();
         this.password = user.getPassword();
         this.email = user.getEmail();

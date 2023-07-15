@@ -2,7 +2,6 @@ package com.recruitmentsystem.controller;
 
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
-import com.recruitmentsystem.entity.Company;
 import com.recruitmentsystem.model.company.CompanyDisplayModel;
 import com.recruitmentsystem.model.company.CompanyRequestModel;
 import com.recruitmentsystem.service.CompanyService;
@@ -20,11 +19,19 @@ import java.util.List;
 public class CompanyController {
     private final CompanyService companyService;
 
-    @GetMapping("/all")
-//    @PreAuthorize("hasAnyRole('ADMIN','HR','USER')")
+    @GetMapping
     public ResponseEntity<List<CompanyDisplayModel>> getAllCompanies() {
         List<CompanyDisplayModel> companies = companyService.findAllCompanies();
         return ResponseEntity.ok(companies);
+    }
+    @GetMapping("/top")
+    public ResponseEntity<?> getTopCompanies(
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "6") Integer pageSize,
+            @RequestParam(defaultValue = "id") String sortBy)
+    {
+        List<CompanyDisplayModel> list = companyService.getTopCompanies(pageNo, pageSize, sortBy);
+        return ResponseEntity.ok(list);
     }
 
     @GetMapping("/find/{id}")
@@ -41,13 +48,8 @@ public class CompanyController {
 
     @GetMapping("/find/{name}")
     public ResponseEntity<?> getCompanyByName(@PathVariable("name") String name) {
-        Company company;
-        try {
-            company = companyService.findCompanyByCompanyName(name);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-        return ResponseEntity.ok(company);
+        List<CompanyDisplayModel> companies = companyService.findCompanyByCompanyName(name);
+        return ResponseEntity.ok(companies);
     }
 
     @PostMapping("/add")

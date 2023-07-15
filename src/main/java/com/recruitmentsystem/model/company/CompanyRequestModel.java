@@ -4,6 +4,7 @@ import java.time.Instant;
 
 public record CompanyRequestModel(
         String name,
+        String companyAddress,
         String companyLogo,
         String companySlogan,
         String companyMessage,

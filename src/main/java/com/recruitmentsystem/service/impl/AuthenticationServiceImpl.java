@@ -163,10 +163,10 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             throw new IllegalStateException(e.getMessage());
         }
 
-        User user = userService.getUserByToken(token);
+        User user = userService.findUserByToken(token);
         System.out.println("Find user by token: " + user);
         // tao ban ghi luu thong tin cu cua user
-        User oldUser = new User(user, user.getId(), true);
+        User oldUser = new User(user, true);
         userRepository.save(oldUser);
 
         // update user

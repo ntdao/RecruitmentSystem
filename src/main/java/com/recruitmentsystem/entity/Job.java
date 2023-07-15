@@ -40,7 +40,7 @@ public class Job extends Audit {
     @JoinColumn(name = "job_level_id")
     private JobLevel jobLevel;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
     private String jobDescription;

@@ -8,11 +8,10 @@ import java.time.Instant;
 public record CompanyDisplayModel(
         Integer id,
         String name,
+        String companyAddress,
         String companyLogo,
         String companySlogan,
-
         String companyMessage,
-
         String companyImage,
         Instant createdAt,
         Instant updatedAt

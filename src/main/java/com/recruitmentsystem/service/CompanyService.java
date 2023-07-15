@@ -2,16 +2,24 @@ package com.recruitmentsystem.service;
 
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
+import com.recruitmentsystem.entity.Category;
 import com.recruitmentsystem.entity.Company;
+import com.recruitmentsystem.entity.User;
 import com.recruitmentsystem.mapper.CompanyMapper;
 import com.recruitmentsystem.model.company.CompanyDisplayModel;
 import com.recruitmentsystem.model.company.CompanyRequestModel;
+import com.recruitmentsystem.model.user.UserDisplayModel;
 import com.recruitmentsystem.repository.ICompanyRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +33,7 @@ public class CompanyService {
         // check company name
         String companyName = companyRegistrationRequest.name();
         if (companyRepository.existsCompanyByCompanyName(companyName)) {
-            throw new ResourceAlreadyExistsException("company name already taken");
+            throw new ResourceAlreadyExistsException("Company name already taken");
         }
 
         // add
@@ -55,10 +63,12 @@ public class CompanyService {
                 .orElseThrow(() -> new ResourceNotFoundException("Company with id " + id + " does not exist"));
     }
 
-    public Company findCompanyByCompanyName(String name) {
-        return companyRepository.findCompanyByCompanyName(name)
-                .filter(company -> !company.isDeleteFlag())
-                .orElseThrow(() -> new ResourceNotFoundException("Company with name " + name + " does not exist"));
+    public List<CompanyDisplayModel> findCompanyByCompanyName(String name) {
+        return companyRepository.findAll()
+                .stream()
+                .filter(c -> (!c.isDeleteFlag() && c.getCompanyName().contains(name)))
+                .map(companyMapper::companyToDisplayModel)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -86,4 +96,30 @@ public class CompanyService {
         company.setDeleteFlag(true);
         companyRepository.save(company);
     }
+
+    public List<CompanyDisplayModel> getTopCompanies(Integer pageNo, Integer pageSize, String sortBy) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+
+        Page<Company> pagedResult = companyRepository.findAll(paging);
+
+        List<CompanyDisplayModel> list = pagedResult.getContent()
+                .stream()
+                .filter(u -> !u.isDeleteFlag())
+                .map(companyMapper::companyToDisplayModel)
+                .collect(Collectors.toList());
+
+        if (pagedResult.hasContent()) {
+            return list;
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+//    public List<CompanyDisplayModel> findTopCompany() {
+//        List<Company> companies= companyRepository.findAll(Sort.by(Sort.Direction.DESC, "total"));
+//        return companies.stream()
+//                .filter(company -> !company.isDeleteFlag())
+//                .map(companyMapper::companyToDisplayModel)
+//                .collect(Collectors.toList());
+//    }
 }

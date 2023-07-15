@@ -19,9 +19,19 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<List<Category>> getAllCategories() {
         List<Category> categories = categoryService.findAllCategories();
+        return ResponseEntity.ok(categories);
+    }
+
+    @GetMapping("/hot")
+    public ResponseEntity<List<Category>> getHotCategories(
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "20") Integer pageSize,
+            @RequestParam(defaultValue = "total") String sortBy
+    ) {
+        List<Category> categories = categoryService.findHotCategories(pageNo, pageSize, sortBy);
         return ResponseEntity.ok(categories);
     }
 
@@ -48,10 +58,6 @@ public class CategoryController {
         }
     }
 
-    /*
-        @RequestBody nói với Spring Boot rằng hãy chuyển Json trong request body
-        thành đối tượng Category
-    */
     @PostMapping("/update/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity updateCategory(@PathVariable("id") Integer id,

@@ -28,6 +28,8 @@ public class Company extends Audit {
 
     private String companyImage;
 
+    private String companyAddress;
+
     public Company(Company company, Integer oldId, boolean deleteFlag) {
         super(company.getCreatedAt(),
                 company.getUpdatedAt(),
@@ -40,5 +42,6 @@ public class Company extends Audit {
         this.companyMessage = company.getCompanyMessage();
         this.companyImage = company.getCompanyImage();
         this.companySlogan = company.getCompanySlogan();
+        this.companyAddress = company.getCompanyAddress();
     }
 }

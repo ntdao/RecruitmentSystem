@@ -67,9 +67,4 @@ public class RoleController {
         }
         return ResponseEntity.ok().build();
     }
-
-//    @DeleteMapping("/delete")
-//    public void deleteRole(@RequestBody Integer[] ids) {
-//        Stream.of(ids).forEach(id -> roleService.deleteRole(id));
-//    }
 }
