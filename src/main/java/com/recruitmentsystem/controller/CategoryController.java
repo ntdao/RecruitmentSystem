@@ -58,7 +58,7 @@ public class CategoryController {
         }
     }
 
-    @PostMapping("/update/{id}")
+    @PutMapping("/update/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity updateCategory(@PathVariable("id") Integer id,
                                      @RequestBody Category request) {

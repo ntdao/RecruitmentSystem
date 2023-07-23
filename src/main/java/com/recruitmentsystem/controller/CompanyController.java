@@ -28,14 +28,14 @@ public class CompanyController {
     public ResponseEntity<?> getTopCompanies(
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "6") Integer pageSize,
-            @RequestParam(defaultValue = "id") String sortBy)
+            @RequestParam(defaultValue = "companyId") String sortBy)
     {
         List<CompanyDisplayModel> list = companyService.getTopCompanies(pageNo, pageSize, sortBy);
         return ResponseEntity.ok(list);
     }
 
     @GetMapping("/find/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','HR')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_HR')")
     public ResponseEntity<?> getCompanyById(@PathVariable("id") Integer id) {
         CompanyDisplayModel company;
         try {
@@ -53,7 +53,7 @@ public class CompanyController {
     }
 
     @PostMapping("/add")
-    @PreAuthorize("hasAnyRole('ADMIN','HR')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_HR')")
     public ResponseEntity<?> registerCompany(@RequestBody CompanyRequestModel request) {
         try {
             companyService.addCompany(request);
@@ -63,8 +63,8 @@ public class CompanyController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/update/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','HR')")
+    @PutMapping("/update/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_HR')")
     public ResponseEntity<?> updateCompany(@PathVariable("id") Integer id,
                                            @RequestBody CompanyRequestModel request) {
         try {
@@ -76,7 +76,7 @@ public class CompanyController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','HR')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_HR')")
     public ResponseEntity deleteCompany(@PathVariable("id") Integer id) {
         try {
             companyService.deleteCompany(id);

@@ -82,6 +82,7 @@ public class User extends Audit implements UserDetails {
         this.imgUrl = user.getImgUrl();
         this.birthday = user.getBirthday();
         this.role = user.getRole();
+        this.enabled = user.getEnabled();
     }
 
 //    @Override

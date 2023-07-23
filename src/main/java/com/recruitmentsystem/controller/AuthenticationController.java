@@ -101,10 +101,15 @@ public class AuthenticationController {
         return ResponseEntity.ok().build();
     }
 
-//    @GetMapping(value = "/welcome", produces = MediaType.TEXT_HTML_VALUE)
+//    @RequestMapping(value = "/username", method = RequestMethod.GET)
 //    @ResponseBody
-//    public String welcomeAsHTML() {
-//        return "<html>\n" + "<header><title>Welcome</title></header>\n" +
-//                "<body>\n" + "Hello world\n" + "</body>\n" + "</html>";
+//    public String currentUserName(Principal principal) {
+//        return principal.getName();
+//    }
+//
+//    @RequestMapping(value = "/username", method = RequestMethod.GET)
+//    @ResponseBody
+//    public String currentUserName(Authentication authentication) {
+//        return authentication.getName();
 //    }
 }

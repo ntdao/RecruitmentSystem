@@ -2,6 +2,7 @@ package com.recruitmentsystem.service;
 
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
+import com.recruitmentsystem.common.myEnum.OrderBy;
 import com.recruitmentsystem.entity.Category;
 import com.recruitmentsystem.repository.ICategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -80,7 +81,30 @@ public class CategoryService {
     }
 
     public List<Category> findHotCategories(Integer pageNo, Integer pageSize, String sortBy) {
-        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+//        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
+//
+//        Page<Category> pagedResult = categoryRepository.findAll(paging);
+//
+//        List<Category> list = pagedResult.getContent()
+//                .stream()
+//                .filter(u -> !u.isDeleteFlag())
+//                .collect(Collectors.toList());
+//
+//        if (pagedResult.hasContent()) {
+//            return list;
+//        } else {
+//            return new ArrayList<>();
+//        }
+        return findCategoriesPagingAndSorting(pageNo, pageSize, sortBy, OrderBy.DESC);
+    }
+
+    public List<Category> findCategoriesPagingAndSorting(Integer pageNo, Integer pageSize, String sortBy, OrderBy order) {
+        Pageable paging;
+        if (order == OrderBy.DESC) {
+            paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
+        } else {
+            paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+        }
 
         Page<Category> pagedResult = categoryRepository.findAll(paging);
 

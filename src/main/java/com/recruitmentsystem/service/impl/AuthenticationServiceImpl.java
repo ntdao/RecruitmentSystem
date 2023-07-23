@@ -164,7 +164,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         }
 
         User user = userService.findUserByToken(token);
-        System.out.println("Find user by token: " + user);
         // tao ban ghi luu thong tin cu cua user
         User oldUser = new User(user, true);
         userRepository.save(oldUser);

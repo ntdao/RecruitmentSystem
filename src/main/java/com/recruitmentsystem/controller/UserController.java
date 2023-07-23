@@ -2,9 +2,11 @@ package com.recruitmentsystem.controller;
 
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
+import com.recruitmentsystem.model.user.UserChangePassword;
 import com.recruitmentsystem.model.user.UserDisplayModel;
 import com.recruitmentsystem.model.user.UserPagination;
 import com.recruitmentsystem.model.user.UserRequestModel;
+import com.recruitmentsystem.security.auth.AuthenticationResponse;
 import com.recruitmentsystem.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -60,7 +62,7 @@ public class UserController {
     @GetMapping("/find")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getUserByName(@RequestParam("name") String name) {
-        List<UserDisplayModel> user = userService.findUserByName(name);
+        List<UserDisplayModel> user = userService.findAllUserByName(name);
         return ResponseEntity.ok(user);
     }
 
@@ -79,7 +81,7 @@ public class UserController {
         @RequestBody nói với Spring Boot rằng hãy chuyển Json trong request body
         thành đối tượng UserRequestModel
     */
-    @PostMapping("/update/{id}")
+    @PutMapping("/update/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateUser(@PathVariable("id") Integer id,
                                      @RequestBody UserRequestModel request) {
@@ -93,17 +95,31 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     public ResponseEntity<?> updateUser(@RequestParam("token") String token,
                                         @RequestBody UserRequestModel request) {
+        AuthenticationResponse response;
         try {
-            userService.updateUser(token, request);
+            response = userService.updateUser(token, request);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/updateUser")
+    public ResponseEntity<?> updateUser(@RequestBody UserRequestModel request) {
+        AuthenticationResponse response;
+        try {
+            response = userService.updateUserByAuth(request);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+        return ResponseEntity.ok(response);
     }
 
 //    @PostMapping("/upload")
@@ -141,6 +157,18 @@ public class UserController {
             } catch (ResourceNotFoundException e) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
             }
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/changePassword")
+    public ResponseEntity<?> changePassword(@RequestBody UserChangePassword request) {
+        try {
+            userService.changePassword(request);
+        }catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         return ResponseEntity.ok().build();
     }

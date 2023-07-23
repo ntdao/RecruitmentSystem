@@ -2,13 +2,15 @@ package com.recruitmentsystem.model.user;
 
 import com.recruitmentsystem.common.myEnum.Gender;
 import jakarta.annotation.Nullable;
+import lombok.Builder;
 
 import java.time.Instant;
 import java.time.LocalDate;
 
+@Builder
 public record UserRequestModel(
         String username,
-        String password,
+        @Nullable String password,
         String email,
         String firstName,
         String lastName,

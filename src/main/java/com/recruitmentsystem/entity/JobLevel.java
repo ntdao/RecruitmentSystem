@@ -18,4 +18,7 @@ public class JobLevel extends Audit {
     private Integer jobLevelId;
     @Enumerated(EnumType.STRING)
     private JobLevelName jobLevelName;
+
+    public JobLevel(JobLevel updateJobLevel, Integer id, boolean deleteFlag) {
+    }
 }

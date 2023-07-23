@@ -33,7 +33,7 @@ public class BranchController {
     }
 
     @GetMapping("/find/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','HR')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_HR')")
     public ResponseEntity<?> getBranchById(@PathVariable("id") Integer id) {
         BranchDisplayModel branch;
         try {
@@ -57,7 +57,7 @@ public class BranchController {
     }
 
     @PostMapping("/add")
-    @PreAuthorize("hasAnyRole('ADMIN','HR')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_HR')")
     public ResponseEntity<?> registerBranch(@RequestBody BranchRequestModel request) {
         try {
             branchService.addBranch(request);
@@ -67,8 +67,8 @@ public class BranchController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/update/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','HR')")
+    @PutMapping("/update/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_HR')")
     public ResponseEntity<?> updateBranch(@PathVariable("id") Integer id,
                                           @RequestBody BranchRequestModel request) {
         try {
@@ -80,7 +80,7 @@ public class BranchController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','HR')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_HR')")
     public ResponseEntity deleteBranch(@PathVariable("id") Integer id) {
         try {
             branchService.deleteBranch(id);

@@ -44,6 +44,7 @@ public class SecurityConfiguration {
                         "/webjars/**",
                         "/swagger-ui.html",
                         "/api/v*/users/getAccountInfo",
+                        "/api/v*/users/updateUser",
                         "/api/v*/users/update",
                         "/api/v*/categories/hot",
                         "/api/v*/companies/top",

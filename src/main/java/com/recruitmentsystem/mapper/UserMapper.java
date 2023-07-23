@@ -34,18 +34,19 @@ public class UserMapper {
     }
 
     public User userRequestModelToUser(UserRequestModel request) {
-        if (request.address() == null && request.imgUrl() == null) {
+        if (request.address() == null
+                && request.imgUrl() == null
+                && request.password() == null
+                && request.roleName() == null) {
             return User
                     .builder()
                     .username(request.username())
                     .firstName(request.firstName())
                     .lastName(request.lastName())
                     .email(request.email())
-                    .password(passwordEncoder.encode(request.password()))
                     .phoneNumber(request.phoneNumber())
                     .gender(request.gender())
                     .birthday(request.birthday())
-                    .role(roleService.findByRoleName("ROLE_USER"))
                     .build();
         } else {
             return User
