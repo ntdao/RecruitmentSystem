@@ -8,7 +8,6 @@ import java.time.Instant;
 public record RoleDisplayModel(
         Integer id,
         String name,
-        String imgUrl,
         Instant createdAt,
         Instant updatedAt
 ) {

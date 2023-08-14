@@ -19,7 +19,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Builder // builder pattern:
+@Builder
+@EqualsAndHashCode
 public class User extends Audit implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +40,7 @@ public class User extends Audit implements UserDetails {
     private Gender gender;
     private String imgUrl;
     private LocalDate birthday;
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn(name = "role_id")
     private Role role;
     private Boolean enabled = false;

@@ -1,5 +1,5 @@
 package com.recruitmentsystem.common.myEnum;
 
-public enum JobLevelName {
+public enum JobLevel {
     NON_MANAGER, MANAGER, DIRECTOR
 }

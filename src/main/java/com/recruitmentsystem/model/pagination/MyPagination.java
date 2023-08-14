@@ -1,4 +1,4 @@
-package com.recruitmentsystem.model.user;
+package com.recruitmentsystem.model.pagination;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -12,10 +12,10 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class UserPagination {
+public class MyPagination<T> {
     long total;
     long totalPage;
     long pageSize;
     long pageNo;
-    List<UserDisplayModel> list;
+    List<T> list;
 }

@@ -49,6 +49,7 @@ public class UserMapper {
                     .birthday(request.birthday())
                     .build();
         } else {
+            System.out.println(roleService.findByRoleName(request.roleName()));
             return User
                     .builder()
                     .username(request.username())

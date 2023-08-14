@@ -113,14 +113,17 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         );
 
         User user = (User) authentication.getPrincipal();
-        System.out.println(user);
         if (!user.isEnabled()) {
             throw new IllegalStateException("Your account has not been verified!");
         } else if (user.isDeleteFlag()) {
             throw new IllegalStateException("Your account does not exist!");
         }
+
         String accessToken = jwtTokenUtil.generateToken(user);
         String refreshToken = jwtTokenUtil.generateRefreshToken(user);
+
+        revokeAllUserTokens(user);
+
         saveUserToken(user, accessToken, jwtTokenUtil.extractExpiration(accessToken).getTime());
         saveUserToken(user, refreshToken, jwtTokenUtil.extractExpiration(refreshToken).getTime());
 
@@ -184,7 +187,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 .token(jwtToken)
                 .tokenType(TokenType.BEARER)
                 .createdAt(Instant.now())
-                .expiresAt(Instant.now().plusMillis(expiresTime))
+                .expiresAt(Instant.ofEpochMilli(expiresTime))
                 .expired(false)
                 .revoked(false)
                 .build();

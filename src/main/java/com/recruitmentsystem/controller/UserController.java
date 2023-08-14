@@ -1,10 +1,10 @@
 package com.recruitmentsystem.controller;
 
-import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
+import com.recruitmentsystem.common.exception.ResourceNotModifiedException;
+import com.recruitmentsystem.model.pagination.MyPagination;
 import com.recruitmentsystem.model.user.UserChangePassword;
 import com.recruitmentsystem.model.user.UserDisplayModel;
-import com.recruitmentsystem.model.user.UserPagination;
 import com.recruitmentsystem.model.user.UserRequestModel;
 import com.recruitmentsystem.security.auth.AuthenticationResponse;
 import com.recruitmentsystem.service.UserService;
@@ -17,37 +17,55 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/all")
+    @GetMapping("/manage_users/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getAllUsers() {
         List<UserDisplayModel> users = userService.findAllUsers();
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping
+    @GetMapping("/manage_users")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getAllUsers(
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy)
     {
-        UserPagination list = userService.getAllUsers1(pageNo, pageSize, sortBy);
+        MyPagination<UserDisplayModel> list = userService.getAllUsers(pageNo, pageSize, sortBy);
         return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/getAccountInfo")
+    @GetMapping("/user/getAccountInfo")
     public ResponseEntity<?> getUserProfile(@RequestParam("token") String token) {
-        UserDisplayModel userDisplayModel = userService
-                .findUserDisplayByToken(token);
-        return ResponseEntity.ok(userDisplayModel);
+        try {
+            UserDisplayModel userDisplayModel = userService
+                    .findUserDisplayByToken(token);
+            return ResponseEntity.ok(userDisplayModel);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
-    @GetMapping("/find/{id}")
+    @GetMapping("/user/getInfo")
+    public ResponseEntity<?> getUserProfile() {
+        try {
+            UserDisplayModel userDisplayModel = userService.getCurrentUserDisplay();
+            return ResponseEntity.ok(userDisplayModel);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/manage_users/find/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getUserById(@PathVariable("id") Integer id) {
         UserDisplayModel user;
@@ -59,20 +77,20 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/find")
+    @GetMapping("/manage_users/find")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getUserByName(@RequestParam("name") String name) {
         List<UserDisplayModel> user = userService.findAllUserByName(name);
         return ResponseEntity.ok(user);
     }
 
-    @PostMapping("/add")
+    @PostMapping("/manage_users/add")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> addUser(@RequestBody UserRequestModel request) {
         try {
             userService.addUser(request);
             return ResponseEntity.ok().build();
-        } catch (ResourceAlreadyExistsException e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
@@ -81,12 +99,14 @@ public class UserController {
         @RequestBody nói với Spring Boot rằng hãy chuyển Json trong request body
         thành đối tượng UserRequestModel
     */
-    @PutMapping("/update/{id}")
+    @PutMapping("/manage_users/update/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateUser(@PathVariable("id") Integer id,
                                      @RequestBody UserRequestModel request) {
         try {
             userService.updateUser(id, request);
+        } catch (ResourceNotModifiedException e) {
+            return ResponseEntity.ok(e.getMessage());
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
@@ -95,7 +115,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/update")
+    @PutMapping("/user/update")
     public ResponseEntity<?> updateUser(@RequestParam("token") String token,
                                         @RequestBody UserRequestModel request) {
         AuthenticationResponse response;
@@ -109,7 +129,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/updateUser")
+    @PutMapping("/user/updateUser")
     public ResponseEntity<?> updateUser(@RequestBody UserRequestModel request) {
         AuthenticationResponse response;
         try {
@@ -138,7 +158,7 @@ public class UserController {
 //        return ResponseEntity.ok().build();
 //    }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/manage_users/delete/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable("id") Integer id) {
         try {
@@ -149,7 +169,8 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/manage_users/delete")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteUser(@RequestBody Integer[] ids) {
         for (Integer id : ids) {
             try {
@@ -161,12 +182,14 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/changePassword")
+    @PutMapping("/user/changePassword")
     public ResponseEntity<?> changePassword(@RequestBody UserChangePassword request) {
         try {
             userService.changePassword(request);
         }catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }

@@ -1,5 +1,6 @@
 package com.recruitmentsystem.entity;
 
+import com.recruitmentsystem.common.myEnum.JobLevel;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,8 +37,11 @@ public class Job extends Audit {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<Category> categories = new HashSet<>();
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "job_level_id")
+//    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//    @JoinColumn(name = "job_level_id")
+//    private JobLevel jobLevel;
+
+    @Enumerated(EnumType.STRING)
     private JobLevel jobLevel;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

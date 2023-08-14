@@ -1,5 +1,6 @@
 package com.recruitmentsystem.model.job;
 
+import com.recruitmentsystem.common.myEnum.JobLevel;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -9,7 +10,7 @@ public record JobDisplayModel(
         String name,
         String companyLogo,
         String jobAddress,
-        String jobLevel,
+        JobLevel jobLevel,
         String jobDescription,
         String jobRequirement,
         String salary,

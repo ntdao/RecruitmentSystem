@@ -26,13 +26,17 @@ public class CategoryController {
     }
 
     @GetMapping("/hot")
-    public ResponseEntity<List<Category>> getHotCategories(
+    public ResponseEntity<?> getHotCategories(
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "20") Integer pageSize,
             @RequestParam(defaultValue = "total") String sortBy
     ) {
-        List<Category> categories = categoryService.findHotCategories(pageNo, pageSize, sortBy);
-        return ResponseEntity.ok(categories);
+        try {
+            List<Category> categories = categoryService.findHotCategories(pageNo, pageSize, sortBy);
+            return ResponseEntity.ok(categories);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping("/find/{id}")

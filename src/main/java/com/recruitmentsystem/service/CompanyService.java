@@ -2,13 +2,11 @@ package com.recruitmentsystem.service;
 
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
-import com.recruitmentsystem.entity.Category;
 import com.recruitmentsystem.entity.Company;
-import com.recruitmentsystem.entity.User;
 import com.recruitmentsystem.mapper.CompanyMapper;
 import com.recruitmentsystem.model.company.CompanyDisplayModel;
 import com.recruitmentsystem.model.company.CompanyRequestModel;
-import com.recruitmentsystem.model.user.UserDisplayModel;
+import com.recruitmentsystem.model.pagination.MyPagination;
 import com.recruitmentsystem.repository.ICompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -113,6 +112,34 @@ public class CompanyService {
         } else {
             return new ArrayList<>();
         }
+    }
+
+    public MyPagination<CompanyDisplayModel> getAllCompanies(Integer pageNo, Integer pageSize, String sortBy) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+
+        Page<Company> pagedResult = companyRepository.findAll(paging);
+
+        List<CompanyDisplayModel> list = pagedResult.getContent()
+                .stream()
+                .filter(u -> !u.isDeleteFlag())
+                .map(companyMapper::companyToDisplayModel)
+                .collect(Collectors.toList());
+
+        int totalPages;
+        if (list.size() % pageSize == 0) {
+            totalPages = list.size() / pageSize;
+        } else {
+            totalPages = list.size() / pageSize + 1;
+        }
+
+        MyPagination pagination = MyPagination.builder()
+                .total(list.size())
+                .totalPage(totalPages)
+                .pageSize(pageSize)
+                .pageNo(pageNo)
+                .list(Collections.singletonList(list))
+                .build();
+        return pagination;
     }
 
 //    public List<CompanyDisplayModel> findTopCompany() {
