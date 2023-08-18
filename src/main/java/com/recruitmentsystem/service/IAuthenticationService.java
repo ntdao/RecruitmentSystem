@@ -1,5 +1,6 @@
 package com.recruitmentsystem.service;
 
+import com.recruitmentsystem.entity.User;
 import com.recruitmentsystem.model.user.UserRequestModel;
 import com.recruitmentsystem.security.auth.AuthenticationRequest;
 import com.recruitmentsystem.security.auth.AuthenticationResponse;
@@ -20,4 +21,6 @@ public interface IAuthenticationService {
     void confirmEmail(String token);
 
     void updatePassword(String token, String newPassword);
+
+//    void revokeAllUserTokens(User updateUser);
 }

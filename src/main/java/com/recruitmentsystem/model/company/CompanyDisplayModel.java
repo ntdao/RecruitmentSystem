@@ -6,14 +6,16 @@ import java.time.Instant;
 
 @Builder
 public record CompanyDisplayModel(
-        Integer id,
-        String name,
+        String companyName,
         String companyAddress,
+        String companyUrl,
         String companyLogo,
         String companySlogan,
-        String companyMessage,
+        String companyIntroduction,
+        String companyField,
         String companyImage,
         Instant createdAt,
         Instant updatedAt
+//        boolean isActive
 ) {
 }

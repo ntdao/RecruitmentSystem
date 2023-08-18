@@ -1,15 +1,13 @@
 package com.recruitmentsystem.model.company;
 
-import java.time.Instant;
-
 public record CompanyRequestModel(
-        String name,
+        String companyName,
         String companyAddress,
         String companyLogo,
         String companySlogan,
-        String companyMessage,
+        String companyIntroduction,
         String companyImage,
-        Instant createdAt,
-        Instant updatedAt
+        String companyUrl,
+        String companyField
 ) {
 }

@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CategoryService {
     private final ICategoryRepository categoryRepository;
-    
+
     public void addCategory(Category request) {
         String name = request.getCategoryName();
         if (categoryRepository.existsCategoryByCategoryName(name)) {
@@ -57,7 +57,7 @@ public class CategoryService {
             throw new ResourceNotFoundException("Category with id " + id + " does not exist");
         }
 //        updateCategory.setUpdatedAt(Instant.now());
-        Category oldCategory = new Category(updateCategory, id, true);
+        Category oldCategory = new Category(updateCategory, true);
         categoryRepository.save(oldCategory);
 
         // update category

@@ -65,6 +65,14 @@ public class User extends Audit implements UserDetails {
 //        this.roles.add(role);
 //    }
 
+
+    @Transient
+    public String getImgUrl() {
+        if (imgUrl == null) return null;
+//        return "/image/user_profile/" + id + "/" + imgUrl;
+        return id + "/" + imgUrl;
+    }
+
     public User(User user, boolean deleteFlag) {
         super(user.getCreatedAt(),
                 user.getUpdatedAt(),

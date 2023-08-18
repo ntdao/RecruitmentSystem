@@ -180,7 +180,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         userRepository.save(user);
     }
 
-    private void saveUserToken(User user, String jwtToken, long expiresTime) {
+    public void saveUserToken(User user, String jwtToken, long expiresTime) {
         Token token = Token
                 .builder()
                 .user(user)

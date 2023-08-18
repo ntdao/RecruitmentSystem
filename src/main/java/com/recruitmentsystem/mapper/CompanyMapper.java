@@ -10,12 +10,13 @@ public class CompanyMapper {
     public CompanyDisplayModel companyToDisplayModel(Company company) {
         return CompanyDisplayModel
                 .builder()
-                .id(company.getCompanyId())
-                .name(company.getCompanyName())
+                .companyName(company.getCompanyName())
                 .companyLogo(company.getCompanyLogo())
                 .companyImage(company.getCompanyImage())
                 .companySlogan(company.getCompanySlogan())
-                .companyMessage(company.getCompanyMessage())
+                .companyIntroduction(company.getCompanyIntroduction())
+                .companyUrl(company.getCompanyUrl())
+                .companyField(company.getCompanyField())
                 .createdAt(company.getCreatedAt())
                 .updatedAt(company.getUpdatedAt())
                 .build();
@@ -24,11 +25,14 @@ public class CompanyMapper {
     public Company companyRequestModelToCompany(CompanyRequestModel request) {
         return Company
                 .builder()
-                .companyName(request.name())
+                .companyName(request.companyName())
                 .companyLogo(request.companyLogo())
                 .companyImage(request.companyImage())
-                .companyMessage(request.companyMessage())
+                .companyIntroduction(request.companyIntroduction())
                 .companySlogan(request.companySlogan())
+                .companyUrl(request.companyUrl())
+                .companyField(request.companyField())
+                .companyName(request.companyName())
                 .build();
     }
 }

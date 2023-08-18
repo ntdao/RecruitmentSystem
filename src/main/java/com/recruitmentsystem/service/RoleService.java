@@ -68,7 +68,7 @@ public class RoleService {
 //        updateRole.setUpdatedAt(LocalDateTime.now());
 
         // tao ban ghi luu thong tin cu cua role
-        Role oldRole = new Role(updateRole, id, true);
+        Role oldRole = new Role(updateRole, true);
         roleRepository.save(oldRole);
 
         // update role

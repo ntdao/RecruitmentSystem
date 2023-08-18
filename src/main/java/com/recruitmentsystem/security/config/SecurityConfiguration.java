@@ -33,7 +33,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests()
 
                 // Cho phép tất cả mọi người truy cập vào địa chỉ này
-                .requestMatchers("/api/v*/auth/**",
+                .requestMatchers(
+                        "/api/v*/auth/**",
                         "/v*/api-docs",
                         "/v*/api-docs/**",
                         "/swagger-resources",
@@ -43,24 +44,21 @@ public class SecurityConfiguration {
                         "/swagger-ui/**",
                         "/webjars/**",
                         "/swagger-ui.html",
+                        "/api/image/**",
                         "/api/v*/user/**",
-                        "/api/v*/categories/hot",
-                        "/api/v*/companies/top",
-                        "/api/v*/companies/find/**",
-                        "/api/v*/companies",
-                        "/api/v*/branches/find/**",
-                        "/api/v*/branches",
-                        "/api/v*/branches/company",
-                        "/api/v*/jobs/best",
-                        "/api/v*/jobs/all")
+                        "/api/v*/categories/**",
+                        "/api/v*/companies/**",
+                        "/api/v*/company/branches/**",
+                        "/api/v*/jobs/**")
                 .permitAll()
 
                 .requestMatchers("/api/v*/manage_users/**").hasRole("ADMIN")
-                .requestMatchers("/api/v*/roles/**").hasRole("ADMIN")
-                .requestMatchers("/api/v*/companies/**").hasAnyRole("ADMIN", "HR")
-                .requestMatchers("/api/v*/branches/**").hasAnyRole("ADMIN", "HR")
-                .requestMatchers("/api/v*/categories/**").hasRole("ADMIN")
-                .requestMatchers("/api/v*/jobs/**").hasAnyRole("ADMIN", "HR")
+                .requestMatchers("/api/v*/manage_roles/**").hasRole("ADMIN")
+                .requestMatchers("/api/v*/manage_companies/**").hasRole("ADMIN")
+                .requestMatchers("/api/v*/company/manage_branches/**").hasRole("ADMIN")
+                .requestMatchers("/api/v*/manage_categories/**").hasRole("ADMIN")
+                .requestMatchers("/api/v*/admin/manage_jobs/**").hasRole("ADMIN")
+                .requestMatchers("/api/v*/hr/manage_jobs/**").hasRole("HR")
 
                 // Tất cả các request khác đều cần phải xác thực mới được truy cập
                 .anyRequest().authenticated()
@@ -71,19 +69,6 @@ public class SecurityConfiguration {
                 .and()
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
-
-//				.logout().permitAll();
-//				.and()
-//				.exceptionHandling()
-//				.authenticationEntryPoint(
-//					(request, response, ex) -> {
-//						response.sendError(
-//							HttpServletResponse.SC_UNAUTHORIZED,
-//							ex.getMessage()
-//						);
-//					}
-//				);
-
 
         return http.build();
     }

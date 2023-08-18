@@ -1,11 +1,11 @@
 package com.recruitmentsystem.model.user;
 
-import lombok.*;
+import lombok.Builder;
 
 @Builder
-public record UserChangePassword (
+public record UserChangePassword(
         String currentPassword,
         String newPassword
 
-){
+) {
 }

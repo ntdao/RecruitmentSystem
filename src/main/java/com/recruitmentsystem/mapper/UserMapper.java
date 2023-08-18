@@ -15,6 +15,7 @@ public class UserMapper {
     private final RoleService roleService;
 
     public UserDisplayModel userToDisplayModel(User user) {
+        System.out.println(user.getImgUrl());
         return UserDisplayModel
                 .builder()
                 .id(user.getId())
@@ -49,7 +50,6 @@ public class UserMapper {
                     .birthday(request.birthday())
                     .build();
         } else {
-            System.out.println(roleService.findByRoleName(request.roleName()));
             return User
                     .builder()
                     .username(request.username())

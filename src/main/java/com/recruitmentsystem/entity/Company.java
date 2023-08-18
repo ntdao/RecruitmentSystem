@@ -3,6 +3,8 @@ package com.recruitmentsystem.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @Data
 @Table
 @AllArgsConstructor
@@ -18,30 +20,32 @@ public class Company extends Audit {
     @Column(nullable = false)
     private String companyName;
     private String companyLogo;
-
-//    @Column(nullable = false)
-//    private String companyInfo;
-
-    private String companyMessage;
-
+    private String companyUrl;
+    private String companyIntroduction;
     private String companySlogan;
-
     private String companyImage;
-
     private String companyAddress;
+    private String companyField;
+//    private boolean isActive;
 
-    public Company(Company company, Integer oldId, boolean deleteFlag) {
+    @OneToMany(mappedBy = "company")
+    private Set<CompanyBranch> branches;
+
+    public Company(Company company, boolean deleteFlag) {
         super(company.getCreatedAt(),
                 company.getUpdatedAt(),
                 company.getCreatedBy(),
                 company.getUpdatedBy(),
                 deleteFlag,
-                oldId);
+                company.getCompanyId());
         this.companyName = company.getCompanyName();
         this.companyLogo = company.getCompanyLogo();
-        this.companyMessage = company.getCompanyMessage();
+        this.companyIntroduction = company.getCompanyIntroduction();
         this.companyImage = company.getCompanyImage();
         this.companySlogan = company.getCompanySlogan();
         this.companyAddress = company.getCompanyAddress();
+        this.companyUrl = company.getCompanyUrl();
+        this.companyField = company.getCompanyField();
+//        this.isActive = company.isActive();
     }
 }

@@ -1,5 +1,6 @@
 package com.recruitmentsystem.security.token;
 
+import com.recruitmentsystem.common.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,12 @@ public class TokenService {
     public void setConfirmedAt(String token) {
         tokenRepository.updateConfirmedAt(
                 token, Instant.now());
+    }
+
+    public boolean isValidToken(String token) {
+        Token tokenUser = tokenRepository.findByToken(token)
+                .orElseThrow(() -> new ResourceNotFoundException("Token does not exist"));
+        return tokenUser.isRevoked();
     }
 
     public List<Token> findAllValidTokenByUser(Integer id) {

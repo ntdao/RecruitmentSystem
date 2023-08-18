@@ -26,13 +26,13 @@ public class Role extends Audit implements Serializable {
         this.roleName = roleName;
     }
 
-    public Role(Role role, Integer oldId, boolean deleteFlag) {
+    public Role(Role role, boolean deleteFlag) {
         super(role.getCreatedAt(),
                 role.getUpdatedAt(),
                 role.getCreatedBy(),
                 role.getUpdatedBy(),
                 deleteFlag,
-                oldId);
+                role.getRoleId());
         this.roleName = role.getRoleName();
     }
 

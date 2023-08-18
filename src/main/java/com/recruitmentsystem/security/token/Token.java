@@ -38,6 +38,10 @@ public class Token {
         return expiresAt.isBefore(Instant.now());
     }
 
+    public boolean isRevoked() {
+        return !revoked;
+    }
+
 //    public Token(String token,
 //                             LocalDateTime createdAt,
 //                             LocalDateTime expiresAt,

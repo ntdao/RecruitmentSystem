@@ -24,13 +24,13 @@ public class Category extends Audit {
 
     private Integer total;
 
-    public Category(Category category, Integer oldId, boolean deleteFlag) {
+    public Category(Category category, boolean deleteFlag) {
         super(category.getCreatedAt(),
                 category.getUpdatedAt(),
                 category.getCreatedBy(),
                 category.getUpdatedBy(),
                 deleteFlag,
-                oldId);
+                category.getCategoryId());
         this.categoryName = category.getCategoryName();
         this.categoryIcon = category.getCategoryIcon();
         this.categoryUrl = category.getCategoryUrl();

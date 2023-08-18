@@ -1,20 +1,30 @@
 package com.recruitmentsystem.mapper;
 
+import com.recruitmentsystem.entity.Category;
 import com.recruitmentsystem.entity.Job;
 import com.recruitmentsystem.model.job.JobDisplayModel;
 import com.recruitmentsystem.model.job.JobRequestModel;
-import com.recruitmentsystem.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class JobMapper {
-//    private final CompanyService companyService;
     public JobDisplayModel jobToDisplayModel(Job job) {
+        Set<Category> categories = job.getCategories();
+        List<String> catList = new ArrayList<>();
+        for (Category c : categories) {
+            catList.add(c.getCategoryName());
+        }
         return JobDisplayModel
                 .builder()
                 .name(job.getJobName())
+                .branch(job.getBranch().getBranchName())
+                .companyName(job.getBranch().getCompany().getCompanyName())
                 .companyLogo(job.getBranch().getCompany().getCompanyLogo())
                 .jobAddress(job.getBranch().getBranchAddress())
                 .jobLevel(job.getJobLevel())
@@ -22,7 +32,7 @@ public class JobMapper {
                 .jobUrl(job.getJobUrl())
                 .jobRequirement(job.getJobRequirement())
                 .jobDescription(job.getJobDescription())
-                .category(job.getCategories().toString())
+                .category(catList)
                 .expiresDate(job.getExpiresDate())
                 .createdAt(job.getCreatedAt())
                 .build();

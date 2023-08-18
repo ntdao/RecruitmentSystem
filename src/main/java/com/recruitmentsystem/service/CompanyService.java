@@ -28,38 +28,56 @@ public class CompanyService {
     private final ICompanyRepository companyRepository;
     private final CompanyMapper companyMapper;
 
-    public void addCompany(CompanyRequestModel companyRegistrationRequest) {
-        // check company name
-        String companyName = companyRegistrationRequest.name();
-        if (companyRepository.existsCompanyByCompanyName(companyName)) {
+    private boolean checkDuplicateCompanyName(String name) {
+        if (companyRepository.existsCompanyByCompanyName(name)) {
             throw new ResourceAlreadyExistsException("Company name already taken");
         }
+        return false;
+    }
 
-        // add
-        Company company = companyMapper.companyRequestModelToCompany(companyRegistrationRequest);
-        company.setCreatedAt(Instant.now());
-        companyRepository.save(company);
+    public void addCompanyAdmin(CompanyRequestModel request) {
+        try {
+            if (!checkDuplicateCompanyName(request.companyName())) {
+                Company company = companyMapper.companyRequestModelToCompany(request);
+                company.setCreatedAt(Instant.now());
+                companyRepository.save(company);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+//        catch (ResourceAlreadyExistsException e) {
+//            throw new ResourceAlreadyExistsException(e.getMessage());
+//        } catch (Exception e) {
+//            throw new RuntimeException(e.getMessage());
+//        }
     }
 
     public List<CompanyDisplayModel> findAllCompanies() {
-        List<Company> companys = companyRepository.findAll();
-        return companys.stream()
+        List<Company> companies = companyRepository.findAll();
+        return companies.stream()
                 .filter(company -> !company.isDeleteFlag())
                 .map(companyMapper::companyToDisplayModel)
                 .collect(Collectors.toList());
     }
 
-    public CompanyDisplayModel findById(Integer id) {
+    public List<Company> findAllCompaniesAdmin() {
+        List<Company> companies = companyRepository.findAll();
+        return companies.stream()
+                .filter(company -> !company.isDeleteFlag())
+                .collect(Collectors.toList());
+    }
+
+    public Company findCompanyByIdAdmin(Integer id) {
         return companyRepository.findById(id)
                 .filter(company -> !company.isDeleteFlag())
-                .map(companyMapper::companyToDisplayModel)
                 .orElseThrow(() -> new ResourceNotFoundException("Company with id " + id + " does not exist"));
     }
 
-    public Company findCompanyById(Integer id) {
-        return companyRepository.findById(id)
-                .filter(company -> !company.isDeleteFlag())
-                .orElseThrow(() -> new ResourceNotFoundException("Company with id " + id + " does not exist"));
+    public List<Company> findCompanyByCompanyNameAdmin(String name) {
+        return companyRepository.findAll()
+                .stream()
+                .filter(c -> (!c.isDeleteFlag() && c.getCompanyName().contains(name)))
+                .collect(Collectors.toList());
     }
 
     public List<CompanyDisplayModel> findCompanyByCompanyName(String name) {
@@ -71,13 +89,20 @@ public class CompanyService {
     }
 
     @Transactional
-    public void updateCompany(Integer id, CompanyRequestModel requestModel) {
+    public void updateCompanyByAdmin(Integer id, CompanyRequestModel requestModel) {
         // tim company theo id
-        Company updateCompany = findCompanyById(id);
-//        updateCompany.setUpdatedAt(LocalDateTime.now());
+        Company updateCompany = findCompanyByIdAdmin(id);
+        updateCompany(updateCompany, requestModel, 0);
+    }
+
+    private void updateCompany(Company updateCompany,
+                               CompanyRequestModel requestModel,
+                               Integer updatedBy) {
+
+        int id = updateCompany.getCompanyId();
 
         // tao ban ghi luu thong tin cu cua company
-        Company oldCompany = new Company(updateCompany, id, true);
+        Company oldCompany = new Company(updateCompany, true);
         companyRepository.save(oldCompany);
 
         // update company
@@ -85,13 +110,13 @@ public class CompanyService {
         updateCompany.setCompanyId(id);
         updateCompany.setCreatedAt(oldCompany.getCreatedAt());
         updateCompany.setCreatedBy(oldCompany.getCreatedBy());
-        updateCompany.setUpdatedAt(oldCompany.getUpdatedAt());
-//        updateCompany.setUpdatedBy();
+        updateCompany.setUpdatedAt(Instant.now());
+        updateCompany.setUpdatedBy(updatedBy);
         companyRepository.save(updateCompany);
     }
 
     public void deleteCompany(Integer id) {
-        Company company = findCompanyById(id);
+        Company company = findCompanyByIdAdmin(id);
         company.setDeleteFlag(true);
         companyRepository.save(company);
     }
@@ -141,12 +166,4 @@ public class CompanyService {
                 .build();
         return pagination;
     }
-
-//    public List<CompanyDisplayModel> findTopCompany() {
-//        List<Company> companies= companyRepository.findAll(Sort.by(Sort.Direction.DESC, "total"));
-//        return companies.stream()
-//                .filter(company -> !company.isDeleteFlag())
-//                .map(companyMapper::companyToDisplayModel)
-//                .collect(Collectors.toList());
-//    }
 }

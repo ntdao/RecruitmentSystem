@@ -34,7 +34,7 @@ public class CategoryController {
         try {
             List<Category> categories = categoryService.findHotCategories(pageNo, pageSize, sortBy);
             return ResponseEntity.ok(categories);
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
@@ -65,7 +65,7 @@ public class CategoryController {
     @PutMapping("/update/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity updateCategory(@PathVariable("id") Integer id,
-                                     @RequestBody Category request) {
+                                         @RequestBody Category request) {
         try {
             categoryService.updateCategory(id, request);
         } catch (ResourceNotFoundException e) {
@@ -75,7 +75,7 @@ public class CategoryController {
         }
         return ResponseEntity.ok().build();
     }
-    
+
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity deleteCategory(@PathVariable("id") Integer id) {

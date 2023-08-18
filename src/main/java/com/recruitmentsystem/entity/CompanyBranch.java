@@ -24,6 +24,7 @@ public class CompanyBranch extends Audit {
     @JoinColumn(name = "company_id")
     private Company company;
 
-    public CompanyBranch(CompanyBranch updateBranch, Integer id, boolean b) {
+    public CompanyBranch(CompanyBranch branch, boolean deleteFlag) {
+
     }
 }

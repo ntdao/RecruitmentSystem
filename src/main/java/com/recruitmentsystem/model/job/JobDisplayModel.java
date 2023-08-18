@@ -4,6 +4,7 @@ import com.recruitmentsystem.common.myEnum.JobLevel;
 import lombok.Builder;
 
 import java.time.Instant;
+import java.util.List;
 
 @Builder
 public record JobDisplayModel(
@@ -16,7 +17,9 @@ public record JobDisplayModel(
         String salary,
         Instant expiresDate,
         String jobUrl,
-        String category,
-        Instant createdAt
+        List<String> category,
+        Instant createdAt,
+        String branch,
+        String companyName
 ) {
 }

@@ -2,7 +2,6 @@ package com.recruitmentsystem.service;
 
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
-import com.recruitmentsystem.common.exception.ResourceNotModifiedException;
 import com.recruitmentsystem.entity.User;
 import com.recruitmentsystem.mapper.UserMapper;
 import com.recruitmentsystem.model.pagination.MyPagination;
@@ -16,6 +15,7 @@ import com.recruitmentsystem.security.token.Token;
 import com.recruitmentsystem.security.token.TokenService;
 import com.recruitmentsystem.security.token.TokenType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,12 +27,18 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.MediaType.*;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +69,7 @@ public class UserService {
             if (!checkDuplicateUsername(request.username()) && !checkDuplicateEmail(request.email())) {
                 User user = userMapper.userRequestModelToUser(request);
                 user.setCreatedAt(Instant.now());
-                user.setCreatedBy(getCurrentUser().getId());
+//                user.setCreatedBy(getCurrentUser().getId());
                 userRepository.save(user);
                 userRepository.enableUser(user.getEmail());
             }
@@ -76,10 +82,7 @@ public class UserService {
 
     public List<UserDisplayModel> findAllUsers() {
         List<User> users = userRepository.findAll();
-        return users.stream()
-                .filter(user -> !user.isDeleteFlag())
-                .map(userMapper::userToDisplayModel)
-                .collect(Collectors.toList());
+        return users.stream().filter(user -> (!user.isDeleteFlag() && user.getRole().getRoleId() != 1)).map(userMapper::userToDisplayModel).collect(Collectors.toList());
     }
 
     private List<UserDisplayModel> getUsers(Integer pageNo, Integer pageSize, String sortBy) {
@@ -87,11 +90,7 @@ public class UserService {
 
         Page<User> pagedResult = userRepository.findAll(paging);
 
-        List<UserDisplayModel> list = pagedResult.getContent()
-                .stream()
-                .filter(u -> !u.isDeleteFlag())
-                .map(userMapper::userToDisplayModel)
-                .collect(Collectors.toList());
+        List<UserDisplayModel> list = pagedResult.getContent().stream().filter(u -> !u.isDeleteFlag()).map(userMapper::userToDisplayModel).collect(Collectors.toList());
 
         if (pagedResult.hasContent()) {
             return list;
@@ -112,66 +111,32 @@ public class UserService {
             totalPages = pageElements / pageSize + 1;
         }
 
-        MyPagination pagination = MyPagination.builder()
-                .total(pageElements)
-                .totalPage(totalPages)
-                .pageSize(pageSize)
-                .pageNo(pageNo)
-                .list(Collections.singletonList(list))
-                .build();
+        MyPagination pagination = MyPagination.builder().total(pageElements).totalPage(totalPages).pageSize(pageSize).pageNo(pageNo).list(Collections.singletonList(list)).build();
         return pagination;
     }
 
     public UserDisplayModel findById(Integer id) {
-        return userRepository.findById(id)
-                .filter(user -> !user.isDeleteFlag())
-                .map(userMapper::userToDisplayModel)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " does not exist"));
+        return userRepository.findById(id).filter(user -> !user.isDeleteFlag()).map(userMapper::userToDisplayModel).orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " does not exist"));
     }
 
     private User findUserById(Integer id) {
-        return userRepository.findById(id)
-                .filter(user -> !user.isDeleteFlag())
-                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " does not exist"));
+        return userRepository.findById(id).filter(user -> !user.isDeleteFlag()).orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " does not exist"));
     }
 
     private User findUserByUsername(String username) {
-        List<User> users = userRepository
-                .findUserByUsername(username)
-                .stream()
-                .filter(user -> !user.isDeleteFlag())
-                .collect(Collectors.toList());
-        if (users.size() == 0) {
-            throw new ResourceNotFoundException("User with username " + username + " does not exist");
-        }
-        return users.get(0);
+        return userRepository.findUserByUsername(username).filter(user -> !user.isDeleteFlag()).orElseThrow(() -> new ResourceNotFoundException("User with username " + username + " does not exist"));
     }
 
     private List<UserDisplayModel> findAllUserByUsername(String name) {
-        return userRepository.findAll()
-                .stream()
-                .filter(user -> (!user.isDeleteFlag() &&
-                        user.getUsername().contains(name)))
-                .map(userMapper::userToDisplayModel)
-                .collect(Collectors.toList());
+        return userRepository.findAll().stream().filter(user -> (!user.isDeleteFlag() && user.getUsername().contains(name))).map(userMapper::userToDisplayModel).collect(Collectors.toList());
     }
 
     private List<UserDisplayModel> findAllUserByFirstName(String name) {
-        return userRepository.findAll()
-                .stream()
-                .filter(user -> (!user.isDeleteFlag() &&
-                        user.getFirstName().contains(name)))
-                .map(userMapper::userToDisplayModel)
-                .collect(Collectors.toList());
+        return userRepository.findAll().stream().filter(user -> (!user.isDeleteFlag() && user.getFirstName().contains(name))).map(userMapper::userToDisplayModel).collect(Collectors.toList());
     }
 
     private List<UserDisplayModel> findAllUserByLastName(String name) {
-        return userRepository.findAll()
-                .stream()
-                .filter(user -> (!user.isDeleteFlag() &&
-                        user.getLastName().contains(name)))
-                .map(userMapper::userToDisplayModel)
-                .collect(Collectors.toList());
+        return userRepository.findAll().stream().filter(user -> (!user.isDeleteFlag() && user.getLastName().contains(name))).map(userMapper::userToDisplayModel).collect(Collectors.toList());
     }
 
     public List<UserDisplayModel> findAllUserByName(String name) {
@@ -183,12 +148,19 @@ public class UserService {
     }
 
     public User findUserByToken(String token) {
-        String email = jwtTokenUtil.extractEmail(token);
+        boolean isValid = tokenService.isValidToken(token);
         User user = null;
-        try {
-            user = findUserByEmail(email);
-        } catch (Exception ex) {
-            throw new ResourceNotFoundException("User with token " + token + " does not exist");
+        if (isValid) {
+            String email = jwtTokenUtil.extractEmail(token);
+            System.out.println(email);
+            try {
+                user = findUserByEmail(email);
+                System.out.println(user);
+            } catch (Exception ex) {
+                throw new ResourceNotFoundException("User with token " + token + " does not exist");
+            }
+        } else {
+            throw new ResourceNotFoundException("Token is invalid");
         }
         return user;
     }
@@ -198,9 +170,7 @@ public class UserService {
     }
 
     public User findUserByEmail(String email) {
-        return userRepository.findTopByEmail(email)
-                .filter(user -> !user.isDeleteFlag())
-                .orElseThrow(() -> new ResourceNotFoundException("User with email " + email + " does not exist"));
+        return userRepository.findTopByEmail(email).filter(user -> !user.isDeleteFlag()).orElseThrow(() -> new ResourceNotFoundException("User with email " + email + " does not exist"));
     }
 
     @Transactional
@@ -209,9 +179,16 @@ public class UserService {
         updateUser(updateUser, request, getCurrentUser().getId());
     }
 
-    private void updateUser(User updateUser, UserRequestModel request, Integer updateBy) {
-        int id = updateUser.getId();
+    @Transactional
+    public AuthenticationResponse updateUser(String token, UserRequestModel request) {
+        User updateUser = findUserByToken(token);
+        AuthenticationResponse response = updateUser(updateUser, request, updateUser.getId());
+        return response;
+    }
 
+    private AuthenticationResponse updateUser(User updateUser, UserRequestModel request, Integer updateBy) {
+        int id = updateUser.getId();
+        AuthenticationResponse response = null;
 //        if (updateUser.equals(request)){
 //            throw new ResourceNotModifiedException("user information has no change");
 //        }
@@ -219,9 +196,13 @@ public class UserService {
         try {
             boolean isUsernameChange = !updateUser.getUsername().equals(request.username());
             boolean isEmailChange = !updateUser.getEmail().equals(request.email());
-
-            boolean isValidUsername = !(isUsernameChange && checkDuplicateUsername(request.username()));
-            boolean isValidEmail = !(isEmailChange && checkDuplicateEmail(request.email()));
+            boolean isValidUsername = true, isValidEmail = true;
+            if (isUsernameChange) {
+                isValidUsername = !checkDuplicateUsername(request.username());
+            }
+            if (isEmailChange) {
+                isValidEmail = !checkDuplicateEmail(request.email());
+            }
 
             if (isValidUsername && isValidEmail) {
                 // tao ban ghi luu thong tin cu cua user
@@ -238,98 +219,88 @@ public class UserService {
                 updateUser.setUpdatedAt(Instant.now());
                 updateUser.setEnabled(oldUser.getEnabled());
                 updateUser.setUpdatedBy(updateBy);
-
-                //        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-                ////        user.setPhotos(fileName);
-                //        updateUser.setImgUrl(fileName);
-                //        String uploadDir = "user-photos/" + id;
-                //        FileService.saveFile(uploadDir, fileName, multipartFile);
+                updateUser.setImgUrl(request.imgUrl());
                 userRepository.save(updateUser);
+
+                String accessToken = jwtTokenUtil.generateToken(updateUser);
+                String refreshToken = jwtTokenUtil.generateRefreshToken(updateUser);
+
+                revokeAllUserTokens(updateUser);
+
+                Token tokenAccess = Token.builder().user(updateUser).token(accessToken).tokenType(TokenType.BEARER).createdAt(Instant.now()).expiresAt(Instant.ofEpochMilli(jwtTokenUtil.extractExpiration(accessToken).getTime())).expired(false).revoked(false).build();
+
+                Token tokenRefresh = Token.builder().user(updateUser).token(refreshToken).tokenType(TokenType.BEARER).createdAt(Instant.now()).expiresAt(Instant.ofEpochMilli(jwtTokenUtil.extractExpiration(refreshToken).getTime())).expired(false).revoked(false).build();
+
+                tokenService.saveToken(tokenAccess);
+                tokenService.saveToken(tokenRefresh);
+
+                response = AuthenticationResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
             }
         } catch (ResourceAlreadyExistsException e) {
             throw new ResourceAlreadyExistsException(e.getMessage());
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+        return response;
     }
 
-    @Transactional
-    public AuthenticationResponse updateUser(String token, UserRequestModel request) {
-        User updateUser = findUserByToken(token);
-        updateUser(updateUser, request, updateUser.getId());
-
-        String accessToken = jwtTokenUtil.generateToken(updateUser);
-        String refreshToken = jwtTokenUtil.generateRefreshToken(updateUser);
-
-        Token tokenAccess = Token
-                .builder()
-                .user(updateUser)
-                .token(accessToken)
-                .tokenType(TokenType.BEARER)
-                .createdAt(Instant.now())
-                .expiresAt(Instant.now().plusMillis(jwtTokenUtil.extractExpiration(accessToken).getTime()))
-                .expired(false)
-                .revoked(false)
-                .build();
-
-        Token tokenRefresh = Token
-                .builder()
-                .user(updateUser)
-                .token(refreshToken)
-                .tokenType(TokenType.BEARER)
-                .createdAt(Instant.now())
-                .expiresAt(Instant.now().plusMillis(jwtTokenUtil.extractExpiration(refreshToken).getTime()))
-                .expired(false)
-                .revoked(false)
-                .build();
-
-        tokenService.saveToken(tokenAccess);
-        tokenService.saveToken(tokenRefresh);
-
-        return AuthenticationResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+    public String uploadUserProfileImage(String token, MultipartFile file) throws IOException {
+        // 1. Check if image is not empty
+        if (file.isEmpty()) {
+            throw new IllegalStateException("Cannot upload empty file [" + file.getSize() + "]");
+        }
+        // 2. If file is an image
+        // 3. The user exists in database
+        User user = findUserByToken(token);
+        System.out.println(user);
+        // 4. Grab some metadata from file if any
+        // 5. Store image in ? and update database with imgUrl
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        System.out.println(fileName);
+        String uploadDir = "user_profile/"+  user.getId();
+//        String uploadDir = "src/main/resources/static/image/user_profile/" +  user.getId() + "/";
+        System.out.println(uploadDir);
+        return FileService.saveFile(uploadDir, fileName, file);
     }
 
-    @Transactional
-    public AuthenticationResponse updateUserByAuth(UserRequestModel request) {
-        User updateUser = getCurrentUser();
-        updateUser(updateUser, request, updateUser.getId());
-
-        String accessToken = jwtTokenUtil.generateToken(updateUser);
-        String refreshToken = jwtTokenUtil.generateRefreshToken(updateUser);
-
-        Token tokenAccess = Token
-                .builder()
-                .user(updateUser)
-                .token(accessToken)
-                .tokenType(TokenType.BEARER)
-                .createdAt(Instant.now())
-                .expiresAt(Instant.now().plusMillis(jwtTokenUtil.extractExpiration(accessToken).getTime()))
-                .expired(false)
-                .revoked(false)
-                .build();
-
-        Token tokenRefresh = Token
-                .builder()
-                .user(updateUser)
-                .token(refreshToken)
-                .tokenType(TokenType.BEARER)
-                .createdAt(Instant.now())
-                .expiresAt(Instant.now().plusMillis(jwtTokenUtil.extractExpiration(refreshToken).getTime()))
-                .expired(false)
-                .revoked(false)
-                .build();
-
-        tokenService.saveToken(tokenAccess);
-        tokenService.saveToken(tokenRefresh);
-
-        return AuthenticationResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-    }
+//    @Transactional
+//    public AuthenticationResponse updateUserByAuth(UserRequestModel request) {
+//        User updateUser = getCurrentUser();
+//        updateUser(updateUser, request, updateUser.getId());
+//
+//        String accessToken = jwtTokenUtil.generateToken(updateUser);
+//        String refreshToken = jwtTokenUtil.generateRefreshToken(updateUser);
+//
+//        Token tokenAccess = Token
+//                .builder()
+//                .user(updateUser)
+//                .token(accessToken)
+//                .tokenType(TokenType.BEARER)
+//                .createdAt(Instant.now())
+//                .expiresAt(Instant.now().plusMillis(jwtTokenUtil.extractExpiration(accessToken).getTime()))
+//                .expired(false)
+//                .revoked(false)
+//                .build();
+//
+//        Token tokenRefresh = Token
+//                .builder()
+//                .user(updateUser)
+//                .token(refreshToken)
+//                .tokenType(TokenType.BEARER)
+//                .createdAt(Instant.now())
+//                .expiresAt(Instant.now().plusMillis(jwtTokenUtil.extractExpiration(refreshToken).getTime()))
+//                .expired(false)
+//                .revoked(false)
+//                .build();
+//
+//        tokenService.saveToken(tokenAccess);
+//        tokenService.saveToken(tokenRefresh);
+//
+//        return AuthenticationResponse.builder()
+//                .accessToken(accessToken)
+//                .refreshToken(refreshToken)
+//                .build();
+//    }
 
     private User getCurrentUser() {
         User user = null;
@@ -341,9 +312,9 @@ public class UserService {
         return user;
     }
 
-    public UserDisplayModel getCurrentUserDisplay() {
-        return userMapper.userToDisplayModel(getCurrentUser());
-    }
+//    public UserDisplayModel getCurrentUserDisplay() {
+//        return userMapper.userToDisplayModel(getCurrentUser());
+//    }
 
     public void deleteUser(Integer id) {
         User user;
@@ -354,11 +325,13 @@ public class UserService {
         }
         user.setDeleteFlag(true);
         userRepository.save(user);
+        revokeAllUserTokens(user);
     }
 
-    public void changePassword(UserChangePassword request) {
+    public void changePassword(String token, UserChangePassword request) {
 
-        User user = getCurrentUser();
+//        User user = getCurrentUser();
+        User user = findUserByToken(token);
         boolean isMatch = passwordEncoder.matches(request.currentPassword(), user.getPassword());
         // kiểm tra mật khẩu hiện tại
         if (isMatch) {
@@ -392,5 +365,19 @@ public class UserService {
         } else {
             throw new IllegalStateException("Your curent password is incorrect");
         }
+    }
+
+    private void revokeAllUserTokens(User user) {
+        List<Token> validUserTokens = tokenService.findAllValidTokenByUser(user.getId());
+        if (validUserTokens.isEmpty()) return;
+        validUserTokens.forEach(token -> {
+            token.setExpired(true);
+            token.setRevoked(true);
+        });
+        tokenService.saveAll(validUserTokens);
+    }
+
+    public byte[] downloadImage(String fileName) {
+        return null;
     }
 }

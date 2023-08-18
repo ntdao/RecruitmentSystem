@@ -8,8 +8,9 @@ import java.time.Instant;
 @Builder
 public record JobRequestModel(
         String name,
-        String companyName,
-        String branchAddress,
+        String company,
+        String branch,
+        String jobAddress,
         JobLevel jobLevel,
         String jobDescription,
         String jobRequirement,

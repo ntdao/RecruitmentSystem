@@ -34,28 +34,34 @@ public class BranchService {
         branchRepository.save(branch);
     }
 
-    public List<BranchDisplayModel> findAllBranches() {
+    public List<CompanyBranch> findAllBranchesAdmin() {
         List<CompanyBranch> branchs = branchRepository.findAll();
         return branchs.stream()
                 .filter(branch -> !branch.isDeleteFlag())
-                .map(branchMapper::branchToDisplayModel)
                 .collect(Collectors.toList());
     }
 
-    public List<BranchDisplayModel> findAllBranchesByCompany(String name) {
-        List<CompanyBranch> branchs = branchRepository.findAll();
-        return branchs.stream()
+//    public List<BranchDisplayModel> findAllBranches() {
+//        List<CompanyBranch> branchs = branchRepository.findAll();
+//        return branchs.stream()
+//                .filter(branch -> !branch.isDeleteFlag())
+//                .map(branchMapper::branchToDisplayModel)
+//                .collect(Collectors.toList());
+//    }
+
+    public List<CompanyBranch> findAllBranchesByCompany(Integer id) {
+        List<CompanyBranch> branches = branchRepository.findAll();
+        System.out.println(branches);
+        return branches.stream()
                 .filter(branch ->
                         (!branch.isDeleteFlag() &&
-                        branch.getCompany().getCompanyName().equals(name)))
-                .map(branchMapper::branchToDisplayModel)
+                                branch.getCompany().getCompanyId() == id))
                 .collect(Collectors.toList());
     }
 
-    public BranchDisplayModel findById(Integer id) {
+    public CompanyBranch findByIdAdmin(Integer id) {
         return branchRepository.findById(id)
                 .filter(branch -> !branch.isDeleteFlag())
-                .map(branchMapper::branchToDisplayModel)
                 .orElseThrow(() -> new ResourceNotFoundException("Branch with id " + id + " does not exist"));
     }
 
@@ -65,10 +71,13 @@ public class BranchService {
                 .orElseThrow(() -> new ResourceNotFoundException("Branch with id " + id + " does not exist"));
     }
 
+    public List<CompanyBranch> findBranchByBranchNameAdmin(String name) {
+        return branchRepository.findAll()
+                .stream()
+                .filter(b -> (!b.isDeleteFlag() && b.getBranchName().contains(name)))
+                .collect(Collectors.toList());
+    }
     public List<BranchDisplayModel> findBranchByBranchName(String name) {
-//        return branchRepository.findByBranchName(name)
-//                .filter(branch -> !branch.isDeleteFlag())
-//                .orElseThrow(() -> new ResourceNotFoundException("Branch with name " + name + " does not exist"));
         return branchRepository.findAll()
                 .stream()
                 .filter(b -> (!b.isDeleteFlag() && b.getBranchName().contains(name)))
@@ -80,10 +89,9 @@ public class BranchService {
     public void updateBranch(Integer id, BranchRequestModel requestModel) {
         // tim branch theo id
         CompanyBranch updateBranch = findBranchById(id);
-//        updateBranch.setUpdatedAt(LocalDateTime.now());
 
         // tao ban ghi luu thong tin cu cua branch
-        CompanyBranch oldBranch = new CompanyBranch(updateBranch, id, true);
+        CompanyBranch oldBranch = new CompanyBranch(updateBranch,true);
         branchRepository.save(oldBranch);
 
         // update branch
@@ -91,7 +99,7 @@ public class BranchService {
         updateBranch.setBranchId(id);
         updateBranch.setCreatedAt(oldBranch.getCreatedAt());
         updateBranch.setCreatedBy(oldBranch.getCreatedBy());
-        updateBranch.setUpdatedAt(oldBranch.getUpdatedAt());
+        updateBranch.setUpdatedAt(Instant.now());
 //        updateBranch.setUpdatedBy();
         branchRepository.save(updateBranch);
     }
