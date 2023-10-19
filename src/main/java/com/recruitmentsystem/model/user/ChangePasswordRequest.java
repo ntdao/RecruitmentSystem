@@ -3,9 +3,10 @@ package com.recruitmentsystem.model.user;
 import lombok.Builder;
 
 @Builder
-public record UserChangePassword(
+public record ChangePasswordRequest(
         String currentPassword,
-        String newPassword
+        String newPassword,
+        String confirmationPassword
 
 ) {
 }

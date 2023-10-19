@@ -5,47 +5,48 @@ import com.recruitmentsystem.common.exception.ResourceNotFoundException;
 import com.recruitmentsystem.entity.User;
 import com.recruitmentsystem.mapper.UserMapper;
 import com.recruitmentsystem.model.pagination.MyPagination;
-import com.recruitmentsystem.model.user.UserChangePassword;
+import com.recruitmentsystem.model.user.ChangePasswordRequest;
 import com.recruitmentsystem.model.user.UserDisplayModel;
 import com.recruitmentsystem.model.user.UserRequestModel;
 import com.recruitmentsystem.repository.IUserRepository;
 import com.recruitmentsystem.security.auth.AuthenticationResponse;
-import com.recruitmentsystem.security.jwt.JwtTokenUtil;
+import com.recruitmentsystem.security.jwt.JwtService;
 import com.recruitmentsystem.security.token.Token;
 import com.recruitmentsystem.security.token.TokenService;
-import com.recruitmentsystem.security.token.TokenType;
+import com.recruitmentsystem.common.myEnum.TokenType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
-
-import static org.springframework.http.MediaType.*;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    @Value("${app.image.root}")
+    private String root;
+
     private final IUserRepository userRepository;
     private final UserMapper userMapper;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtService jwtService;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -123,9 +124,9 @@ public class UserService {
         return userRepository.findById(id).filter(user -> !user.isDeleteFlag()).orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " does not exist"));
     }
 
-    private User findUserByUsername(String username) {
-        return userRepository.findUserByUsername(username).filter(user -> !user.isDeleteFlag()).orElseThrow(() -> new ResourceNotFoundException("User with username " + username + " does not exist"));
-    }
+//    private User findUserByUsername(String username) {
+//        return userRepository.findUserByUsername(username).filter(user -> !user.isDeleteFlag()).orElseThrow(() -> new ResourceNotFoundException("User with username " + username + " does not exist"));
+//    }
 
     private List<UserDisplayModel> findAllUserByUsername(String name) {
         return userRepository.findAll().stream().filter(user -> (!user.isDeleteFlag() && user.getUsername().contains(name))).map(userMapper::userToDisplayModel).collect(Collectors.toList());
@@ -151,7 +152,7 @@ public class UserService {
         boolean isValid = tokenService.isValidToken(token);
         User user = null;
         if (isValid) {
-            String email = jwtTokenUtil.extractEmail(token);
+            String email = jwtService.extractEmail(token);
             System.out.println(email);
             try {
                 user = findUserByEmail(email);
@@ -174,16 +175,22 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(Integer id, UserRequestModel request) {
+    public void updateUser(Integer id, UserRequestModel request, Principal connectedUser) {
         User updateUser = findUserById(id);
-        updateUser(updateUser, request, getCurrentUser().getId());
+        updateUser(updateUser, request, getCurrentUser(connectedUser).getId());
     }
 
     @Transactional
     public AuthenticationResponse updateUser(String token, UserRequestModel request) {
         User updateUser = findUserByToken(token);
-        AuthenticationResponse response = updateUser(updateUser, request, updateUser.getId());
-        return response;
+        return updateUser(updateUser, request, updateUser.getId());
+    }
+
+    @Transactional
+    public AuthenticationResponse updateUserByAuth(UserRequestModel request, Principal connectedUser) {
+        User updateUser = getCurrentUser(connectedUser);
+        System.out.println("Update user: " + updateUser);
+        return updateUser(updateUser, request, updateUser.getId());
     }
 
     private AuthenticationResponse updateUser(User updateUser, UserRequestModel request, Integer updateBy) {
@@ -207,6 +214,7 @@ public class UserService {
             if (isValidUsername && isValidEmail) {
                 // tao ban ghi luu thong tin cu cua user
                 User oldUser = new User(updateUser, true);
+                System.out.println("Old info: " + oldUser);
                 userRepository.save(oldUser);
 
                 // update user
@@ -219,17 +227,31 @@ public class UserService {
                 updateUser.setUpdatedAt(Instant.now());
                 updateUser.setEnabled(oldUser.getEnabled());
                 updateUser.setUpdatedBy(updateBy);
-                updateUser.setImgUrl(request.imgUrl());
+                updateUser.setImgUrl(oldUser.getImgUrl());
+                System.out.println(updateUser);
+                System.out.println("New info: " + oldUser);
                 userRepository.save(updateUser);
 
-                String accessToken = jwtTokenUtil.generateToken(updateUser);
-                String refreshToken = jwtTokenUtil.generateRefreshToken(updateUser);
+                String accessToken = jwtService.generateToken(updateUser);
+                String refreshToken = jwtService.generateRefreshToken(updateUser);
 
                 revokeAllUserTokens(updateUser);
 
-                Token tokenAccess = Token.builder().user(updateUser).token(accessToken).tokenType(TokenType.BEARER).createdAt(Instant.now()).expiresAt(Instant.ofEpochMilli(jwtTokenUtil.extractExpiration(accessToken).getTime())).expired(false).revoked(false).build();
+                Token tokenAccess = Token
+                        .builder()
+                        .user(updateUser)
+                        .token(accessToken)
+                        .tokenType(TokenType.ACCESS)
+                        .expired(false)
+                        .revoked(false).build();
 
-                Token tokenRefresh = Token.builder().user(updateUser).token(refreshToken).tokenType(TokenType.BEARER).createdAt(Instant.now()).expiresAt(Instant.ofEpochMilli(jwtTokenUtil.extractExpiration(refreshToken).getTime())).expired(false).revoked(false).build();
+                Token tokenRefresh = Token
+                        .builder()
+                        .user(updateUser)
+                        .token(refreshToken)
+                        .tokenType(TokenType.REFRESH)
+                        .expired(false)
+                        .revoked(false).build();
 
                 tokenService.saveToken(tokenAccess);
                 tokenService.saveToken(tokenRefresh);
@@ -244,77 +266,72 @@ public class UserService {
         return response;
     }
 
-    public String uploadUserProfileImage(String token, MultipartFile file) throws IOException {
+    public void uploadUserProfileImage(String token, MultipartFile file) throws IOException {
+        User user = findUserByToken(token);
+        uploadProfileImage(user, file);
+    }
+
+    public void uploadUserProfileImageNoToken(Principal connectedUser, MultipartFile file) throws IOException {
+        User user = getCurrentUser(connectedUser);
+        uploadProfileImage(user, file);
+    }
+
+    private void uploadProfileImage(User user, MultipartFile file) throws IOException {
         // 1. Check if image is not empty
         if (file.isEmpty()) {
             throw new IllegalStateException("Cannot upload empty file [" + file.getSize() + "]");
         }
         // 2. If file is an image
         // 3. The user exists in database
-        User user = findUserByToken(token);
-        System.out.println(user);
+        System.out.println("User upload image " + user);
         // 4. Grab some metadata from file if any
         // 5. Store image in ? and update database with imgUrl
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        System.out.println(fileName);
-        String uploadDir = "user_profile/"+  user.getId();
+//        System.out.println(fileName);
+
+        // Get the file extension
+        String extension = FilenameUtils.getExtension(fileName);
+        fileName = UUID.randomUUID().toString() + "." + extension;
+//        System.out.println(fileName);
+
+        String fileDir = "img\\user_profile\\user_" + user.getId();
+        String uploadDir = root + fileDir;
+//        String uploadDir = "user_profile/" + user.getId();
 //        String uploadDir = "src/main/resources/static/image/user_profile/" +  user.getId() + "/";
-        System.out.println(uploadDir);
-        return FileService.saveFile(uploadDir, fileName, file);
+//        System.out.println(uploadDir);
+
+        String filePath = FileService.saveFile(uploadDir, fileName, file);
+        System.out.println(filePath);
+
+        String imgUrl = fileDir + fileName;
+
+        // update the img_url
+        user.setImgUrl(imgUrl);
+        User oldUser = new User(user, true);
+        userRepository.save(oldUser);
+
+        // update user
+        user.setUpdatedAt(Instant.now());
+        user.setUpdatedBy(user.getId());
+        // save user
+        userRepository.save(user);
     }
 
-//    @Transactional
-//    public AuthenticationResponse updateUserByAuth(UserRequestModel request) {
-//        User updateUser = getCurrentUser();
-//        updateUser(updateUser, request, updateUser.getId());
-//
-//        String accessToken = jwtTokenUtil.generateToken(updateUser);
-//        String refreshToken = jwtTokenUtil.generateRefreshToken(updateUser);
-//
-//        Token tokenAccess = Token
-//                .builder()
-//                .user(updateUser)
-//                .token(accessToken)
-//                .tokenType(TokenType.BEARER)
-//                .createdAt(Instant.now())
-//                .expiresAt(Instant.now().plusMillis(jwtTokenUtil.extractExpiration(accessToken).getTime()))
-//                .expired(false)
-//                .revoked(false)
-//                .build();
-//
-//        Token tokenRefresh = Token
-//                .builder()
-//                .user(updateUser)
-//                .token(refreshToken)
-//                .tokenType(TokenType.BEARER)
-//                .createdAt(Instant.now())
-//                .expiresAt(Instant.now().plusMillis(jwtTokenUtil.extractExpiration(refreshToken).getTime()))
-//                .expired(false)
-//                .revoked(false)
-//                .build();
-//
-//        tokenService.saveToken(tokenAccess);
-//        tokenService.saveToken(tokenRefresh);
-//
-//        return AuthenticationResponse.builder()
-//                .accessToken(accessToken)
-//                .refreshToken(refreshToken)
-//                .build();
-//    }
+    private User getCurrentUser(Principal connectedUser) {
+//        User user = null;
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+//            String currentUsername = authentication.getName();
+//            user = findUserByUsername(currentUsername);
+//        }
+        return (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+    }
 
-    private User getCurrentUser() {
-        User user = null;
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            String currentUsername = authentication.getName();
-            user = findUserByUsername(currentUsername);
-        }
+    public UserDisplayModel getCurrentUserDisplay(Principal connectedUser) {
+        UserDisplayModel user = userMapper.userToDisplayModel(getCurrentUser(connectedUser));
+        System.out.println("User info: " + user);
         return user;
     }
-
-//    public UserDisplayModel getCurrentUserDisplay() {
-//        return userMapper.userToDisplayModel(getCurrentUser());
-//    }
 
     public void deleteUser(Integer id) {
         User user;
@@ -328,29 +345,13 @@ public class UserService {
         revokeAllUserTokens(user);
     }
 
-    public void changePassword(String token, UserChangePassword request) {
+    public void changePassword(String token, ChangePasswordRequest request) {
 
 //        User user = getCurrentUser();
         User user = findUserByToken(token);
         boolean isMatch = passwordEncoder.matches(request.currentPassword(), user.getPassword());
         // kiểm tra mật khẩu hiện tại
         if (isMatch) {
-            // update user
-//            UserRequestModel requestModel = UserRequestModel.builder()
-//                    .username(user.getUsername())
-//                    .email(user.getEmail())
-//                    .password(request.getNewPassword())
-//                    .firstName(user.getFirstName())
-//                    .lastName(user.getLastName())
-//                    .phoneNumber(user.getPhoneNumber())
-//                    .address(user.getAddress())
-//                    .gender(user.getGender())
-//                    .birthday(user.getBirthday())
-//                    .imgUrl(user.getImgUrl())
-//                    .createdAt(user.getCreatedAt())
-//                    .updatedAt(user.getUpdatedAt())
-//                    .roleName(user.getRole().getRoleName())
-//                    .build();
             user.setPassword(passwordEncoder.encode(request.newPassword()));
 
             // tao ban ghi luu thong tin cu cua user
@@ -362,9 +363,40 @@ public class UserService {
             user.setUpdatedBy(user.getId());
 
             userRepository.save(user);
+            revokeAllUserTokens(user);
+
         } else {
-            throw new IllegalStateException("Your curent password is incorrect");
+            throw new IllegalStateException("Your current password is incorrect");
         }
+    }
+
+    public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
+
+        var user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+
+        // check if the current password is correct
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+            throw new IllegalStateException("Wrong password");
+        }
+        // check if the two new passwords are the same
+        if (!request.newPassword().equals(request.confirmationPassword())) {
+            throw new IllegalStateException("Password are not the same");
+        }
+
+        // update the password
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+
+        User oldUser = new User(user, true);
+        userRepository.save(oldUser);
+
+        // update user
+        user.setUpdatedAt(Instant.now());
+        user.setUpdatedBy(user.getId());
+
+        // save the new password
+        userRepository.save(user);
+
+        revokeAllUserTokens(user);
     }
 
     private void revokeAllUserTokens(User user) {
@@ -377,7 +409,7 @@ public class UserService {
         tokenService.saveAll(validUserTokens);
     }
 
-    public byte[] downloadImage(String fileName) {
-        return null;
-    }
+//    public byte[] downloadImage(String fileName) {
+//        return null;
+//    }
 }

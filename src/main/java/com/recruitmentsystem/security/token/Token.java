@@ -1,5 +1,6 @@
 package com.recruitmentsystem.security.token;
 
+import com.recruitmentsystem.common.myEnum.TokenType;
 import com.recruitmentsystem.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 @Data
 @Builder
@@ -16,30 +16,31 @@ import java.time.temporal.ChronoUnit;
 @AllArgsConstructor
 @Entity
 public class Token {
-    @Enumerated(EnumType.STRING)
-    public TokenType tokenType = TokenType.BEARER;
-    public boolean revoked = false;
-    public boolean expired = false;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Enumerated(EnumType.STRING)
+    public TokenType tokenType;
+    public boolean revoked = false;
+    public boolean expired = false;
     @Column(nullable = false, unique = true)
     private String token;
-    @Column(nullable = false)
-    private Instant createdAt;
-    @Column(nullable = false)
-    private Instant expiresAt = Instant.now().plus(15, ChronoUnit.MINUTES);
+//    @Column(nullable = false)
+//    private Instant createdAt;
+//    @Column(nullable = false)
+//    private Instant expiresAt = Instant.now().plus(15, ChronoUnit.MINUTES);
     private Instant confirmedAt;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
 
     public boolean isExpired() {
-        return expiresAt.isBefore(Instant.now());
+        return expired;
     }
 
     public boolean isRevoked() {
-        return !revoked;
+        return revoked;
     }
 
 //    public Token(String token,

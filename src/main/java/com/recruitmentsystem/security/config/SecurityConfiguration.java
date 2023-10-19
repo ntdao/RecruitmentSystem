@@ -48,17 +48,18 @@ public class SecurityConfiguration {
                         "/api/v*/user/**",
                         "/api/v*/categories/**",
                         "/api/v*/companies/**",
-                        "/api/v*/company/branches/**",
+                        "/api/v*/branches/**",
                         "/api/v*/jobs/**")
                 .permitAll()
 
-                .requestMatchers("/api/v*/manage_users/**").hasRole("ADMIN")
-                .requestMatchers("/api/v*/manage_roles/**").hasRole("ADMIN")
-                .requestMatchers("/api/v*/manage_companies/**").hasRole("ADMIN")
-                .requestMatchers("/api/v*/company/manage_branches/**").hasRole("ADMIN")
-                .requestMatchers("/api/v*/manage_categories/**").hasRole("ADMIN")
-                .requestMatchers("/api/v*/admin/manage_jobs/**").hasRole("ADMIN")
-                .requestMatchers("/api/v*/hr/manage_jobs/**").hasRole("HR")
+                .requestMatchers("/api/v*/manage/**").hasRole("ADMIN")
+//                .requestMatchers("/api/v*/manage/**/**").hasRole("ADMIN")
+//                .requestMatchers("/api/v*/manage_roles/**").hasRole("ADMIN")
+//                .requestMatchers("/api/v*/manage_companies/**").hasRole("ADMIN")
+//                .requestMatchers("/api/v*/company/manage_branches/**").hasRole("ADMIN")
+//                .requestMatchers("/api/v*/manage_categories/**").hasRole("ADMIN")
+                .requestMatchers("/api/v*/admin/manage/jobs/**").hasRole("ADMIN")
+                .requestMatchers("/api/v*/hr/manage/jobs/**").hasRole("HR")
 
                 // Tất cả các request khác đều cần phải xác thực mới được truy cập
                 .anyRequest().authenticated()

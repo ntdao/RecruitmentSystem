@@ -19,7 +19,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
     @Override
@@ -41,19 +41,19 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             return;
         }
         jwtToken = authHeader.substring(7);
-        email = jwtTokenUtil.extractEmail(jwtToken);
+        email = jwtService.extractEmail(jwtToken);
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-            System.out.println(userDetails);
+//            System.out.println(userDetails);
 
-            if (jwtTokenUtil.isTokenValid(jwtToken, userDetails)) {
+            if (jwtService.isTokenValid(jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
                         userDetails.getAuthorities()
                 );
-                System.out.println(authToken);
+//                System.out.println(authToken);
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );

@@ -20,7 +20,7 @@ import java.util.Set;
 @AllArgsConstructor
 @ToString
 @Builder
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class User extends Audit implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,12 +66,12 @@ public class User extends Audit implements UserDetails {
 //    }
 
 
-    @Transient
-    public String getImgUrl() {
-        if (imgUrl == null) return null;
-//        return "/image/user_profile/" + id + "/" + imgUrl;
-        return id + "/" + imgUrl;
-    }
+//    @Transient
+//    public String getImgUrl() {
+//        if (imgUrl == null) return null;
+////        return "/image/user_profile/" + id + "/" + imgUrl;
+//        return id + "/" + imgUrl;
+//    }
 
     public User(User user, boolean deleteFlag) {
         super(user.getCreatedAt(),

@@ -20,9 +20,9 @@ public class FileService {
         }
         try (InputStream inputStream = multipartFile.getInputStream()) {
             Path filePath = uploadPath.resolve(fileName);
-            System.out.println(filePath.toString());
+//            System.out.println(filePath.toString());
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-            System.out.println(filePath.toString());
+//            System.out.println(filePath.toString());
             return filePath.toString();
         } catch (IOException ioe) {
             throw new IOException("Could not save image file: " + fileName, ioe);

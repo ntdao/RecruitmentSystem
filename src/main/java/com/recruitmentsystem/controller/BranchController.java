@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/company")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class BranchController {
     private final BranchService branchService;
     private final JobService jobService;
 
-    @GetMapping("/branches/{companyId}")
-    public ResponseEntity<?> getAllBranchesByCompany(@PathVariable Integer companyId) {
+    @GetMapping("/branches/{company-id}")
+    public ResponseEntity<?> getAllBranchesByCompany(@PathVariable("company-id") Integer companyId) {
         List<CompanyBranch> companies = branchService.findAllBranchesByCompany(companyId);
         return ResponseEntity.ok(companies);
     }
@@ -50,13 +50,13 @@ public class BranchController {
         }
     }
 
-    @GetMapping("/manage_branches")
+    @GetMapping("/manage/branches/all")
     public ResponseEntity<?> getAllBranches() {
         List<CompanyBranch> companies = branchService.findAllBranchesAdmin();
         return ResponseEntity.ok(companies);
     }
 
-    @GetMapping("/manage_branches/find/{id}")
+    @GetMapping("/manage/branches/find/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getBranchById(@PathVariable("id") Integer id) {
         CompanyBranch branch;
@@ -68,7 +68,7 @@ public class BranchController {
         return ResponseEntity.ok(branch);
     }
 
-    @GetMapping("/manage_branches/find/{name}")
+    @GetMapping("/manage/branches/find/{name}")
     public ResponseEntity<?> getBranchByNameAdmin(@PathVariable("name") String name) {
         List<CompanyBranch> branch;
         try {
@@ -79,7 +79,7 @@ public class BranchController {
         return ResponseEntity.ok(branch);
     }
 
-    @PostMapping("/manage_branches/add")
+    @PostMapping("/manage/branches/add")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> registerBranch(@RequestBody BranchRequestModel request) {
         try {
@@ -90,7 +90,7 @@ public class BranchController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/manage_breanches/update/{id}")
+    @PutMapping("/manage/branches/update/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateBranch(@PathVariable("id") Integer id,
                                           @RequestBody BranchRequestModel request) {
@@ -102,7 +102,7 @@ public class BranchController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/manage_breanches/delete/{id}")
+    @DeleteMapping("/manage/branches/delete/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity deleteBranch(@PathVariable("id") Integer id) {
         try {

@@ -45,8 +45,8 @@ public class CompanyController {
         return ResponseEntity.ok(companies);
     }
 
-    @GetMapping("/companies/jobs/{companyId}")
-    public ResponseEntity<?> getAllJob(@PathVariable("companyId") Integer id) {
+    @GetMapping("/companies/jobs/{company-id}")
+    public ResponseEntity<?> getAllJob(@PathVariable("company-id") Integer id) {
         try {
             List<Job> jobs = jobService.findAllJobsByCompany(id);
             return ResponseEntity.ok(jobs);
@@ -55,14 +55,14 @@ public class CompanyController {
         }
     }
 
-    @GetMapping("/manage_companies/all")
+    @GetMapping("/manage/companies/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<Company>> getAllCompaniesAdmin() {
         List<Company> companies = companyService.findAllCompaniesAdmin();
         return ResponseEntity.ok(companies);
     }
 
-    @GetMapping("/manage_companies/find/{id}")
+    @GetMapping("/manage/companies/find/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getCompanyById(@PathVariable("id") Integer id) {
         Company company;
@@ -75,7 +75,7 @@ public class CompanyController {
     }
 
 
-    @PostMapping("/manage_companies/add")
+    @PostMapping("/manage/companies/add")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> addCompany(@RequestBody CompanyRequestModel request) {
         try {
@@ -86,7 +86,7 @@ public class CompanyController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/manage_companies/update/{id}")
+    @PutMapping("/manage/companies/update/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateCompany(@PathVariable("id") Integer id,
                                            @RequestBody CompanyRequestModel request) {
@@ -98,7 +98,7 @@ public class CompanyController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/manage_companies/delete/{id}")
+    @DeleteMapping("/manage/companies/delete/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity deleteCompany(@PathVariable("id") Integer id) {
         try {

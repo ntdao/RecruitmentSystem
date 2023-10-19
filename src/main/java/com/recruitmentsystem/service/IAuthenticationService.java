@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public interface IAuthenticationService {
-    AuthenticationResponse register(UserRequestModel request);
+    void register(UserRequestModel request);
 
     AuthenticationResponse login(AuthenticationRequest request);
 

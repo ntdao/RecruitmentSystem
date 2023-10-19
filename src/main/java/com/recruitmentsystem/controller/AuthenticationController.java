@@ -22,13 +22,12 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<?> register(
             @RequestBody UserRequestModel request) {
-        AuthenticationResponse response;
         try {
-            response = authenticationService.register(request);
+            authenticationService.register(request);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping(path = "/register/confirm")
@@ -61,12 +60,11 @@ public class AuthenticationController {
             authenticationService.refreshToken(request, response);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-
         }
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/forgot_password")
+    @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Object request) {
         AuthenticationResponse response;
         String email = request.toString().substring(7, request.toString().length() - 1);
@@ -88,7 +86,7 @@ public class AuthenticationController {
 //        return ResponseEntity.ok().build();
 //    }
 
-    @PostMapping("/reset_password")
+    @PostMapping("/reset-password")
     public ResponseEntity<?> processResetPassword(@RequestParam("token") String token,
                                                   @RequestBody Object newPassword) {
         try {

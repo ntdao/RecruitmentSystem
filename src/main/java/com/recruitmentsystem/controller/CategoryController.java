@@ -13,19 +13,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/categories")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @GetMapping
+    @GetMapping("/categories")
     public ResponseEntity<List<Category>> getAllCategories() {
         List<Category> categories = categoryService.findAllCategories();
         return ResponseEntity.ok(categories);
     }
 
-    @GetMapping("/hot")
+    @GetMapping("/categories/hot")
     public ResponseEntity<?> getHotCategories(
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "20") Integer pageSize,
@@ -39,7 +39,7 @@ public class CategoryController {
         }
     }
 
-    @GetMapping("/find/{id}")
+    @GetMapping("/manage/categories/find/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getCategoryById(@PathVariable("id") Integer id) {
         Category category;
@@ -51,7 +51,7 @@ public class CategoryController {
         return ResponseEntity.ok(category);
     }
 
-    @PostMapping("/add")
+    @PostMapping("/manage/categories/add")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity addCategory(@RequestBody Category request) {
         try {
@@ -62,7 +62,7 @@ public class CategoryController {
         }
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/manage/categories/update/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity updateCategory(@PathVariable("id") Integer id,
                                          @RequestBody Category request) {
@@ -76,7 +76,7 @@ public class CategoryController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/manage/categories/delete/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity deleteCategory(@PathVariable("id") Integer id) {
         try {

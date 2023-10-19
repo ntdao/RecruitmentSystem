@@ -17,21 +17,29 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Component
-public class JwtTokenUtil {
+public class JwtService {
     @Value("${app.jwt.secret}")
     private String SECRET_KEY;
+    @Value("${app.jwt.email_verify.expiration}")
+    private long emailExipiration;
     @Value("${app.jwt.expiration}")
     private long jwtExpiration;
     @Value("${app.jwt.refresh_token.expiration}")
     private long refreshExpiration;
 
-    public String generateToken(User user) {
-        return buildToken(new HashMap<>(), user, jwtExpiration);
+    public String generateToken(Map<String, Object> extraClaims, User user) {
+        return buildToken(extraClaims, user, jwtExpiration);
     }
 
-    public String generateRefreshToken(
-            User user
-    ) {
+    public String generateToken(User user) {
+        return generateToken(new HashMap<>(), user);
+    }
+
+    public String generateEmailToken(User user) {
+        return buildToken(new HashMap<>(), user, emailExipiration);
+    }
+
+    public String generateRefreshToken(User user) {
         return buildToken(new HashMap<>(), user, refreshExpiration);
     }
 
@@ -45,7 +53,7 @@ public class JwtTokenUtil {
                 .setClaims(extraClaims)
                 .setSubject(user.getEmail())
                 .claim("username", user.getUsername())
-                .claim("roles", user.getRole().toString())
+                .claim("role", user.getRole().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(SignatureAlgorithm.HS256, getSignInKey())

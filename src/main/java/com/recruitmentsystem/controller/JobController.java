@@ -44,14 +44,14 @@ public class JobController {
         return ResponseEntity.ok(jobs);
     }
 
-    @GetMapping("/admin/manage_jobs/all")
+    @GetMapping("/admin/manage/jobs/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<Job>> getAllJobsAdmin() {
         List<Job> jobs = jobService.findAllJobsAdmin();
         return ResponseEntity.ok(jobs);
     }
 
-    @GetMapping("/admin/manage_jobs/find/{id}")
+    @GetMapping("/admin/manage/jobs/find/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getJobById(@PathVariable("id") Integer id) {
         Job job;
@@ -63,7 +63,7 @@ public class JobController {
         return ResponseEntity.ok(job);
     }
 
-    @DeleteMapping("/admin/manage_jobs/delete/{id}")
+    @DeleteMapping("/admin/manage/jobs/delete/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity deleteJob(@PathVariable("id") Integer id) {
         try {
@@ -74,14 +74,14 @@ public class JobController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/hr/manage_jobs/all")
+    @GetMapping("/hr/manage/jobs/all")
     @PreAuthorize("hasRole('ROLE_HR')")
     public ResponseEntity<List<Job>> getAllJobsHR(String token) {
         List<Job> jobs = jobService.findAllJobsByHR(token);
         return ResponseEntity.ok(jobs);
     }
 
-    @GetMapping("/hr/manage_jobs/find/{id}")
+    @GetMapping("/hr/manage/jobs/find/{id}")
     @PreAuthorize("hasRole('ROLE_HR')")
     public ResponseEntity<?> getJobByIdHR(@PathVariable("id") Integer id) {
         Job job;
@@ -93,7 +93,7 @@ public class JobController {
         return ResponseEntity.ok(job);
     }
 
-    @DeleteMapping("/hr/manage_jobs/delete/{id}")
+    @DeleteMapping("/hr/manage/jobs/delete/{id}")
     @PreAuthorize("hasRole('ROLE_HR')")
     public ResponseEntity deleteJobHR(@PathVariable("id") Integer id) {
         try {
@@ -105,7 +105,7 @@ public class JobController {
     }
 
 
-//    @PostMapping("/manage_jobs/add")
+//    @PostMapping("/manage-jobs/add")
 //    @PreAuthorize("hasRole('ROLE_ADMIN')")
 //    public ResponseEntity<?> addJob(@RequestBody JobRequestModel request) {
 //        try {
@@ -116,7 +116,7 @@ public class JobController {
 //        return ResponseEntity.ok().build();
 //    }
 //
-//    @PutMapping("/manage_jobs/update/{id}")
+//    @PutMapping("/manage-jobs/update/{id}")
 //    @PreAuthorize("hasRole('ROLE_ADMIN')")
 //    public ResponseEntity<?> updateJob(@PathVariable("id") Integer id,
 //                                           @RequestBody JobRequestModel request) {

@@ -9,10 +9,10 @@ import com.recruitmentsystem.model.user.UserRequestModel;
 import com.recruitmentsystem.repository.IUserRepository;
 import com.recruitmentsystem.security.auth.AuthenticationRequest;
 import com.recruitmentsystem.security.auth.AuthenticationResponse;
-import com.recruitmentsystem.security.jwt.JwtTokenUtil;
+import com.recruitmentsystem.security.jwt.JwtService;
 import com.recruitmentsystem.security.token.Token;
 import com.recruitmentsystem.security.token.TokenService;
-import com.recruitmentsystem.security.token.TokenType;
+import com.recruitmentsystem.common.myEnum.TokenType;
 import com.recruitmentsystem.service.EmailService;
 import com.recruitmentsystem.service.IAuthenticationService;
 import com.recruitmentsystem.service.UserService;
@@ -36,16 +36,15 @@ import java.util.List;
 public class AuthenticationServiceImpl implements IAuthenticationService {
     private final IUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtService jwtService;
     private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
     private final UserService userService;
     private final TokenService tokenService;
-    private final long EMAIL_EXPIRATION = 15 * 60 * 1000;
 
     @Override
-    public AuthenticationResponse register(UserRequestModel request) {
+    public void register(UserRequestModel request) {
         // check username
         String username = request.username();
         if (userRepository.existsUserByUsername(username)) {
@@ -62,25 +61,11 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         user.setCreatedAt(Instant.now());
         User savedUser = userRepository.save(user);
 
-//        String refreshToken = jwtTokenUtil.generateRefreshToken(user);
-//        Token token = Token
-//                .builder()
-//                .token(accessToken)
-//                .createdAt(Instant.now())
-//                .expiresAt(Instant.now().plus(15, ChronoUnit.MINUTES))
-//                .user(user)
-//                .build();
-//        tokenService.saveToken(token);
-        String accessToken = jwtTokenUtil.generateToken(user);
-        saveUserToken(savedUser, accessToken, EMAIL_EXPIRATION);
+        String token = jwtService.generateEmailToken(user);
+        saveUserToken(savedUser, token, TokenType.EMAIL);
 
-        String link = "http://localhost:3000/register/confirm?token=" + accessToken;
+        String link = "http://localhost:3000/register/confirm?token=" + token;
         emailService.sendConfirmEmail(request.username(), request.email(), link);
-
-        return AuthenticationResponse.builder()
-                .accessToken(accessToken)
-//                .refreshToken(refreshToken)
-                .build();
     }
 
     @Transactional
@@ -93,11 +78,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         if (confirmationToken.getConfirmedAt() != null) {
             throw new IllegalStateException("email already confirmed");
         }
-//        Instant expiredAt = confirmationToken.getExpiresAt();
-//
-//        if (expiredAt.isBefore(Instant.now())) {
-//            throw new IllegalStateException("token expired");
-//        }
+
         if (confirmationToken.isExpired()) {
             throw new IllegalStateException("token expired");
         }
@@ -111,7 +92,6 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(), request.getPassword())
         );
-
         User user = (User) authentication.getPrincipal();
         if (!user.isEnabled()) {
             throw new IllegalStateException("Your account has not been verified!");
@@ -119,13 +99,13 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             throw new IllegalStateException("Your account does not exist!");
         }
 
-        String accessToken = jwtTokenUtil.generateToken(user);
-        String refreshToken = jwtTokenUtil.generateRefreshToken(user);
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
 
         revokeAllUserTokens(user);
 
-        saveUserToken(user, accessToken, jwtTokenUtil.extractExpiration(accessToken).getTime());
-        saveUserToken(user, refreshToken, jwtTokenUtil.extractExpiration(refreshToken).getTime());
+        saveUserToken(user, accessToken, TokenType.ACCESS);
+        saveUserToken(user, refreshToken, TokenType.REFRESH);
 
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
@@ -136,23 +116,14 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     @Override
     public AuthenticationResponse forgotPassword(String email) {
         User user = userService.findUserByEmail(email);
-        String accessToken = jwtTokenUtil.generateToken(user);
-        saveUserToken(user, accessToken, EMAIL_EXPIRATION);
-//        Token token = Token
-//                        .builder()
-//                        .token(accessToken)
-//                        .createdAt(Instant.now())
-//                        .expiresAt(Instant.now().plus(15, ChronoUnit.MINUTES))
-//                        .user(user)
-//                        .build();
-//        tokenService.saveToken(token);
+        String token = jwtService.generateEmailToken(user);
+        saveUserToken(user, token, TokenType.EMAIL);
 
-        String link = "http://localhost:3000/reset_password?token=" + accessToken;
+        String link = "http://localhost:3000/reset_password?token=" + token;
         emailService.sendResetPasswordEmail(user.getUsername(), user.getEmail(), link);
 
         return AuthenticationResponse.builder()
-                .accessToken(accessToken)
-//                .refreshToken(refreshToken)
+                .accessToken(token)
                 .build();
     }
 
@@ -180,14 +151,12 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         userRepository.save(user);
     }
 
-    public void saveUserToken(User user, String jwtToken, long expiresTime) {
+    public void saveUserToken(User user, String jwtToken, TokenType type) {
         Token token = Token
                 .builder()
                 .user(user)
                 .token(jwtToken)
-                .tokenType(TokenType.BEARER)
-                .createdAt(Instant.now())
-                .expiresAt(Instant.ofEpochMilli(expiresTime))
+                .tokenType(type)
                 .expired(false)
                 .revoked(false)
                 .build();
@@ -216,13 +185,13 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             return;
         }
         refreshToken = authHeader.substring(7);
-        userEmail = jwtTokenUtil.extractEmail(refreshToken);
+        userEmail = jwtService.extractEmail(refreshToken);
         if (userEmail != null) {
             User user = userService.findUserByEmail(userEmail);
-            if (jwtTokenUtil.isTokenValid(refreshToken, user)) {
-                var accessToken = jwtTokenUtil.generateToken(user);
+            if (jwtService.isTokenValid(refreshToken, user)) {
+                var accessToken = jwtService.generateToken(user);
                 revokeAllUserTokens(user);
-                saveUserToken(user, accessToken, 24 * 60 * 60 * 60);
+                saveUserToken(user, accessToken, TokenType.ACCESS);
                 var authResponse = AuthenticationResponse.builder()
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
