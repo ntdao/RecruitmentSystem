@@ -8,6 +8,7 @@ import com.recruitmentsystem.model.job.JobDisplayModel;
 import com.recruitmentsystem.model.job.JobRequestModel;
 import com.recruitmentsystem.service.JobService;
 import com.recruitmentsystem.service.JobService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -46,8 +47,8 @@ public class JobController {
 
     @GetMapping("/admin/manage/jobs/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<List<Job>> getAllJobsAdmin() {
-        List<Job> jobs = jobService.findAllJobsAdmin();
+    public ResponseEntity<?> getAllJobsAdmin() {
+        List<JobDisplayModel> jobs = jobService.findAllJobs();
         return ResponseEntity.ok(jobs);
     }
 
@@ -65,9 +66,10 @@ public class JobController {
 
     @DeleteMapping("/admin/manage/jobs/delete/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity deleteJob(@PathVariable("id") Integer id) {
+    public ResponseEntity deleteJob(@PathVariable("id") Integer id,
+                                    HttpServletRequest request) {
         try {
-            jobService.deleteJob(id);
+            jobService.deleteJob(id, request.getUserPrincipal());
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
@@ -76,8 +78,13 @@ public class JobController {
 
     @GetMapping("/hr/manage/jobs/all")
     @PreAuthorize("hasRole('ROLE_HR')")
-    public ResponseEntity<List<Job>> getAllJobsHR(String token) {
-        List<Job> jobs = jobService.findAllJobsByHR(token);
+    public ResponseEntity<?> getAllJobsHR(HttpServletRequest request) {
+        List<JobDisplayModel> jobs;
+        try {
+            jobs = jobService.findAllJobsByHR(request.getUserPrincipal());
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
         return ResponseEntity.ok(jobs);
     }
 
@@ -95,9 +102,10 @@ public class JobController {
 
     @DeleteMapping("/hr/manage/jobs/delete/{id}")
     @PreAuthorize("hasRole('ROLE_HR')")
-    public ResponseEntity deleteJobHR(@PathVariable("id") Integer id) {
+    public ResponseEntity deleteJobHR(@PathVariable("id") Integer id,
+                                      HttpServletRequest request) {
         try {
-            jobService.deleteJob(id);
+            jobService.deleteJob(id, request.getUserPrincipal());
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
@@ -105,8 +113,8 @@ public class JobController {
     }
 
 
-//    @PostMapping("/manage-jobs/add")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    @PostMapping("/hr/manage/jobs/add")
+//    @PreAuthorize("hasRole('ROLE_HR')")
 //    public ResponseEntity<?> addJob(@RequestBody JobRequestModel request) {
 //        try {
 //            jobService.addJobAdmin(request);

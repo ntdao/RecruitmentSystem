@@ -1,11 +1,13 @@
 package com.recruitmentsystem.security.jwt;
 
 import com.recruitmentsystem.entity.User;
+import com.recruitmentsystem.security.token.TokenService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Component
+@RequiredArgsConstructor
 public class JwtService {
     @Value("${app.jwt.secret}")
     private String SECRET_KEY;
@@ -26,6 +29,7 @@ public class JwtService {
     private long jwtExpiration;
     @Value("${app.jwt.refresh_token.expiration}")
     private long refreshExpiration;
+    private final TokenService tokenService;
 
     public String generateToken(Map<String, Object> extraClaims, User user) {
         return buildToken(extraClaims, user, jwtExpiration);
@@ -98,7 +102,9 @@ public class JwtService {
 
     public Boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        return (username.equals(userDetails.getUsername()))
+                && !isTokenExpired(token)
+                && tokenService.isValidToken(token);
     }
 
 //	public boolean validateAccessToken(String token) {

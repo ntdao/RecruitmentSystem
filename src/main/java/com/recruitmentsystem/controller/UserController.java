@@ -7,6 +7,7 @@ import com.recruitmentsystem.model.user.UserDisplayModel;
 import com.recruitmentsystem.model.user.UserRequestModel;
 import com.recruitmentsystem.security.auth.AuthenticationResponse;
 import com.recruitmentsystem.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,9 +67,10 @@ public class UserController {
    */
     @PostMapping("/manage/users/add")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> addUser(@RequestBody UserRequestModel request) {
+    public ResponseEntity<?> addUser(@RequestBody UserRequestModel userRequest,
+                                     HttpServletRequest request) {
         try {
-            userService.addUser(request);
+            userService.addUser(userRequest, request.getUserPrincipal());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -111,9 +113,10 @@ public class UserController {
 
     @DeleteMapping("/manage/users/delete/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> deleteUser(@PathVariable("id") Integer id) {
+    public ResponseEntity<?> deleteUser(@PathVariable("id") Integer id,
+                                        HttpServletRequest request) {
         try {
-            userService.deleteUser(id);
+            userService.deleteUser(id, request.getUserPrincipal());
             return ResponseEntity.ok().build();
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -122,10 +125,11 @@ public class UserController {
 
     @DeleteMapping("/manage/users/delete")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> deleteUser(@RequestBody Integer[] ids) {
+    public ResponseEntity<?> deleteUser(@RequestBody Integer[] ids,
+                                        HttpServletRequest request) {
         for (Integer id : ids) {
             try {
-                userService.deleteUser(id);
+                userService.deleteUser(id, request.getUserPrincipal());
             } catch (ResourceNotFoundException e) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
             }
@@ -154,6 +158,8 @@ public class UserController {
             response = userService.updateUser(token, request);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token is invalid");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -173,25 +179,26 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/user/image/upload")
-    public ResponseEntity uploadImage(@RequestParam("token") String token,
+    @PostMapping(value = "/user/image/upload",  consumes = {"multipart/form-data"})
+    public ResponseEntity<?> uploadImage(@RequestParam("token") String token,
                                       @RequestParam("image") MultipartFile multipartFile) {
+        String imgUrl;
         try {
-            userService.uploadUserProfileImage(token, multipartFile);
+            imgUrl = userService.uploadUserProfileImage(token, multipartFile);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(imgUrl);
     }
 
     // khong su dung token
     @GetMapping("/user/get-info-no-token")
-    public ResponseEntity<?> getUserProfile(Principal connectedUser) {
+    public ResponseEntity<?> getUserProfile(HttpServletRequest request) {
         UserDisplayModel userDisplayModel;
         try {
-            userDisplayModel = userService.getCurrentUserDisplay(connectedUser);
+            userDisplayModel = userService.getCurrentUserDisplay(request.getUserPrincipal());
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
@@ -201,38 +208,54 @@ public class UserController {
     }
 
     @PutMapping("/user/update-no-token")
-    public ResponseEntity<?> updateUser(@RequestBody UserRequestModel request, Principal connectedUser) {
+    public ResponseEntity<?> updateUser(@RequestBody UserRequestModel userRequestModel,
+                                        HttpServletRequest request) {
         AuthenticationResponse response;
         try {
-            response = userService.updateUserByAuth(request, connectedUser);
+            response = userService.updateUserByAuth(userRequestModel, request.getUserPrincipal());
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token is invalid");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/user/image/upload-no-token")
-    public ResponseEntity uploadImage(@RequestParam("image") MultipartFile multipartFile,
-                                      Principal connectedUser) {
+//    @PostMapping("/user/image/upload-no-token")
+//    public ResponseEntity uploadImage(@RequestParam("image") MultipartFile multipartFile,
+//                                      HttpServletRequest request) {
+//        try {
+//            userService.uploadUserProfileImageNoToken(request.getUserPrincipal(), multipartFile);
+//        } catch (ResourceNotFoundException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+//        } catch (IOException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+//        }
+//        return ResponseEntity.ok().build();
+//    }
+
+    @PostMapping(value = "/user/image/upload-no-token", consumes = {"multipart/form-data"})
+    public ResponseEntity<?> uploadImageUrl(@RequestParam("image") MultipartFile multipartFile,
+                                      HttpServletRequest request) {
+        String imgUrl;
         try {
-            userService.uploadUserProfileImageNoToken(connectedUser, multipartFile);
+            imgUrl = userService.uploadUserProfileImageNoToken(request.getUserPrincipal(), multipartFile);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(imgUrl);
     }
 
     @PatchMapping("/user/change-password-no-token")
     public ResponseEntity<?> changePassword(
-            @RequestBody ChangePasswordRequest request,
-            Principal connectedUser
-    ) {
+            @RequestBody ChangePasswordRequest passwordRequest,
+            HttpServletRequest request) {
         try {
-            userService.changePassword(request, connectedUser);
+            userService.changePassword(passwordRequest, request.getUserPrincipal());
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {

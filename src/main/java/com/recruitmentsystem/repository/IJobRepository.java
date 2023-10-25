@@ -31,8 +31,8 @@ public interface IJobRepository extends JpaRepository<Job, Integer>, PagingAndSo
     List<Integer> findAllJobByBranch(int id);
 
     @Query(value = "select j.job_id from hr_branch h " +
-            "left join company_branch b on h.branch_id = b.brand_id " +
-            "left join job j on j.branch_id = b.brancd_id " +
+            "left join company_branch b on h.branch_id = b.branch_id " +
+            "left join job j on j.branch_id = b.branch_id " +
             "where h.user_id = ?1", nativeQuery = true)
     List<Integer> findAllJobByHR(int id);
 

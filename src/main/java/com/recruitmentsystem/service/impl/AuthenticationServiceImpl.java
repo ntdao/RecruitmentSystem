@@ -119,7 +119,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         String token = jwtService.generateEmailToken(user);
         saveUserToken(user, token, TokenType.EMAIL);
 
-        String link = "http://localhost:3000/reset_password?token=" + token;
+        String link = "http://localhost:3000/reset-password?token=" + token;
         emailService.sendResetPasswordEmail(user.getUsername(), user.getEmail(), link);
 
         return AuthenticationResponse.builder()
@@ -138,6 +138,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         }
 
         User user = userService.findUserByToken(token);
+        revokeAllUserTokens(user);
+
         // tao ban ghi luu thong tin cu cua user
         User oldUser = new User(user, true);
         userRepository.save(oldUser);

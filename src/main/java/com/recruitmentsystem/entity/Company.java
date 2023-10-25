@@ -28,8 +28,8 @@ public class Company extends Audit {
     private String companyField;
 //    private boolean isActive;
 
-    @OneToMany(mappedBy = "company")
-    private Set<CompanyBranch> branches;
+//    @OneToMany(mappedBy = "company")
+//    private Set<CompanyBranch> branches;
 
     public Company(Company company, boolean deleteFlag) {
         super(company.getCreatedAt(),

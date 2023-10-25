@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CompanyService {
     private final ICompanyRepository companyRepository;
+    private final UserService userService;
     private final CompanyMapper companyMapper;
 
     private boolean checkDuplicateCompanyName(String name) {
@@ -35,11 +37,12 @@ public class CompanyService {
         return false;
     }
 
-    public void addCompanyAdmin(CompanyRequestModel request) {
+    public void addCompanyAdmin(CompanyRequestModel request, Principal connectedUser) {
         try {
             if (!checkDuplicateCompanyName(request.companyName())) {
                 Company company = companyMapper.companyRequestModelToCompany(request);
                 company.setCreatedAt(Instant.now());
+                company.setCreatedBy(userService.getCurrentUser(connectedUser).getId());
                 companyRepository.save(company);
             }
         } catch (Exception e) {
@@ -60,25 +63,28 @@ public class CompanyService {
                 .collect(Collectors.toList());
     }
 
-    public List<Company> findAllCompaniesAdmin() {
-        List<Company> companies = companyRepository.findAll();
-        return companies.stream()
-                .filter(company -> !company.isDeleteFlag())
-                .collect(Collectors.toList());
-    }
+//    public List<CompanyDisplayModel> findAllCompaniesAdmin() {
+//        List<Company> companies = companyRepository.findAll();
+//        return companies.stream()
+//                .filter(company -> !company.isDeleteFlag())
+//                .map(companyMapper::companyToDisplayModel)
+//                .collect(Collectors.toList());
+//    }
 
-    public Company findCompanyByIdAdmin(Integer id) {
+
+
+    public Company findCompanyById(Integer id) {
         return companyRepository.findById(id)
                 .filter(company -> !company.isDeleteFlag())
                 .orElseThrow(() -> new ResourceNotFoundException("Company with id " + id + " does not exist"));
     }
 
-    public List<Company> findCompanyByCompanyNameAdmin(String name) {
-        return companyRepository.findAll()
-                .stream()
-                .filter(c -> (!c.isDeleteFlag() && c.getCompanyName().contains(name)))
-                .collect(Collectors.toList());
-    }
+//    public List<Company> findCompanyByCompanyNameAdmin(String name) {
+//        return companyRepository.findAll()
+//                .stream()
+//                .filter(c -> (!c.isDeleteFlag() && c.getCompanyName().contains(name)))
+//                .collect(Collectors.toList());
+//    }
 
     public List<CompanyDisplayModel> findCompanyByCompanyName(String name) {
         return companyRepository.findAll()
@@ -89,10 +95,10 @@ public class CompanyService {
     }
 
     @Transactional
-    public void updateCompanyByAdmin(Integer id, CompanyRequestModel requestModel) {
+    public void updateCompanyByAdmin(Integer id, CompanyRequestModel requestModel, Principal connectedUser) {
         // tim company theo id
-        Company updateCompany = findCompanyByIdAdmin(id);
-        updateCompany(updateCompany, requestModel, 0);
+        Company updateCompany = findCompanyById(id);
+        updateCompany(updateCompany, requestModel, userService.getCurrentUser(connectedUser).getId());
     }
 
     private void updateCompany(Company updateCompany,
@@ -115,9 +121,11 @@ public class CompanyService {
         companyRepository.save(updateCompany);
     }
 
-    public void deleteCompany(Integer id) {
-        Company company = findCompanyByIdAdmin(id);
+    public void deleteCompany(Integer id, Principal connectedUser) {
+        Company company = findCompanyById(id);
         company.setDeleteFlag(true);
+        company.setUpdatedAt(Instant.now());
+        company.setUpdatedBy(userService.getCurrentUser(connectedUser).getId());
         companyRepository.save(company);
     }
 

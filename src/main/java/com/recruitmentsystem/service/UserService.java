@@ -43,7 +43,6 @@ import java.util.stream.Collectors;
 public class UserService {
     @Value("${app.image.root}")
     private String root;
-
     private final IUserRepository userRepository;
     private final UserMapper userMapper;
     private final JwtService jwtService;
@@ -65,12 +64,12 @@ public class UserService {
     }
 
     @Transactional
-    public void addUser(UserRequestModel request) {
+    public void addUser(UserRequestModel request, Principal connectedUser) {
         try {
             if (!checkDuplicateUsername(request.username()) && !checkDuplicateEmail(request.email())) {
                 User user = userMapper.userRequestModelToUser(request);
                 user.setCreatedAt(Instant.now());
-//                user.setCreatedBy(getCurrentUser().getId());
+                user.setCreatedBy(getCurrentUser(connectedUser).getId());
                 userRepository.save(user);
                 userRepository.enableUser(user.getEmail());
             }
@@ -227,9 +226,9 @@ public class UserService {
                 updateUser.setUpdatedAt(Instant.now());
                 updateUser.setEnabled(oldUser.getEnabled());
                 updateUser.setUpdatedBy(updateBy);
-                updateUser.setImgUrl(oldUser.getImgUrl());
+//                updateUser.setImgUrl(oldUser.getImgUrl());
                 System.out.println(updateUser);
-                System.out.println("New info: " + oldUser);
+                System.out.println("New info: " + updateUser);
                 userRepository.save(updateUser);
 
                 String accessToken = jwtService.generateToken(updateUser);
@@ -260,23 +259,25 @@ public class UserService {
             }
         } catch (ResourceAlreadyExistsException e) {
             throw new ResourceAlreadyExistsException(e.getMessage());
+        } catch (IllegalStateException e) {
+            throw new ResourceAlreadyExistsException(e.getMessage());
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
         return response;
     }
 
-    public void uploadUserProfileImage(String token, MultipartFile file) throws IOException {
+    public String uploadUserProfileImage(String token, MultipartFile file) throws IOException {
         User user = findUserByToken(token);
-        uploadProfileImage(user, file);
+        return uploadProfileImage(user, file);
     }
 
-    public void uploadUserProfileImageNoToken(Principal connectedUser, MultipartFile file) throws IOException {
+    public String uploadUserProfileImageNoToken(Principal connectedUser, MultipartFile file) throws IOException {
         User user = getCurrentUser(connectedUser);
-        uploadProfileImage(user, file);
+        return uploadProfileImage(user, file);
     }
 
-    private void uploadProfileImage(User user, MultipartFile file) throws IOException {
+    private String uploadProfileImage(User user, MultipartFile file) throws IOException {
         // 1. Check if image is not empty
         if (file.isEmpty()) {
             throw new IllegalStateException("Cannot upload empty file [" + file.getSize() + "]");
@@ -294,7 +295,7 @@ public class UserService {
         fileName = UUID.randomUUID().toString() + "." + extension;
 //        System.out.println(fileName);
 
-        String fileDir = "img\\user_profile\\user_" + user.getId();
+        String fileDir = "img/user_profile/user_" + user.getId() + "/";
         String uploadDir = root + fileDir;
 //        String uploadDir = "user_profile/" + user.getId();
 //        String uploadDir = "src/main/resources/static/image/user_profile/" +  user.getId() + "/";
@@ -304,20 +305,20 @@ public class UserService {
         System.out.println(filePath);
 
         String imgUrl = fileDir + fileName;
-
-        // update the img_url
-        user.setImgUrl(imgUrl);
-        User oldUser = new User(user, true);
-        userRepository.save(oldUser);
-
-        // update user
-        user.setUpdatedAt(Instant.now());
-        user.setUpdatedBy(user.getId());
-        // save user
-        userRepository.save(user);
+        return imgUrl;
+//        // update the img_url
+//        user.setImgUrl(imgUrl);
+//        User oldUser = new User(user, true);
+//        userRepository.save(oldUser);
+//
+//        // update user
+//        user.setUpdatedAt(Instant.now());
+//        user.setUpdatedBy(user.getId());
+//        // save user
+//        userRepository.save(user);
     }
 
-    private User getCurrentUser(Principal connectedUser) {
+    public User getCurrentUser(Principal connectedUser) {
 //        User user = null;
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        if (!(authentication instanceof AnonymousAuthenticationToken)) {
@@ -333,7 +334,7 @@ public class UserService {
         return user;
     }
 
-    public void deleteUser(Integer id) {
+    public void deleteUser(Integer id, Principal connectedUser) {
         User user;
         try {
             user = findUserById(id);
@@ -341,6 +342,8 @@ public class UserService {
             throw new ResourceNotFoundException("User with id " + id + " does not exist");
         }
         user.setDeleteFlag(true);
+        user.setUpdatedAt(Instant.now());
+        user.setUpdatedBy(getCurrentUser(connectedUser).getId());
         userRepository.save(user);
         revokeAllUserTokens(user);
     }
@@ -372,7 +375,7 @@ public class UserService {
 
     public void changePassword(ChangePasswordRequest request, Principal connectedUser) {
 
-        var user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+        User user = getCurrentUser(connectedUser);
 
         // check if the current password is correct
         if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {

@@ -30,7 +30,7 @@ public class TokenService {
     public boolean isValidToken(String token) {
         Token tokenUser = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Token does not exist"));
-        return !tokenUser.isRevoked();
+        return !tokenUser.isExpired() && !tokenUser.isRevoked();
     }
 
     public List<Token> findAllValidTokenByUser(Integer id) {

@@ -1,5 +1,5 @@
-package com.recruitmentsystem.common.myEnum;
-
-public enum ContactType {
-    USER, COMPANY
-}
+//package com.recruitmentsystem.common.myEnum;
+//
+//public enum ContactType {
+//    USER, COMPANY
+//}

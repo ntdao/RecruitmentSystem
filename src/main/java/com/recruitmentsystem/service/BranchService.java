@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,8 +21,9 @@ import java.util.stream.Collectors;
 public class BranchService {
     private final IBranchRepository branchRepository;
     private final BranchMapper branchMapper;
+    private final UserService userService;
 
-    public void addBranch(BranchRequestModel request) {
+    public void addBranch(BranchRequestModel request, Principal connectedUser) {
         // check branch name
         String branchName = request.name();
         if (branchRepository.existsByBranchName(branchName)) {
@@ -31,6 +33,7 @@ public class BranchService {
         // add
         CompanyBranch branch = branchMapper.branchRequestModelToBranch(request);
         branch.setCreatedAt(Instant.now());
+        branch.setCreatedBy(userService.getCurrentUser(connectedUser).getId());
         branchRepository.save(branch);
     }
 
@@ -50,6 +53,7 @@ public class BranchService {
 //    }
 
     public List<CompanyBranch> findAllBranchesByCompany(Integer id) {
+
         List<CompanyBranch> branches = branchRepository.findAll();
         System.out.println(branches);
         return branches.stream()
@@ -86,7 +90,7 @@ public class BranchService {
     }
 
     @Transactional
-    public void updateBranch(Integer id, BranchRequestModel requestModel) {
+    public void updateBranch(Integer id, BranchRequestModel requestModel, Principal connectedUser) {
         // tim branch theo id
         CompanyBranch updateBranch = findBranchById(id);
 
@@ -100,13 +104,15 @@ public class BranchService {
         updateBranch.setCreatedAt(oldBranch.getCreatedAt());
         updateBranch.setCreatedBy(oldBranch.getCreatedBy());
         updateBranch.setUpdatedAt(Instant.now());
-//        updateBranch.setUpdatedBy();
+        updateBranch.setUpdatedBy(userService.getCurrentUser(connectedUser).getId());
         branchRepository.save(updateBranch);
     }
 
-    public void deleteBranch(Integer id) {
+    public void deleteBranch(Integer id, Principal connectedUser) {
         CompanyBranch branch = findBranchById(id);
         branch.setDeleteFlag(true);
+        branch.setUpdatedAt(Instant.now());
+        branch.setUpdatedBy(userService.getCurrentUser(connectedUser).getId());
         branchRepository.save(branch);
     }
 }

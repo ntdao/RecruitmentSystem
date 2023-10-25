@@ -36,7 +36,6 @@ public class UserMapper {
 
     public User userRequestModelToUser(UserRequestModel request) {
         if (request.address() == null
-                && request.imgUrl() == null
                 && request.password() == null
                 && request.roleName() == null) {
             return User
@@ -48,6 +47,7 @@ public class UserMapper {
                     .phoneNumber(request.phoneNumber())
                     .gender(request.gender())
                     .birthday(request.birthday())
+                    .imgUrl(request.imgUrl())
                     .build();
         } else {
             return User
@@ -61,7 +61,7 @@ public class UserMapper {
                     .address(request.address())
                     .gender(request.gender())
                     .birthday(request.birthday())
-                    .imgUrl(request.imgUrl())
+                    .imgUrl("img\\user_profile\\avatar.png")
                     .role(roleService.findByRoleName(request.roleName()))
                     .build();
         }

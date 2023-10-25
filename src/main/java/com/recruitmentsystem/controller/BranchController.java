@@ -6,8 +6,10 @@ import com.recruitmentsystem.entity.CompanyBranch;
 import com.recruitmentsystem.entity.Job;
 import com.recruitmentsystem.model.branch.BranchDisplayModel;
 import com.recruitmentsystem.model.branch.BranchRequestModel;
+import com.recruitmentsystem.model.job.JobDisplayModel;
 import com.recruitmentsystem.service.BranchService;
 import com.recruitmentsystem.service.JobService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,11 +42,13 @@ public class BranchController {
         return ResponseEntity.ok(branch);
     }
 
-    @GetMapping("/branches/jobs/{branchId}")
-    public ResponseEntity<?> getAllJob(@PathVariable("branchId") Integer id) {
+    @GetMapping("/branches/jobs/{branch-id}")
+    public ResponseEntity<?> getAllJob(@PathVariable("branch-id") Integer id) {
         try {
-            List<Job> jobs = jobService.findAllJobsByBranch(id);
+            List<JobDisplayModel> jobs = jobService.findAllJobsByBranch(id);
             return ResponseEntity.ok(jobs);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -81,9 +85,10 @@ public class BranchController {
 
     @PostMapping("/manage/branches/add")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> registerBranch(@RequestBody BranchRequestModel request) {
+    public ResponseEntity<?> registerBranch(@RequestBody BranchRequestModel branchRequest,
+                                            HttpServletRequest request) {
         try {
-            branchService.addBranch(request);
+            branchService.addBranch(branchRequest, request.getUserPrincipal());
         } catch (ResourceAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
@@ -93,9 +98,10 @@ public class BranchController {
     @PutMapping("/manage/branches/update/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateBranch(@PathVariable("id") Integer id,
-                                          @RequestBody BranchRequestModel request) {
+                                          @RequestBody BranchRequestModel branchRequest,
+                                          HttpServletRequest request) {
         try {
-            branchService.updateBranch(id, request);
+            branchService.updateBranch(id, branchRequest, request.getUserPrincipal());
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -104,9 +110,10 @@ public class BranchController {
 
     @DeleteMapping("/manage/branches/delete/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity deleteBranch(@PathVariable("id") Integer id) {
+    public ResponseEntity deleteBranch(@PathVariable("id") Integer id,
+                                       HttpServletRequest request) {
         try {
-            branchService.deleteBranch(id);
+            branchService.deleteBranch(id, request.getUserPrincipal());
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }

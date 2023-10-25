@@ -25,6 +25,13 @@ public class CompanyBranch extends Audit {
     private Company company;
 
     public CompanyBranch(CompanyBranch branch, boolean deleteFlag) {
-
+        super(branch.getCreatedAt(),
+                branch.getUpdatedAt(),
+                branch.getCreatedBy(),
+                branch.getUpdatedBy(),
+                deleteFlag,
+                branch.getBranchId());
+        this.branchName = branch.getBranchName();
+        this.branchAddress = branch.getBranchAddress();
     }
 }

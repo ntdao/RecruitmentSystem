@@ -22,12 +22,13 @@ public class JobMapper {
         }
         return JobDisplayModel
                 .builder()
+                .id(job.getJobId())
                 .name(job.getJobName())
                 .branch(job.getBranch().getBranchName())
                 .companyName(job.getBranch().getCompany().getCompanyName())
                 .companyLogo(job.getBranch().getCompany().getCompanyLogo())
                 .jobAddress(job.getBranch().getBranchAddress())
-                .jobLevel(job.getJobLevel())
+                .jobLevel(job.getJobLevel().toString())
                 .salary(job.getSalary())
                 .jobUrl(job.getJobUrl())
                 .jobRequirement(job.getJobRequirement())
