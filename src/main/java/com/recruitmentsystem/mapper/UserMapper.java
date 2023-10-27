@@ -15,7 +15,6 @@ public class UserMapper {
     private final RoleService roleService;
 
     public UserDisplayModel userToDisplayModel(User user) {
-        System.out.println(user.getImgUrl());
         return UserDisplayModel
                 .builder()
                 .id(user.getId())
@@ -37,6 +36,7 @@ public class UserMapper {
     public User userRequestModelToUser(UserRequestModel request) {
         if (request.address() == null
                 && request.password() == null
+                && request.imgUrl() == null
                 && request.roleName() == null) {
             return User
                     .builder()
@@ -47,7 +47,7 @@ public class UserMapper {
                     .phoneNumber(request.phoneNumber())
                     .gender(request.gender())
                     .birthday(request.birthday())
-                    .imgUrl(request.imgUrl())
+//                    .imgUrl(request.imgUrl())
                     .build();
         } else {
             return User
@@ -61,7 +61,7 @@ public class UserMapper {
                     .address(request.address())
                     .gender(request.gender())
                     .birthday(request.birthday())
-                    .imgUrl("img\\user_profile\\avatar.png")
+                    .imgUrl("img/user_profile/avatar.png")
                     .role(roleService.findByRoleName(request.roleName()))
                     .build();
         }

@@ -226,7 +226,7 @@ public class UserService {
                 updateUser.setUpdatedAt(Instant.now());
                 updateUser.setEnabled(oldUser.getEnabled());
                 updateUser.setUpdatedBy(updateBy);
-//                updateUser.setImgUrl(oldUser.getImgUrl());
+                updateUser.setImgUrl(oldUser.getImgUrl());
                 System.out.println(updateUser);
                 System.out.println("New info: " + updateUser);
                 userRepository.save(updateUser);
@@ -267,17 +267,17 @@ public class UserService {
         return response;
     }
 
-    public String uploadUserProfileImage(String token, MultipartFile file) throws IOException {
+    public void uploadUserProfileImage(String token, MultipartFile file) throws IOException {
         User user = findUserByToken(token);
-        return uploadProfileImage(user, file);
+        uploadProfileImage(user, file);
     }
 
-    public String uploadUserProfileImageNoToken(Principal connectedUser, MultipartFile file) throws IOException {
+    public void uploadUserProfileImageNoToken(Principal connectedUser, MultipartFile file) throws IOException {
         User user = getCurrentUser(connectedUser);
-        return uploadProfileImage(user, file);
+        uploadProfileImage(user, file);
     }
 
-    private String uploadProfileImage(User user, MultipartFile file) throws IOException {
+    private void uploadProfileImage(User user, MultipartFile file) throws IOException {
         // 1. Check if image is not empty
         if (file.isEmpty()) {
             throw new IllegalStateException("Cannot upload empty file [" + file.getSize() + "]");
@@ -286,7 +286,6 @@ public class UserService {
         // 3. The user exists in database
         System.out.println("User upload image " + user);
         // 4. Grab some metadata from file if any
-        // 5. Store image in ? and update database with imgUrl
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 //        System.out.println(fileName);
 
@@ -305,17 +304,17 @@ public class UserService {
         System.out.println(filePath);
 
         String imgUrl = fileDir + fileName;
-        return imgUrl;
-//        // update the img_url
-//        user.setImgUrl(imgUrl);
-//        User oldUser = new User(user, true);
-//        userRepository.save(oldUser);
-//
-//        // update user
-//        user.setUpdatedAt(Instant.now());
-//        user.setUpdatedBy(user.getId());
-//        // save user
-//        userRepository.save(user);
+//        return imgUrl;
+        // 5. Store image (disk) and update database with imgUrl
+        user.setImgUrl(imgUrl);
+        User oldUser = new User(user, true);
+        userRepository.save(oldUser);
+
+        // update user
+        user.setUpdatedAt(Instant.now());
+        user.setUpdatedBy(user.getId());
+        // save user
+        userRepository.save(user);
     }
 
     public User getCurrentUser(Principal connectedUser) {

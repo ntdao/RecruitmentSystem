@@ -182,15 +182,14 @@ public class UserController {
     @PostMapping(value = "/user/image/upload",  consumes = {"multipart/form-data"})
     public ResponseEntity<?> uploadImage(@RequestParam("token") String token,
                                       @RequestParam("image") MultipartFile multipartFile) {
-        String imgUrl;
         try {
-            imgUrl = userService.uploadUserProfileImage(token, multipartFile);
+            userService.uploadUserProfileImage(token, multipartFile);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return ResponseEntity.ok(imgUrl);
+        return ResponseEntity.ok().build();
     }
 
     // khong su dung token
@@ -239,15 +238,15 @@ public class UserController {
     @PostMapping(value = "/user/image/upload-no-token", consumes = {"multipart/form-data"})
     public ResponseEntity<?> uploadImageUrl(@RequestParam("image") MultipartFile multipartFile,
                                       HttpServletRequest request) {
-        String imgUrl;
         try {
-            imgUrl = userService.uploadUserProfileImageNoToken(request.getUserPrincipal(), multipartFile);
+            System.out.println("File size: " + multipartFile.getSize());
+            userService.uploadUserProfileImageNoToken(request.getUserPrincipal(), multipartFile);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return ResponseEntity.ok(imgUrl);
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/user/change-password-no-token")
