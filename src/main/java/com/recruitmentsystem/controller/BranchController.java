@@ -3,8 +3,6 @@ package com.recruitmentsystem.controller;
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
 import com.recruitmentsystem.entity.CompanyBranch;
-import com.recruitmentsystem.entity.Job;
-import com.recruitmentsystem.model.branch.BranchDisplayModel;
 import com.recruitmentsystem.model.branch.BranchRequestModel;
 import com.recruitmentsystem.model.job.JobDisplayModel;
 import com.recruitmentsystem.service.BranchService;
@@ -31,16 +29,16 @@ public class BranchController {
         return ResponseEntity.ok(companies);
     }
 
-    @GetMapping("/branches/find/{name}")
-    public ResponseEntity<?> getBranchByName(@PathVariable("name") String name) {
-        List<BranchDisplayModel> branch;
-        try {
-            branch = branchService.findBranchByBranchName(name);
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-        return ResponseEntity.ok(branch);
-    }
+//    @GetMapping("/branches/find/{name}")
+//    public ResponseEntity<?> getBranchByName(@PathVariable("name") String name) {
+//        List<BranchDisplayModel> branch;
+//        try {
+//            branch = branchService.findBranchByBranchName(name);
+//        } catch (ResourceNotFoundException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+//        }
+//        return ResponseEntity.ok(branch);
+//    }
 
     @GetMapping("/branches/jobs/{branch-id}")
     public ResponseEntity<?> getAllJob(@PathVariable("branch-id") Integer id) {
@@ -54,11 +52,11 @@ public class BranchController {
         }
     }
 
-    @GetMapping("/manage/branches/all")
-    public ResponseEntity<?> getAllBranches() {
-        List<CompanyBranch> companies = branchService.findAllBranchesAdmin();
-        return ResponseEntity.ok(companies);
-    }
+//    @GetMapping("/manage/branches/all")
+//    public ResponseEntity<?> getAllBranches() {
+//        List<CompanyBranch> companies = branchService.findAllBranchesAdmin();
+//        return ResponseEntity.ok(companies);
+//    }
 
     @GetMapping("/manage/branches/find/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -85,8 +83,8 @@ public class BranchController {
 
     @PostMapping("/manage/branches/add")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> registerBranch(@RequestBody BranchRequestModel branchRequest,
-                                            HttpServletRequest request) {
+    public ResponseEntity<?> addBranch(@RequestBody BranchRequestModel branchRequest,
+                                       HttpServletRequest request) {
         try {
             branchService.addBranch(branchRequest, request.getUserPrincipal());
         } catch (ResourceAlreadyExistsException e) {

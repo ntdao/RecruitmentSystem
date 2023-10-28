@@ -21,6 +21,7 @@ import java.util.function.Function;
 @Component
 @RequiredArgsConstructor
 public class JwtService {
+    private final TokenService tokenService;
     @Value("${app.jwt.secret}")
     private String SECRET_KEY;
     @Value("${app.jwt.email_verify.expiration}")
@@ -29,7 +30,6 @@ public class JwtService {
     private long jwtExpiration;
     @Value("${app.jwt.refresh_token.expiration}")
     private long refreshExpiration;
-    private final TokenService tokenService;
 
     public String generateToken(Map<String, Object> extraClaims, User user) {
         return buildToken(extraClaims, user, jwtExpiration);

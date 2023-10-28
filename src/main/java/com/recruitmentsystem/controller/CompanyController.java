@@ -2,7 +2,6 @@ package com.recruitmentsystem.controller;
 
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
-import com.recruitmentsystem.entity.Company;
 import com.recruitmentsystem.model.company.CompanyDisplayModel;
 import com.recruitmentsystem.model.company.CompanyRequestModel;
 import com.recruitmentsystem.model.job.JobDisplayModel;
@@ -57,19 +56,19 @@ public class CompanyController {
         }
     }
 
-    @GetMapping("/manage/companies/all")
+    @GetMapping("/admin/manage/companies/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<CompanyDisplayModel>> getAllCompaniesAdmin() {
         List<CompanyDisplayModel> companies = companyService.findAllCompanies();
         return ResponseEntity.ok(companies);
     }
 
-    @GetMapping("/manage/companies/find/{id}")
+    @GetMapping("/admin/manage/companies/find/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getCompanyById(@PathVariable("id") Integer id) {
-        Company company;
+        CompanyDisplayModel company;
         try {
-            company = companyService.findCompanyById(id);
+            company = companyService.findCompanyDisplayModelById(id);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
@@ -77,7 +76,7 @@ public class CompanyController {
     }
 
 
-    @PostMapping("/manage/companies/add")
+    @PostMapping("/admin/manage/companies/add")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> addCompany(@RequestBody CompanyRequestModel companyRequest,
                                         HttpServletRequest request) {
@@ -89,7 +88,7 @@ public class CompanyController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/manage/companies/update/{id}")
+    @PutMapping("/admin/manage/companies/update/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateCompany(@PathVariable("id") Integer id,
                                            @RequestBody CompanyRequestModel companyRequest,
@@ -102,9 +101,9 @@ public class CompanyController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/manage/companies/delete/{id}")
+    @DeleteMapping("/admin/manage/companies/delete/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity deleteCompany(@PathVariable("id") Integer id,
+    public ResponseEntity<?> deleteCompany(@PathVariable("id") Integer id,
                                         HttpServletRequest request) {
         try {
             companyService.deleteCompany(id, request.getUserPrincipal());
@@ -112,5 +111,19 @@ public class CompanyController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/hr/manage/companies/info")
+    @PreAuthorize("hasRole('ROLE_HR')")
+    public ResponseEntity<?> getCompanyByHR(HttpServletRequest request) {
+        CompanyDisplayModel company;
+        try {
+            company = companyService.findCompanyDisplayModelByHR(request.getUserPrincipal());
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+        return ResponseEntity.ok(company);
     }
 }

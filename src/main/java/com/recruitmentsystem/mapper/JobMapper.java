@@ -1,5 +1,6 @@
 package com.recruitmentsystem.mapper;
 
+import com.recruitmentsystem.common.myEnum.JobType;
 import com.recruitmentsystem.entity.Category;
 import com.recruitmentsystem.entity.Job;
 import com.recruitmentsystem.model.job.JobDisplayModel;
@@ -25,7 +26,7 @@ public class JobMapper {
                 .id(job.getJobId())
                 .name(job.getJobName())
                 .branch(job.getBranch().getBranchName())
-                .companyName(job.getBranch().getCompany().getCompanyName())
+                .companyName(job.getBranch().getCompany().getCompanyFullName())
                 .companyLogo(job.getBranch().getCompany().getCompanyLogo())
                 .jobAddress(job.getBranch().getBranchAddress())
                 .jobLevel(job.getJobLevel().toString())
@@ -33,8 +34,15 @@ public class JobMapper {
                 .jobUrl(job.getJobUrl())
                 .jobRequirement(job.getJobRequirement())
                 .jobDescription(job.getJobDescription())
+                .jobBenefit(job.getJobBenefit())
+                .jobTag(job.getJobTag())
+                .jobType(job.getJobType().toString())
+                .jobGender(job.getJobGender().toString())
+                .jobQuantity(job.getJobQuantity())
+                .jobExperience(job.getJobExperience().toString())
+                .jobStatus(job.getJobStatus().toString())
                 .category(catList)
-                .expiresDate(job.getExpiresDate())
+                .jobDeadline(job.getJobDeadline())
                 .createdAt(job.getCreatedAt())
                 .build();
     }
@@ -46,12 +54,14 @@ public class JobMapper {
 //                .branch(request.companyName())
 //                .jobAddress(job.getBranch().getBranchAddress())
                 .jobLevel(request.jobLevel())
-                .salary(request.salary())
+                .salary(request.salaryMin() + " - "+ request.salaryMax())
                 .jobUrl(request.jobUrl())
                 .jobRequirement(request.jobRequirement())
                 .jobDescription(request.jobDescription())
+                .jobBenefit(request.jobBenefit())
+                .jobType(JobType.fromString(request.jobType()))
 //                .category(request.getCategories().toString())
-                .expiresDate(request.expiresDate())
+                .jobDeadline(request.jobDeadline())
                 .build();
     }
 }

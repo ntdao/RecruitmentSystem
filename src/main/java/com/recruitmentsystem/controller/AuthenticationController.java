@@ -1,8 +1,8 @@
 package com.recruitmentsystem.controller;
 
+import com.recruitmentsystem.model.auth.AuthenticationRequest;
+import com.recruitmentsystem.model.auth.AuthenticationResponse;
 import com.recruitmentsystem.model.user.UserRequestModel;
-import com.recruitmentsystem.security.auth.AuthenticationRequest;
-import com.recruitmentsystem.security.auth.AuthenticationResponse;
 import com.recruitmentsystem.service.IAuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

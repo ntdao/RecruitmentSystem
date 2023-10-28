@@ -1,14 +1,12 @@
 package com.recruitmentsystem.entity;
 
-import com.recruitmentsystem.common.myEnum.JobLevel;
+import com.recruitmentsystem.common.myEnum.*;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.Hibernate;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -17,29 +15,8 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
-//@RequiredArgsConstructor
 @ToString
 @Builder
-//@NamedEntityGraphs({
-//        @NamedEntityGraph(name = "job_company.all",
-//                attributeNodes = {
-//                        @NamedAttributeNode(value = "jobId"),
-//                        @NamedAttributeNode(value = "jobName"),
-//                        @NamedAttributeNode(value = "branch"),
-//                        @NamedAttributeNode(value = "jobName"),
-//                        @NamedAttributeNode(value = "jobName"),
-//                        @NamedAttributeNode(value = "jobName"),
-//                        @NamedAttributeNode(value = "jobName"),
-//                        @NamedAttributeNode(value = "jobName"),
-//                        @NamedAttributeNode(value = "jobName"),
-//                        @NamedAttributeNode(value = "jobName"),
-//                        @NamedAttributeNode(value = "jobName"),
-//                        @NamedAttributeNode(value = "jobName"),
-//                        @NamedAttributeNode(value = "jobName"),
-//                        @NamedAttributeNode(value = "jobName"),
-//
-//                })
-//})
 public class Job extends Audit implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,9 +39,6 @@ public class Job extends Audit implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<Category> categories = new HashSet<>();
-//    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-//    @JoinColumn(name = "job_level_id")
-//    private JobLevel jobLevel;
 
     @Enumerated(EnumType.STRING)
     private JobLevel jobLevel;
@@ -73,39 +47,24 @@ public class Job extends Audit implements Serializable {
 //    @JoinColumn(name = "user_id")
 //    private User user;
     private String jobDescription;
+    private String jobBenefit;
     private String jobRequirement;
     private String salary;
-    private Instant expiresDate;
+    private Integer salaryMin;
+    private Integer salaryMax;
+    private Instant jobDeadline;
     private String jobUrl;
-
-    public Job(Integer jobId,
-               String jobName,
-               CompanyBranch branch,
-               Set<Category> categories,
-               JobLevel jobLevel,
-               String jobDescription,
-               String jobRequirement,
-               String salary,
-               Instant expiresDate,
-               String jobUrl,
-               Instant createdAt,
-               Instant updatedAt,
-               Integer createdBy,
-               Integer updatedBy,
-               boolean deleteFlag,
-               Integer oldId) {
-        super(createdAt, updatedAt, createdBy, updatedBy, deleteFlag, oldId);
-        this.jobId = jobId;
-        this.jobName = jobName;
-        this.branch = branch;
-        this.categories = categories;
-        this.jobLevel = jobLevel;
-        this.jobDescription = jobDescription;
-        this.jobRequirement = jobRequirement;
-        this.salary = salary;
-        this.expiresDate = expiresDate;
-        this.jobUrl = jobUrl;
-    }
+    private String jobTag;
+//    private String jobSkill;
+    private Integer jobQuantity;
+    @Enumerated(EnumType.STRING)
+    private Gender jobGender;
+    @Enumerated(EnumType.STRING)
+    private JobType jobType;
+    @Enumerated(EnumType.STRING)
+    private JobExperience jobExperience;
+    @Enumerated(EnumType.STRING)
+    private JobStatus jobStatus;
 
     public Job(Job job, boolean deleteFlag) {
         super(job.getCreatedAt(),
@@ -121,20 +80,14 @@ public class Job extends Audit implements Serializable {
         this.jobDescription = job.getJobDescription();
         this.jobRequirement = job.getJobRequirement();
         this.salary = job.getSalary();
-        this.expiresDate = job.getExpiresDate();
+        this.jobDeadline = job.getJobDeadline();
         this.jobUrl = job.getJobUrl();
+        this.jobQuantity = job.getJobQuantity();
+        this.jobBenefit = job.getJobBenefit();
+        this.jobGender = job.getJobGender();
+        this.jobTag = job.getJobTag();
+        this.jobType = job.getJobType();
+        this.jobStatus = job.getJobStatus();
+        this.jobExperience = job.getJobExperience();
     }
-
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-//        Job job = (Job) o;
-//        return getJobId() != null && Objects.equals(getJobId(), job.getJobId());
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return getClass().hashCode();
-//    }
 }

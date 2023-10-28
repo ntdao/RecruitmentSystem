@@ -1,11 +1,6 @@
 package com.recruitmentsystem.repository;
 
 import com.recruitmentsystem.entity.Job;
-import com.recruitmentsystem.model.job.JobDisplayModel;
-import jakarta.persistence.ColumnResult;
-import jakarta.persistence.ConstructorResult;
-import jakarta.persistence.NamedNativeQuery;
-import jakarta.persistence.SqlResultSetMapping;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;

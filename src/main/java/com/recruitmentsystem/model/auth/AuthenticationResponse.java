@@ -1,4 +1,4 @@
-package com.recruitmentsystem.security.auth;
+package com.recruitmentsystem.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

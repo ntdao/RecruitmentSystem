@@ -4,12 +4,12 @@
 //import jakarta.persistence.*;
 //import lombok.*;
 //
-//@EqualsAndHashCode(callSuper = true)
 //@Entity
 //@Table
-//@Data
-//@AllArgsConstructor
 //@NoArgsConstructor
+//@AllArgsConstructor
+//@Getter
+//@Setter
 //@ToString
 //@Builder
 //public class Contact extends Audit {

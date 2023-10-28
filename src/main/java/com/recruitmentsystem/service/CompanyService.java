@@ -30,16 +30,19 @@ public class CompanyService {
     private final UserService userService;
     private final CompanyMapper companyMapper;
 
-    private boolean checkDuplicateCompanyName(String name) {
-        if (companyRepository.existsCompanyByCompanyName(name)) {
-            throw new ResourceAlreadyExistsException("Company name already taken");
+    private boolean checkDuplicateCompanyName(String shortName, String fullName) {
+        if (companyRepository.existsCompanyByCompanyShortName(shortName)) {
+            throw new ResourceAlreadyExistsException("Company short name already taken");
+        }
+        if (companyRepository.existsCompanyByCompanyFullName(fullName)) {
+            throw new ResourceAlreadyExistsException("Company full name already taken");
         }
         return false;
     }
 
     public void addCompanyAdmin(CompanyRequestModel request, Principal connectedUser) {
         try {
-            if (!checkDuplicateCompanyName(request.companyName())) {
+            if (!checkDuplicateCompanyName(request.companyShortName(), request.companyFullName())) {
                 Company company = companyMapper.companyRequestModelToCompany(request);
                 company.setCreatedAt(Instant.now());
                 company.setCreatedBy(userService.getCurrentUser(connectedUser).getId());
@@ -71,25 +74,34 @@ public class CompanyService {
 //                .collect(Collectors.toList());
 //    }
 
-
-
     public Company findCompanyById(Integer id) {
         return companyRepository.findById(id)
                 .filter(company -> !company.isDeleteFlag())
                 .orElseThrow(() -> new ResourceNotFoundException("Company with id " + id + " does not exist"));
     }
 
-//    public List<Company> findCompanyByCompanyNameAdmin(String name) {
-//        return companyRepository.findAll()
-//                .stream()
-//                .filter(c -> (!c.isDeleteFlag() && c.getCompanyName().contains(name)))
-//                .collect(Collectors.toList());
-//    }
+    public CompanyDisplayModel findCompanyDisplayModelById(Integer id) {
+        return companyRepository.findById(id)
+                .filter(company -> !company.isDeleteFlag())
+                .map(companyMapper::companyToDisplayModel)
+                .orElseThrow(() -> new ResourceNotFoundException("Company with id " + id + " does not exist"));
+    }
+
+    public List<Company> findCompanyByCompanyNameAdmin(String name) {
+        return companyRepository.findAll()
+                .stream()
+                .filter(c -> (!c.isDeleteFlag()
+                        && c.getCompanyShortName().contains(name)
+                        && c.getCompanyFullName().contains(name)))
+                .collect(Collectors.toList());
+    }
 
     public List<CompanyDisplayModel> findCompanyByCompanyName(String name) {
         return companyRepository.findAll()
                 .stream()
-                .filter(c -> (!c.isDeleteFlag() && c.getCompanyName().contains(name)))
+                .filter(c -> (!c.isDeleteFlag()
+                        && c.getCompanyShortName().contains(name)
+                        && c.getCompanyFullName().contains(name)))
                 .map(companyMapper::companyToDisplayModel)
                 .collect(Collectors.toList());
     }
@@ -173,5 +185,12 @@ public class CompanyService {
                 .list(Collections.singletonList(list))
                 .build();
         return pagination;
+    }
+
+    public CompanyDisplayModel findCompanyDisplayModelByHR(Principal connectedUser) {
+        int hrId = userService.getCurrentUser(connectedUser).getId();
+        Integer companyId = companyRepository.findCompanyByHR(hrId);
+        System.out.println(companyId);
+        return findCompanyDisplayModelById(companyId);
     }
 }

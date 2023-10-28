@@ -1,17 +1,12 @@
 package com.recruitmentsystem.controller;
 
-import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
-import com.recruitmentsystem.entity.Job;
-import com.recruitmentsystem.entity.Job;
+import com.recruitmentsystem.common.myEnum.*;
 import com.recruitmentsystem.model.job.JobDisplayModel;
-import com.recruitmentsystem.model.job.JobRequestModel;
-import com.recruitmentsystem.service.JobService;
 import com.recruitmentsystem.service.JobService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -45,19 +40,44 @@ public class JobController {
         return ResponseEntity.ok(jobs);
     }
 
+    @GetMapping("/jobs/job-type")
+    public ResponseEntity<?> getAllJobType() {
+        return ResponseEntity.ok(JobType.getAll());
+    }
+
+    @GetMapping("/jobs/job-level")
+    public ResponseEntity<?> getAllJobLevel() {
+        return ResponseEntity.ok(JobLevel.getAll());
+    }
+
+    @GetMapping("/jobs/job-gender")
+    public ResponseEntity<?> getAllJobGender() {
+        return ResponseEntity.ok(Gender.getAll());
+    }
+
+    @GetMapping("/jobs/job-experience")
+    public ResponseEntity<?> getAllJobExperience() {
+        return ResponseEntity.ok(JobExperience.getAll());
+    }
+
+    @GetMapping("/jobs/job-status")
+    public ResponseEntity<?> getAllJobStatus() {
+        return ResponseEntity.ok(JobStatus.getAll());
+    }
+
     @GetMapping("/admin/manage/jobs/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getAllJobsAdmin() {
-        List<JobDisplayModel> jobs = jobService.findAllJobs();
+        List<JobDisplayModel> jobs = jobService.findAllJobsByAdmin();
         return ResponseEntity.ok(jobs);
     }
 
     @GetMapping("/admin/manage/jobs/find/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getJobById(@PathVariable("id") Integer id) {
-        Job job;
+        JobDisplayModel job;
         try {
-            job = jobService.findJobByIdAdmin(id);
+            job = jobService.findById(id);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
@@ -66,7 +86,7 @@ public class JobController {
 
     @DeleteMapping("/admin/manage/jobs/delete/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity deleteJob(@PathVariable("id") Integer id,
+    public ResponseEntity<?> deleteJob(@PathVariable("id") Integer id,
                                     HttpServletRequest request) {
         try {
             jobService.deleteJob(id, request.getUserPrincipal());
@@ -91,9 +111,9 @@ public class JobController {
     @GetMapping("/hr/manage/jobs/find/{id}")
     @PreAuthorize("hasRole('ROLE_HR')")
     public ResponseEntity<?> getJobByIdHR(@PathVariable("id") Integer id) {
-        Job job;
+        JobDisplayModel job;
         try {
-            job = jobService.findJobByIdAdmin(id);
+            job = jobService.findById(id);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
@@ -102,7 +122,7 @@ public class JobController {
 
     @DeleteMapping("/hr/manage/jobs/delete/{id}")
     @PreAuthorize("hasRole('ROLE_HR')")
-    public ResponseEntity deleteJobHR(@PathVariable("id") Integer id,
+    public ResponseEntity<?> deleteJobHR(@PathVariable("id") Integer id,
                                       HttpServletRequest request) {
         try {
             jobService.deleteJob(id, request.getUserPrincipal());

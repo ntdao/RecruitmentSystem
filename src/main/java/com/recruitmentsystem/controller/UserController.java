@@ -1,11 +1,11 @@
 package com.recruitmentsystem.controller;
 
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
+import com.recruitmentsystem.model.auth.AuthenticationResponse;
 import com.recruitmentsystem.model.pagination.MyPagination;
 import com.recruitmentsystem.model.user.ChangePasswordRequest;
 import com.recruitmentsystem.model.user.UserDisplayModel;
 import com.recruitmentsystem.model.user.UserRequestModel;
-import com.recruitmentsystem.security.auth.AuthenticationResponse;
 import com.recruitmentsystem.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -97,7 +96,7 @@ public class UserController {
 //    @PutMapping("/manage/users/update-role/{user-id}")
 //    @PreAuthorize("hasRole('ROLE_ADMIN')")
 //    public ResponseEntity<?> updateUser(@PathVariable("user-id") Integer id,
-//                                        @RequestBody UserRequestModel request,
+//                                        @RequestBody Role role,
 //                                        Principal connectedUser) {
 //        try {
 //            userService.updateUser(id, request, connectedUser);
@@ -179,9 +178,9 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(value = "/user/image/upload",  consumes = {"multipart/form-data"})
+    @PostMapping(value = "/user/image/upload", consumes = {"multipart/form-data"})
     public ResponseEntity<?> uploadImage(@RequestParam("token") String token,
-                                      @RequestParam("image") MultipartFile multipartFile) {
+                                         @RequestParam("image") MultipartFile multipartFile) {
         try {
             userService.uploadUserProfileImage(token, multipartFile);
         } catch (ResourceNotFoundException e) {
@@ -237,7 +236,7 @@ public class UserController {
 
     @PostMapping(value = "/user/image/upload-no-token", consumes = {"multipart/form-data"})
     public ResponseEntity<?> uploadImageUrl(@RequestParam("image") MultipartFile multipartFile,
-                                      HttpServletRequest request) {
+                                            HttpServletRequest request) {
         try {
             System.out.println("File size: " + multipartFile.getSize());
             userService.uploadUserProfileImageNoToken(request.getUserPrincipal(), multipartFile);

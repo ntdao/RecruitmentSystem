@@ -1,5 +1,6 @@
-package com.recruitmentsystem.security.auth;
+package com.recruitmentsystem.model.auth;
 
+import com.recruitmentsystem.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +10,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationRequest {
+public class RegisterRequest {
+    private String firstName;
+    private String lastName;
     private String email;
     private String password;
+    private Role role;
 }

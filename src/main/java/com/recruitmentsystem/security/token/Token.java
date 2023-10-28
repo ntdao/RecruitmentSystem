@@ -17,16 +17,16 @@ import java.time.Instant;
 @Entity
 public class Token {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
     @Enumerated(EnumType.STRING)
     public TokenType tokenType;
     public boolean revoked = false;
     public boolean expired = false;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     @Column(nullable = false, unique = true)
     private String token;
-//    @Column(nullable = false)
+    //    @Column(nullable = false)
 //    private Instant createdAt;
 //    @Column(nullable = false)
 //    private Instant expiresAt = Instant.now().plus(15, ChronoUnit.MINUTES);

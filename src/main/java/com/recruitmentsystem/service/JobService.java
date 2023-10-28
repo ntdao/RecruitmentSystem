@@ -1,6 +1,7 @@
 package com.recruitmentsystem.service;
 
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
+import com.recruitmentsystem.common.myEnum.JobStatus;
 import com.recruitmentsystem.entity.Company;
 import com.recruitmentsystem.entity.CompanyBranch;
 import com.recruitmentsystem.entity.Job;
@@ -40,7 +41,15 @@ public class JobService {
 
     public List<JobDisplayModel> findAllJobs() {
         List<Job> jobs = jobRepository.findAll();
-        return jobs.stream().filter(job -> !job.isDeleteFlag()).map(jobMapper::jobToDisplayModel).collect(Collectors.toList());
+        return jobs.stream().filter(job -> !job.isDeleteFlag()
+                && job.getJobStatus() == JobStatus.RECRUITING)
+                .map(jobMapper::jobToDisplayModel).collect(Collectors.toList());
+    }
+
+    public List<JobDisplayModel> findAllJobsByAdmin() {
+        List<Job> jobs = jobRepository.findAll();
+        return jobs.stream().filter(job -> !job.isDeleteFlag())
+                .map(jobMapper::jobToDisplayModel).collect(Collectors.toList());
     }
 
     public List<JobDisplayModel> findAllJobsByCompany(int companyId) {
@@ -95,12 +104,12 @@ public class JobService {
         return jobs.stream().filter(job -> (!job.isDeleteFlag() && job.getJobName().contains(name))).map(jobMapper::jobToDisplayModel).collect(Collectors.toList());
     }
 
-//    public JobDisplayModel findById(Integer id) {
-//        return jobRepository.findById(id)
-//                .filter(job -> !job.isDeleteFlag())
-//                .map(jobMapper::jobToDisplayModel)
-//                .orElseThrow(() -> new ResourceNotFoundException("Job with id " + id + " does not exist"));
-//    }
+    public JobDisplayModel findById(Integer id) {
+        return jobRepository.findById(id)
+                .filter(job -> !job.isDeleteFlag())
+                .map(jobMapper::jobToDisplayModel)
+                .orElseThrow(() -> new ResourceNotFoundException("Job with id " + id + " does not exist"));
+    }
 
     public Job findJobById(Integer id) {
         return jobRepository.findById(id).filter(job -> !job.isDeleteFlag()).orElseThrow(() -> new ResourceNotFoundException("Job with id " + id + " does not exist"));
@@ -152,9 +161,9 @@ public class JobService {
         }
     }
 
-    public List<Job> findAllJobsAdmin() {
-        return jobRepository.findAll().stream().filter(j -> !j.isDeleteFlag()).collect(Collectors.toList());
-    }
+//    public List<Job> findAllJobsAdmin() {
+//        return jobRepository.findAll().stream().filter(j -> !j.isDeleteFlag()).collect(Collectors.toList());
+//    }
 
     public Job findJobByIdAdmin(Integer id) {
         return jobRepository.findById(id).filter(j -> !j.isDeleteFlag()).orElseThrow(() -> new ResourceNotFoundException("Job with id " + id + " does not exist"));

@@ -2,19 +2,20 @@ package com.recruitmentsystem.service;
 
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
+import com.recruitmentsystem.common.myEnum.TokenType;
 import com.recruitmentsystem.entity.User;
 import com.recruitmentsystem.mapper.UserMapper;
+import com.recruitmentsystem.model.auth.AuthenticationResponse;
 import com.recruitmentsystem.model.pagination.MyPagination;
 import com.recruitmentsystem.model.user.ChangePasswordRequest;
 import com.recruitmentsystem.model.user.UserDisplayModel;
 import com.recruitmentsystem.model.user.UserRequestModel;
 import com.recruitmentsystem.repository.IUserRepository;
-import com.recruitmentsystem.security.auth.AuthenticationResponse;
 import com.recruitmentsystem.security.jwt.JwtService;
 import com.recruitmentsystem.security.token.Token;
 import com.recruitmentsystem.security.token.TokenService;
-import com.recruitmentsystem.common.myEnum.TokenType;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -41,13 +41,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    @Value("${app.image.root}")
-    private String root;
     private final IUserRepository userRepository;
     private final UserMapper userMapper;
     private final JwtService jwtService;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Value("${app.image.root}")
+    private String root;
 
     private boolean checkDuplicateUsername(String username) {
         if (userRepository.existsUserByUsername(username)) {
@@ -291,7 +291,7 @@ public class UserService {
 
         // Get the file extension
         String extension = FilenameUtils.getExtension(fileName);
-        fileName = UUID.randomUUID().toString() + "." + extension;
+        fileName = UUID.randomUUID() + "." + extension;
 //        System.out.println(fileName);
 
         String fileDir = "img/user_profile/user_" + user.getId() + "/";

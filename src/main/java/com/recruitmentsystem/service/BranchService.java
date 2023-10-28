@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,7 +54,6 @@ public class BranchService {
 //    }
 
     public List<CompanyBranch> findAllBranchesByCompany(Integer id) {
-
         List<CompanyBranch> branches = branchRepository.findAll();
         System.out.println(branches);
         return branches.stream()
@@ -61,6 +61,18 @@ public class BranchService {
                         (!branch.isDeleteFlag() &&
                                 branch.getCompany().getCompanyId() == id))
                 .collect(Collectors.toList());
+    }
+
+    public List<String> findAllBranchesAddressByCompany(Integer id) {
+        List<CompanyBranch> branches = branchRepository.findAll()
+                .stream()
+                .filter(branch ->
+                        (!branch.isDeleteFlag() &&
+                                branch.getCompany().getCompanyId() == id))
+                .collect(Collectors.toList());
+        List<String> branchAddress = new ArrayList<>();
+        branches.forEach(b -> branchAddress.add(b.getBranchAddress()));
+        return branchAddress;
     }
 
     public CompanyBranch findByIdAdmin(Integer id) {
@@ -81,6 +93,7 @@ public class BranchService {
                 .filter(b -> (!b.isDeleteFlag() && b.getBranchName().contains(name)))
                 .collect(Collectors.toList());
     }
+
     public List<BranchDisplayModel> findBranchByBranchName(String name) {
         return branchRepository.findAll()
                 .stream()
@@ -95,7 +108,7 @@ public class BranchService {
         CompanyBranch updateBranch = findBranchById(id);
 
         // tao ban ghi luu thong tin cu cua branch
-        CompanyBranch oldBranch = new CompanyBranch(updateBranch,true);
+        CompanyBranch oldBranch = new CompanyBranch(updateBranch, true);
         branchRepository.save(oldBranch);
 
         // update branch

@@ -3,13 +3,14 @@ package com.recruitmentsystem.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
-@Table
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
-@Builder
+@Table
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 @ToString
+@Builder
 public class CompanyBranch extends Audit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

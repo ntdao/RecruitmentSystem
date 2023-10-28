@@ -13,7 +13,7 @@ public class FileService {
     // tạo thư mục nếu không tồn tại
     // lưu tệp đã tải lên từ đối tượng MultipartFile vào một tệp trong hệ thống tệp.
     public static String saveFile(String uploadDir, String fileName,
-                                MultipartFile multipartFile) throws IOException {
+                                  MultipartFile multipartFile) throws IOException {
         Path uploadPath = Paths.get(uploadDir);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);

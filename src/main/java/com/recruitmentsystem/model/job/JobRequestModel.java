@@ -14,9 +14,17 @@ public record JobRequestModel(
         JobLevel jobLevel,
         String jobDescription,
         String jobRequirement,
-        String salary,
-        Instant expiresDate,
+        Integer salaryMax,
+        Integer salaryMin,
+        Instant jobDeadline,
         String jobUrl,
+        String jobBenefit,
+        Integer jobQuantity,
+        String jobType,
+        String jobTag,
+        String jobGender,
+        String jobStatus,
+        String jobExperience,
         String categories
 ) {
 }

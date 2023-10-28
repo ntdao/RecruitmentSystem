@@ -15,12 +15,14 @@ import java.util.Set;
 
 @Entity // khai báo với Spring Boot rằng đây là 1 entity biểu diễn table trong db
 @Table
-@Data // tự động khai báo getter và setter cho class
+//@Data // tự động khai báo getter và setter cho class
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @ToString
 @Builder
-@EqualsAndHashCode(callSuper = true)
+//@EqualsAndHashCode(callSuper = true)
 public class User extends Audit implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
