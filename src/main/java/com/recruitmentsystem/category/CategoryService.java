@@ -46,6 +46,12 @@ public class CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category with id " + id + " does not exist"));
     }
 
+    public Category findByName(String name) {
+        return categoryRepository.findByCategoryName(name)
+                .orElseThrow(() -> new ResourceNotFoundException("Category with name " + name + " does not exist"));
+
+    }
+
     public CategoryResponseModel findCategoryResponseModelById(Integer id) {
         return categoryMapper.categoryToResponseModel(findById(id));
     }

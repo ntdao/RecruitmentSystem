@@ -216,7 +216,7 @@ public class UserService {
     }
 
     private AuthenticationResponseModel updateUser(User updateUser, UserRequestModel request) {
-        Integer userId = updateUser.getUserId();
+        int userId = updateUser.getUserId();
         Account updateAccount = updateUser.getAccount();
         int accountId = updateAccount.getId();
 

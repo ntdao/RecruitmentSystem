@@ -1,16 +1,21 @@
 package com.recruitmentsystem.company;
 
+import com.recruitmentsystem.account.Account;
+import com.recruitmentsystem.account.AccountRepository;
+import com.recruitmentsystem.account.AccountService;
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
-import com.recruitmentsystem.account.Account;
 import com.recruitmentsystem.pagination.MyPagination;
-import com.recruitmentsystem.account.AccountService;
+import com.recruitmentsystem.role.RoleService;
+import com.recruitmentsystem.user.User;
 import com.recruitmentsystem.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,37 +28,42 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CompanyService {
+    private final AccountRepository accountRepository;
     private final CompanyRepository companyRepository;
     private final AccountService accountService;
+    private final RoleService roleService;
     private final UserService userService;
     private final CompanyMapper companyMapper;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    private boolean checkDuplicateCompanyName(String shortName, String fullName) {
+    private void checkDuplicateCompanyName(String shortName, String fullName) {
         if (companyRepository.existsCompanyByCompanyShortName(shortName)) {
             throw new ResourceAlreadyExistsException("Company short name already taken");
         }
         if (companyRepository.existsCompanyByCompanyFullName(fullName)) {
             throw new ResourceAlreadyExistsException("Company full name already taken");
         }
-        return false;
     }
 
-    public void addCompanyAdmin(CompanyRequestModel request, Principal connectedUser) {
-        try {
-            if (!checkDuplicateCompanyName(request.companyShortName(), request.companyFullName())) {
-                Company company = companyMapper.companyRequestModelToCompany(request);
-//                company.setCreatedAt(Instant.now());
-//                company.setCreatedBy(userService.getCurrentUser(connectedUser).getUserId());
-                companyRepository.save(company);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
-//        catch (ResourceAlreadyExistsException e) {
-//            throw new ResourceAlreadyExistsException(e.getMessage());
-//        } catch (Exception e) {
-//            throw new RuntimeException(e.getMessage());
-//        }
+    public CompanyResponseModel addCompanyAdmin(CompanyRequestModel request, Principal connectedUser) {
+        accountService.checkDuplicateEmail(request.email());
+        checkDuplicateCompanyName(request.companyShortName(), request.companyFullName());
+
+        Account account = Account.builder()
+                .email(request.email())
+                .password(passwordEncoder.encode(request.password()))
+                .role(roleService.findRoleByName(request.roleName()))
+                .enabled(true)
+                .build();
+
+        Company company = companyMapper.companyRequestModelToCompany(request);
+
+        accountRepository.save(account);
+        company.setAccount(account);
+        companyRepository.save(company);
+
+        // bị lỗi trường lastModified và lastModifiedBy
+        return companyMapper.companyToResponseModel(company);
     }
 
     public List<CompanyResponseModel> findAllCompanies() {
@@ -106,34 +116,53 @@ public class CompanyService {
     public void updateCompanyByAdmin(Integer id, CompanyRequestModel requestModel, Principal connectedUser) {
         // tim company theo id
         Company updateCompany = findCompanyById(id);
-        updateCompany(updateCompany, requestModel, userService.getCurrentUser(connectedUser).getUserId());
+        updateCompany(updateCompany, requestModel);
+    }
+    public CompanyResponseModel updateCompanyByCompany(CompanyRequestModel request, Principal connectedUser) {
+        Account account = userService.getCurrentAccount(connectedUser);
+        Company company = findCompanyByEmail(account.getEmail());
+        return null;
     }
 
-    private void updateCompany(Company updateCompany,
-                               CompanyRequestModel requestModel,
-                               Integer updatedBy) {
-
+    private void updateCompany(Company updateCompany, CompanyRequestModel request) {
         int id = updateCompany.getCompanyId();
+        Account updateAccount = updateCompany.getAccount();
+
+        boolean isEmailChange = !updateAccount.getEmail().equals(request.email());
+        if (isEmailChange) {
+            accountService.checkDuplicateEmail(request.email());
+        }
+
+        boolean isNameChange = !updateCompany.getCompanyFullName().equals(request.companyFullName()) &&
+                updateCompany.getCompanyShortName().equals(request.companyShortName());
+        if (isNameChange) {
+            checkDuplicateCompanyName(request.companyFullName(), request.companyShortName());
+        }
+
+        Account oldAccount = new Account(updateAccount, true);
+        System.out.println("Account - before update: " + oldAccount);
+        accountRepository.save(oldAccount);
+
+        updateAccount.setEmail(request.email());
+        System.out.println("Account - after update: " + updateAccount);
+        accountRepository.save(updateAccount);
 
         // tao ban ghi luu thong tin cu cua company
         Company oldCompany = new Company(updateCompany, true);
         companyRepository.save(oldCompany);
+        System.out.println("Company - Old info: " + oldCompany);
 
         // update company
-        updateCompany = companyMapper.companyRequestModelToCompany(requestModel);
+        updateCompany = companyMapper.companyRequestModelToCompany(request);
         updateCompany.setCompanyId(id);
-//        updateCompany.setCreatedAt(oldCompany.getCreatedAt());
-//        updateCompany.setCreatedBy(oldCompany.getCreatedBy());
-//        updateCompany.setUpdatedAt(Instant.now());
-//        updateCompany.setUpdatedBy(updatedBy);
+        updateCompany.setAccount(updateAccount);
         companyRepository.save(updateCompany);
+        System.out.println("Company - New info: " + updateCompany);
     }
 
     public void deleteCompany(Integer id) {
         Company company = findCompanyById(id);
         company.setDeleteFlag(true);
-//        company.setUpdatedAt(Instant.now());
-//        company.setUpdatedBy(userService.getCurrentUser(connectedUser).getUserId());
         companyRepository.save(company);
     }
 

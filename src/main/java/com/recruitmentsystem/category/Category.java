@@ -1,7 +1,11 @@
 package com.recruitmentsystem.category;
 
+import com.recruitmentsystem.company.Company;
+import com.recruitmentsystem.job.Job;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 //@Table

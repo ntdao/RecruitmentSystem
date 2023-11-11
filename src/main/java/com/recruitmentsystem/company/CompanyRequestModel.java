@@ -1,6 +1,8 @@
 package com.recruitmentsystem.company;
 
 public record CompanyRequestModel(
+        String password,
+        String roleName,
         String companyShortName,
         String companyFullName,
         String companyAddress,
@@ -12,7 +14,7 @@ public record CompanyRequestModel(
         Integer companyFoundedYear,
         String companyMST,
         String companyLicense,
-        Integer companySize,
+        String companySize,
         String companyTag,
 //        boolean isActive,
         String email,

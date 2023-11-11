@@ -1,7 +1,10 @@
 package com.recruitmentsystem.jobposition;
 
+import com.recruitmentsystem.job.Job;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 //@Table
@@ -20,5 +23,9 @@ public class JobPosition {
     private String jobPositionName;
     @Column(name = "job_position_name_vi")
     private String jobPositionNameVI;
+    @OneToMany(mappedBy = "jobPosition", cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private List<Job> jobs;
 }
 

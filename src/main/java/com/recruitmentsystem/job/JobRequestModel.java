@@ -15,6 +15,7 @@ public record JobRequestModel(
         String jobRequirement,
         Integer salaryMax,
         Integer salaryMin,
+        boolean isSalaryVisible,
         Instant jobDeadline,
         String jobUrl,
         String jobBenefit,

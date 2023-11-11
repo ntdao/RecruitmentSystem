@@ -2,9 +2,10 @@ package com.recruitmentsystem.job;
 
 import com.recruitmentsystem.category.Category;
 import com.recruitmentsystem.common.myEnum.Gender;
+import com.recruitmentsystem.common.myEnum.JobStatus;
 import com.recruitmentsystem.company.Company;
 import com.recruitmentsystem.jobposition.JobPosition;
-import com.recruitmentsystem.jobstatus.JobStatus;
+//import com.recruitmentsystem.jobstatus.JobStatus;
 import com.recruitmentsystem.jobtype.JobType;
 import com.recruitmentsystem.skill.Skill;
 import jakarta.persistence.*;
@@ -38,6 +39,7 @@ public class Job {
     private String jobDescription;
     private String jobBenefit;
     private String jobRequirement;
+    private boolean isSalaryVisible;
     private String salary;
     private Integer salaryMin;
     private Integer salaryMax;
@@ -48,22 +50,25 @@ public class Job {
     @Enumerated(EnumType.STRING)
     private Gender jobGender;
     private String jobExperience;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private String jobAddress;
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     private Company company;
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_position_id")
     private JobPosition jobPosition;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_type_id")
     private JobType jobType;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "job_status_id")
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "job_status_id")
+//    private JobStatus jobStatus;
+    @Enumerated(EnumType.STRING)
     private JobStatus jobStatus;
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY) // fetch type mặc định là LAZY
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @JoinTable(
@@ -105,6 +110,7 @@ public class Job {
         this.jobQuantity = job.getJobQuantity();
         this.jobGender = job.getJobGender();
         this.jobExperience = job.getJobExperience();
+        this.jobAddress = job.getJobAddress();
         this.company = job.getCompany();
         this.category = job.getCategory();
         this.jobPosition = job.getJobPosition();

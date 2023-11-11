@@ -1,11 +1,18 @@
 package com.recruitmentsystem.job;
 
+import com.recruitmentsystem.category.CategoryService;
+import com.recruitmentsystem.jobposition.JobPositionService;
+import com.recruitmentsystem.jobtype.JobTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class JobMapper {
+    private final CategoryService categoryService;
+    private final JobPositionService jobPositionService;
+    private final JobTypeService jobTypeService;
+    private final SalaryService salaryService;
     public JobResponseModel jobToResponseModel(Job job) {
         return JobResponseModel
                 .builder()
@@ -14,12 +21,12 @@ public class JobMapper {
                 .companyName(job.getCompany().getCompanyFullName())
                 .companyLogo(job.getCompany().getCompanyLogo())
 //                .jobAddress(job.getBranch().getBranchAddress())
-                .jobLevel(job.getJobPosition().toString())
+                .jobPosition(job.getJobPosition().toString())
                 .salary(job.getSalary())
                 .jobUrl(job.getJobUrl())
                 .jobRequirement(job.getJobRequirement())
                 .jobDescription(job.getJobDescription())
-                .jobBenefit(job.getJobBenefit())
+//                .jobBenefit(job.getJobBenefit())
                 .jobTag(job.getJobTag())
                 .jobType(job.getJobType().toString())
                 .jobGender(job.getJobGender().toString())
@@ -36,16 +43,14 @@ public class JobMapper {
         return Job
                 .builder()
                 .jobName(request.name())
-//                .branch(request.companyName())
-//                .jobAddress(job.getBranch().getBranchAddress())
-//                .jobPosition(request.jobPosition())
-                .salary(request.salaryMin() + " - " + request.salaryMax())
+                .jobAddress(request.jobAddress())
+                .jobPosition(jobPositionService.findByName(request.jobPosition()))
+                .salary(salaryService.salaryRequestToResponse(request.isSalaryVisible(), request.salaryMax(), request.salaryMin()))
                 .jobUrl(request.jobUrl())
                 .jobRequirement(request.jobRequirement())
                 .jobDescription(request.jobDescription())
-                .jobBenefit(request.jobBenefit())
-//                .jobType(request.jobType())
-//                .category(request.get)
+                .jobType(jobTypeService.findByName(request.jobType()))
+                .category(categoryService.findByName(request.category()))
                 .jobExpiredDate(request.jobDeadline())
                 .build();
     }

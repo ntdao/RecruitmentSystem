@@ -1,10 +1,10 @@
 package com.recruitmentsystem.job;
 
+import com.recruitmentsystem.address.AddressService;
+import com.recruitmentsystem.address.Province.ProvinceResponseModel;
 import com.recruitmentsystem.common.myEnum.Gender;
 import com.recruitmentsystem.jobposition.JobPositionResponseModel;
 import com.recruitmentsystem.jobposition.JobPositionService;
-import com.recruitmentsystem.jobstatus.JobStatusResponseModel;
-import com.recruitmentsystem.jobstatus.JobStatusService;
 import com.recruitmentsystem.jobtype.JobTypeResponseModel;
 import com.recruitmentsystem.jobtype.JobTypeService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,9 +20,9 @@ import java.util.List;
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class JobController {
+    private final AddressService addressService;
     private final JobService jobService;
     private final JobPositionService jobPositionService;
-//    private final JobStatusService jobStatusService;
     private final JobTypeService jobTypeService;
 
     @GetMapping("/jobs/all")
@@ -57,16 +57,6 @@ public class JobController {
     public ResponseEntity<?> getAllJobGender() {
         return ResponseEntity.ok(Gender.getAll());
     }
-
-//    @GetMapping("/jobs/job-experience")
-//    public ResponseEntity<?> getAllJobExperience() {
-//        return ResponseEntity.ok(JobExperience.getAll());
-//    }
-
-//    @GetMapping("/jobs/job-status")
-//    public List<JobStatusResponseModel> getAllJobStatus() {
-//        return jobStatusService.findAllJobStatusResponseModel();
-//    }
 
     @GetMapping("/admin/manage/jobs/all")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -106,7 +96,7 @@ public class JobController {
         return jobService.findById(id);
     }
 
-    @DeleteMapping("/hr/manage/jobs/delete/{id}")
+    @DeleteMapping("/company/manage/jobs/delete/{id}")
     @PreAuthorize("hasAuthority('COMPANY')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteJobByCompany(@PathVariable("id") Integer id,

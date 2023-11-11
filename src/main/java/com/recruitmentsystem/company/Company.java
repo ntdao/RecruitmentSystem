@@ -2,6 +2,7 @@ package com.recruitmentsystem.company;
 
 import com.recruitmentsystem.account.Account;
 import com.recruitmentsystem.industry.Industry;
+import com.recruitmentsystem.job.Job;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
@@ -11,6 +12,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 //@Table
@@ -32,11 +34,12 @@ public class Company {
     private String companyFullName;
     private String companyLogo;
     private String companyUrl;
+    @Column(columnDefinition = "text")
     private String companyIntroduction;
     private String companyImage;
     private String companyAddress;
-    // fetch = lazy -> error lazyinit...
-    @ManyToOne()
+    // fetch = LAZY -> error lazy init...
+    @ManyToOne() // fetch type mặc định là EAGER
     @JoinColumn(name = "industry_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
@@ -44,7 +47,7 @@ public class Company {
     private Integer companyFoundedYear;
     private String companyMst;
     private String companyLicense;
-    private Integer companySize;
+    private String companySize;
     private String companyTag;
     private boolean isActive;
 //    @PrimaryKeyJoinColumn
@@ -57,6 +60,10 @@ public class Company {
     private String youtubeUrl;
     private String linkedinUrl;
     private String companyBranch;
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private List<Job> jobs;
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createDate;

@@ -21,7 +21,7 @@ public record CompanyResponseModel(
         Integer companyFoundedYear,
         String companyMST,
         String companyLicense,
-        Integer companySize,
+        String companySize,
         String companyTag,
         boolean isActive,
         String email,

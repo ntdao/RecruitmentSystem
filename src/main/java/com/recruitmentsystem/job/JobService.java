@@ -29,19 +29,16 @@ public class JobService {
     private final JobMapper jobMapper;
     private final UserService userService;
     private final CompanyService companyService;
-//    private final BranchService branchService;
 
     public void addJob(JobRequestModel requestModel, Principal connectedUser) {
         Job job = jobMapper.jobRequestModelToJob(requestModel);
-//        job.setCreatedAt(Instant.now());
-//        job.setCreatedBy(userService.getCurrentUser(connectedUser).getId());
         jobRepository.save(job);
     }
 
     public List<JobResponseModel> findAllJobs() {
         List<Job> jobs = jobRepository.findAll();
         return jobs.stream().filter(job -> !job.isDeleteFlag()
-                        && job.getJobStatus().getJobStatusName() == "RECRUITING")
+                        && job.getJobStatus().toString().equals("RECRUITING"))
                 .map(jobMapper::jobToResponseModel).collect(Collectors.toList());
     }
 

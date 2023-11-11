@@ -53,7 +53,8 @@ public class SecurityConfiguration {
                         "/api/v*/categories/**",
                         "/api/v*/companies/**",
                         "/api/v*/branches/**",
-                        "/api/v*/jobs/**")
+                        "/api/v*/jobs/**",
+                        "/api/v*/address/**")
                 .permitAll()
 
                 .requestMatchers("/api/v*/admin/manage/**").hasAuthority("ADMIN")

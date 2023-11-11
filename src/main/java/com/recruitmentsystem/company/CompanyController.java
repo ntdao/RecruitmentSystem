@@ -60,10 +60,9 @@ public class CompanyController {
 //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> addCompany(@RequestBody CompanyRequestModel companyRequest, 
+    public CompanyResponseModel addCompany(@RequestBody CompanyRequestModel companyRequest,
                                         Principal connectedUser) {
-        companyService.addCompanyAdmin(companyRequest, connectedUser);
-        return ResponseEntity.ok().build();
+        return companyService.addCompanyAdmin(companyRequest, connectedUser);
     }
 
     @PutMapping("/admin/manage/companies/update/{id}")
@@ -89,5 +88,13 @@ public class CompanyController {
     @PreAuthorize("hasAuthority('COMPANY')")
     public CompanyResponseModel getCompanyInfo(Principal connectedUser) {
         return companyService.findCompanyDisplayModel(connectedUser);
+    }
+
+    @GetMapping("/company/manage/update")
+//    @PreAuthorize("hasRole('ROLE_COMPANY')")
+    @PreAuthorize("hasAuthority('COMPANY')")
+    public CompanyResponseModel update(@RequestBody CompanyRequestModel companyRequestModel,
+                                       Principal connectedUser) {
+        return companyService.updateCompanyByCompany(companyRequestModel, connectedUser);
     }
 }
