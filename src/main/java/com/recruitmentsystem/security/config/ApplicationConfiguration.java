@@ -1,9 +1,11 @@
 package com.recruitmentsystem.security.config;
 
-import com.recruitmentsystem.repository.IUserRepository;
+import com.recruitmentsystem.account.AccountRepository;
+import com.recruitmentsystem.auditing.ApplicationAuditAware;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -17,7 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfiguration {
-    private final IUserRepository userRepository;
+    private final AccountRepository accountRepository;
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -38,14 +40,18 @@ public class ApplicationConfiguration {
         // khong ma hoa mat khau
 //        return NoOpPasswordEncoder.getInstance();
     }
+    @Bean
+    public AuditorAware<Integer> auditorAware() {
+        return new ApplicationAuditAware();
+    }
 
     @Bean
     public UserDetailsService userDetailsService() {
         return new UserDetailsService() {
             @Override
             public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-                return userRepository.findTopByEmail(email)
-                        .orElseThrow(() -> new UsernameNotFoundException("User with email " + email + " not found"));
+                return accountRepository.findTopByEmail(email)
+                        .orElseThrow(() -> new UsernameNotFoundException("Account with email " + email + " not found"));
             }
         };
     }

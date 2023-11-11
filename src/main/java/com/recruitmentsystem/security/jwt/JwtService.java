@@ -1,7 +1,6 @@
 package com.recruitmentsystem.security.jwt;
 
-import com.recruitmentsystem.entity.User;
-import com.recruitmentsystem.security.token.TokenService;
+import com.recruitmentsystem.token.TokenService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -31,33 +30,32 @@ public class JwtService {
     @Value("${app.jwt.refresh_token.expiration}")
     private long refreshExpiration;
 
-    public String generateToken(Map<String, Object> extraClaims, User user) {
-        return buildToken(extraClaims, user, jwtExpiration);
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        return buildToken(extraClaims, userDetails, jwtExpiration);
     }
 
-    public String generateToken(User user) {
-        return generateToken(new HashMap<>(), user);
+    public String generateToken(UserDetails userDetails) {
+        return generateToken(new HashMap<>(), userDetails);
     }
 
-    public String generateEmailToken(User user) {
-        return buildToken(new HashMap<>(), user, emailExipiration);
+    public String generateEmailToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails, emailExipiration);
     }
 
-    public String generateRefreshToken(User user) {
-        return buildToken(new HashMap<>(), user, refreshExpiration);
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails, refreshExpiration);
     }
 
     private String buildToken(
             Map<String, Object> extraClaims,
-            User user,
+            UserDetails userDetails,
             long expiration
     ) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
-                .setSubject(user.getEmail())
-                .claim("username", user.getUsername())
-                .claim("role", user.getRole().toString())
+                .setSubject(userDetails.getUsername())
+                .claim("role", userDetails.getAuthorities())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(SignatureAlgorithm.HS256, getSignInKey())
@@ -88,8 +86,8 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractUsername(String token) {
-        return (String) extractAllClaims(token).get("username");
+    public String extractUserDetailsname(String token) {
+        return (String) extractAllClaims(token).get("userDetailsname");
     }
 
     public Date extractExpiration(String token) {
@@ -101,28 +99,7 @@ public class JwtService {
     }
 
     public Boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()))
-                && !isTokenExpired(token)
-                && tokenService.isValidToken(token);
+        final String username = extractEmail(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
-
-//	public boolean validateAccessToken(String token) {
-//		try {
-//			Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
-//			return true;
-//		} catch (ExpiredJwtException ex) {
-//			LOGGER.error("JWT expired", ex.getMessage());
-//		} catch (IllegalArgumentException ex) {
-//			LOGGER.error("Token is null, empty or only whitespace", ex.getMessage());
-//		} catch (MalformedJwtException ex) {
-//			LOGGER.error("JWT is invalid", ex);
-//		} catch (UnsupportedJwtException ex) {
-//			LOGGER.error("JWT is not supported", ex);
-//		} catch (SignatureException ex) {
-//			LOGGER.error("Signature validation failed");
-//		}
-//
-//		return false;
-//	}
 }

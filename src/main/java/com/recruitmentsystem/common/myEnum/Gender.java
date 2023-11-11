@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 public enum Gender {
     MALE("Nam"),
     FEMALE("Nữ"),
-    NA("Không yêu cầu");
+    OTHER("Khác");
     public final String label;
 
     Gender(String label) {
