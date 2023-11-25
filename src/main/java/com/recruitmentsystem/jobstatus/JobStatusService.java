@@ -28,7 +28,7 @@
 //        }
 //    }
 //    public void deleteJobStatus(Integer id) {
-//        JobStatus jobStatus = findById(id);
+//        JobStatus jobStatus = findUserResponseModelById(id);
 //        jobStatusRepository.delete(jobStatus);
 //    }
 //    public List<JobStatus> findAll() {
@@ -40,23 +40,23 @@
 //                .map(jobStatusMapper::jobStatusToResponseModel)
 //                .collect(Collectors.toList());
 //    }
-//    public JobStatus findById(Integer id) {
-//        return jobStatusRepository.findById(id)
+//    public JobStatus findUserResponseModelById(Integer id) {
+//        return jobStatusRepository.findUserResponseModelById(id)
 //                .orElseThrow(() -> new ResourceNotFoundException("JobStatus with id " + id + " does not exist"));
 //    }
-//    public JobStatus findByName(String name) {
+//    public JobStatus findIndustryByName(String name) {
 //        return jobStatusRepository.findByJobStatusNameVI(name)
 //                .orElseThrow(() -> new ResourceNotFoundException("JobStatus with name " + name + " does not exist"));
 //    }
 //    public JobStatusResponseModel findJobStatusResponseModelById(Integer id) {
-//        return jobStatusMapper.jobStatusToResponseModel(findById(id));
+//        return jobStatusMapper.jobStatusToResponseModel(findUserResponseModelById(id));
 //    }
 //    public JobStatusResponseModel findJobStatusResponseModelByName(String name) {
-//        return jobStatusMapper.jobStatusToResponseModel(findByName(name));
+//        return jobStatusMapper.jobStatusToResponseModel(findIndustryByName(name));
 //    }
 //    @Transactional
 //    public void updateJobStatus(Integer id, JobStatusRequestModel request) {
-//        JobStatus updateJobStatus = findById(id);
+//        JobStatus updateJobStatus = findUserResponseModelById(id);
 //        JobStatus jobStatusRequest = jobStatusMapper.jobStatusRequestModelToJobStatus(request);
 //        jobStatusRequest.setJobStatusId(id);
 //        jobStatusRepository.save(updateJobStatus);

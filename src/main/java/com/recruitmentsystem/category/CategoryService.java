@@ -3,8 +3,6 @@ package com.recruitmentsystem.category;
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
 import com.recruitmentsystem.common.myEnum.OrderBy;
-import com.recruitmentsystem.category.Category;
-import com.recruitmentsystem.category.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +20,7 @@ import java.util.stream.Collectors;
 public class CategoryService {
     private final CategoryMapper categoryMapper;
     private final CategoryRepository categoryRepository;
+
     private void checkDuplicatedCategoryName(String name) {
         if (categoryRepository.existsCategoryByCategoryName(name)) {
             throw new ResourceAlreadyExistsException("Category name already taken");
@@ -46,10 +45,13 @@ public class CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category with id " + id + " does not exist"));
     }
 
-    public Category findByName(String name) {
+    public Category findCategoryByName(String name) {
         return categoryRepository.findByCategoryName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Category with name " + name + " does not exist"));
+    }
 
+    public List<Category> findByName(String name) {
+        return categoryRepository.findByCategoryNameContains(name);
     }
 
     public CategoryResponseModel findCategoryResponseModelById(Integer id) {

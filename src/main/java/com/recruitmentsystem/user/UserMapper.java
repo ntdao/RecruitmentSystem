@@ -1,26 +1,18 @@
 package com.recruitmentsystem.user;
 
-import com.recruitmentsystem.role.RoleService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class UserMapper {
-    private final PasswordEncoder passwordEncoder;
-    private final RoleService roleService;
-
     public UserResponseModel userToResponseModel(User user) {
         return UserResponseModel
                 .builder()
-//                .id(user.getUserId())
-//                .username(user.getUsername())
+                .id(user.getUserId())
                 .email(user.getAccount().getUsername())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .phoneNumber(user.getPhoneNumber())
-                .address(user.getAddress())
+//                .address(addressMapper.addressToResponseModel(user.getAddress()))
                 .gender(user.getGender())
                 .birthday(user.getBirthday())
                 .imgUrl(user.getImgUrl())
@@ -37,10 +29,9 @@ public class UserMapper {
                 && request.roleName() == null) {
             return User
                     .builder()
-//                    .username(request.username())
                     .firstName(request.firstName())
                     .lastName(request.lastName())
-//                    .email(request.email())
+//                    .address(addressService.addressRequestModelToEntity(request.address()))
                     .phoneNumber(request.phoneNumber())
                     .gender(request.gender())
                     .birthday(request.birthday())
@@ -48,33 +39,14 @@ public class UserMapper {
         } else {
             return User
                     .builder()
-//                    .username(request.username())
                     .firstName(request.firstName())
                     .lastName(request.lastName())
-//                    .email(request.email())
-//                    .password(passwordEncoder.encode(request.password()))
                     .phoneNumber(request.phoneNumber())
-                    .address(request.address())
+//                    .address(addressService.addressRequestModelToEntity(request.address()))
                     .gender(request.gender())
                     .birthday(request.birthday())
                     .imgUrl("img/user_profile/avatar.png")
-//                    .role(roleService.findRoleByName(request.roleName()))
                     .build();
         }
     }
-//    public User registerRequestModelToUser(RegisterRequestModel request) {
-//        return User
-//                .builder()
-//                .username(request.username())
-//                .firstName(request.firstName())
-//                .lastName(request.lastName())
-//                .email(request.email())
-//                .password(passwordEncoder.encode(request.password()))
-//                .phoneNumber(request.phoneNumber())
-//                .gender(request.gender())
-//                .birthday(request.birthday())
-//                .imgUrl("img/user_profile/avatar.png")
-//                .role(roleService.findRoleByName("CANDIDATE"))
-//                .build();
-//    }
 }

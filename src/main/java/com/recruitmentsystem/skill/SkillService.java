@@ -54,6 +54,14 @@ public class SkillService {
     public SkillResponseModel findSkillResponseModelByName(String name) {
         return skillMapper.skillToResponseModel(findByName(name));
     }
+    private List<Skill> findSkillByJob(Integer id) {
+        return skillRepository.findByJobId(id);
+    }
+    public List<SkillResponseModel> findSkillResponseModelByJob(Integer id) {
+        return findSkillByJob(id).stream()
+                .map(skillMapper::skillToResponseModel)
+                .collect(Collectors.toList());
+    }
     @Transactional
     public void updateSkill(Integer id, SkillRequestModel request) {
         Skill updateSkill = findById(id);

@@ -1,34 +1,52 @@
 package com.recruitmentsystem.job;
 
-import com.recruitmentsystem.job.Job;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface JobRepository extends JpaRepository<Job, Integer>, PagingAndSortingRepository<Job, Integer> {
-    @Query(value = "select j.job_id " +
-            "from job j " +
-            "left join job_category jc on j.job_id = jc.job_id " +
-            "right join company c on c.company_id = j.company_id " +
-            "where c.company_id = ?1 " +
-            "group by j.job_id",
-            nativeQuery = true)
-    List<Integer> findAllJobByCompany(int id);
+public interface JobRepository extends JpaRepository<Job, Integer> {
+    @Query("""
+        select j from Job j
+        join fetch j.jobSkills
+        join fetch j.jobAddresses
+        where j.deleteFlag = false
+        """)
+    List<Job> findAllJobs();
+    @Query("""
+        select j from Job j
+        join fetch j.jobSkills
+        join fetch j.jobAddresses
+        where j.company.companyId = :id
+        and j.deleteFlag = false
+        """)
+    List<Job> findAllJobByCompany(Integer id);
+    @Query("""
+        select j from Job j
+        join fetch j.jobSkills
+        join fetch j.jobAddresses
+        where j.deleteFlag = false
+        and j.jobName like %?1%
+        """)
+    List<Job> findByJobName(String jobName);
 
-//    @Query(value = "select j.job_id from company_branch b  " +
-//            "left join job j on b.branch_id = j.branch_id " +
-//            "where b.branch_id = ?1", nativeQuery = true)
-//    List<Integer> findAllJobByBranch(int id);
-
-//    @Query(value = "select j.job_id from hr_branch h " +
-//            "left join company_branch b on h.branch_id = b.branch_id " +
-//            "left join job j on j.branch_id = b.branch_id " +
-//            "where h.user_id = ?1", nativeQuery = true)
-//    List<Integer> findAllJobByHR(int id);
-
-    List<Job> findByJobNameContaining(String jobName);
+    Optional<Job> findByJobIdAndDeleteFlagFalse(Integer id);
+    @Query(value = """
+        select j from Job j
+        join fetch j.jobSkills
+        join fetch j.jobAddresses
+        where j.deleteFlag = false
+        """,
+    countQuery = """
+            select j from Job j
+            join fetch j.jobSkills
+            join fetch j.jobAddresses
+            where j.deleteFlag = false
+            """)
+    Page<Job> findAllJob(Pageable paging);
 }

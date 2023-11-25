@@ -1,8 +1,7 @@
-package com.recruitmentsystem.address.District;
+package com.recruitmentsystem.address.district;
 
-import com.recruitmentsystem.address.Province.Province;
-import com.recruitmentsystem.address.administrative_region.AdministrativeRegion;
 import com.recruitmentsystem.address.administrative_unit.AdministrativeUnit;
+import com.recruitmentsystem.address.province.Province;
 import com.recruitmentsystem.address.ward.Ward;
 import jakarta.persistence.*;
 import lombok.*;

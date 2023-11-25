@@ -2,8 +2,10 @@ package com.recruitmentsystem.user;
 
 import com.recruitmentsystem.auth.AuthenticationResponseModel;
 import com.recruitmentsystem.pagination.MyPagination;
+import com.recruitmentsystem.usereducation.UserEducationDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,14 +21,12 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/admin/manage/users/all")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PreAuthorize("hasAuthority('ADMIN')")
     public List<UserResponseModel> getAllUsers() {
         return userService.findAllUsers();
     }
 
     @GetMapping("/admin/manage/users/all-paging")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PreAuthorize("hasAuthority('ADMIN')")
     public MyPagination<UserResponseModel> getAllUsers(@RequestParam(defaultValue = "0") Integer pageNo,
                                                        @RequestParam(defaultValue = "10") Integer pageSize,
@@ -35,25 +35,18 @@ public class UserController {
     }
 
     @GetMapping("/admin/manage/users/find/{id}")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PreAuthorize("hasAuthority('ADMIN')")
     public UserResponseModel getUserById(@PathVariable("id") Integer id) {
-        return userService.findById(id);
+        return userService.findUserResponseModelById(id);
     }
 
     @GetMapping("/admin/manage/users/find")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PreAuthorize("hasAuthority('ADMIN')")
     public List<UserResponseModel> getUserByName(@RequestParam("name") String name) {
         return userService.findAllUserByName(name);
     }
 
-    /*
-       @RequestBody nói với Spring Boot rằng hãy chuyển Json trong request body
-       thành đối tượng UserRequestModel
-   */
     @PostMapping("/admin/manage/users/add")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponseModel addUser(@RequestBody UserRequestModel userRequest) {
@@ -78,7 +71,6 @@ public class UserController {
 //    }
 
     @DeleteMapping("/admin/manage/users/delete/{id}")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable("id") Integer id) {
@@ -86,7 +78,6 @@ public class UserController {
     }
 
     @DeleteMapping("/admin/manage/users/delete")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@RequestBody Integer[] ids) {
@@ -95,39 +86,20 @@ public class UserController {
         }
     }
 
-//    @GetMapping("/user/get-info")
-//    public UserResponseModel getUserProfile(@RequestParam("token") String token) {
-//        return userService.findUserDisplayByToken(token);
-//    }
-
-//    @PutMapping("/user/update")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-//    public AuthenticationResponseModel updateUser(@RequestParam("token") String token,
-//                                                  @RequestBody UserRequestModel request) {
-//        return userService.updateUserByToken(token, request);
-//    }
-
-//    @PutMapping("/user/change-password")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-//    public void changePassword(@RequestParam("token") String token,
-//                               @RequestBody ChangePasswordRequestModel request) {
-//        userService.changePassword(token, request);
-//    }
-
-//    @PostMapping(value = "/user/image/upload", consumes = {"multipart/form-data"})
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public void uploadImage(@RequestParam("token") String token,
-//                            @RequestParam("image") MultipartFile multipartFile) {
-//        userService.uploadUserProfileImage(token, multipartFile);
-//    }
-
-    /**
-        Không sử dụng token
-        Sử dụng Principal
-     */
     @GetMapping("/user/get-info-no-token")
     public UserResponseModel getUserProfile(Principal connectedUser) {
         return userService.getCurrentUserDisplay(connectedUser);
+    }
+
+    @GetMapping("/user/get-user-education")
+    public List<UserEducationDto> getUserEducation(Principal connectedUser) {
+        return userService.getUserEducation(connectedUser);
+    }
+
+    @PostMapping("/user/add-user-education")
+    public void addUserEducation(@RequestBody UserEducationDto userEducationDto,
+                                 Principal connectedUser) {
+        userService.addUserEducation(userEducationDto, connectedUser);
     }
 
     @PutMapping("/user/update-no-token")
@@ -140,11 +112,57 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(value = "/user/image/upload-no-token", consumes = {"multipart/form-data"})
+    @PostMapping(
+            value = "/user/image/upload-no-token",
+            consumes = {"multipart/form-data"}
+    )
     @ResponseStatus(HttpStatus.CREATED)
     public void uploadImageUrl(@RequestParam("image") MultipartFile multipartFile, Principal connectedUser) {
         System.out.println("File size: " + multipartFile.getSize());
         userService.uploadUserProfileImageNoToken(connectedUser, multipartFile);
+    }
+
+    /**
+     *
+     * @param file
+     * @param connectedUser
+     *
+     * upload image to AWS S3 Bucket
+     */
+    @PostMapping(
+            value = "/user/profile-image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public void uploadUserProfileImage(@RequestParam("file") MultipartFile file,
+                                           Principal connectedUser) {
+        userService.uploadUserProfileImage(connectedUser, file);
+    }
+
+    @PostMapping(
+            value = "/user/cv",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public void uploadUserCV(@RequestParam("file") MultipartFile file,
+                                           Principal connectedUser) {
+        userService.uploadUserCV(connectedUser, file);
+    }
+
+    @GetMapping(
+            value = "/user/{userId}/cv",
+            produces = MediaType.APPLICATION_PDF_VALUE
+    )
+    public byte[] getUserCV(
+            @PathVariable("userId") Integer userId) {
+        return userService.getUserCV(userId);
+    }
+
+    @GetMapping(
+            value = "/user/{userId}/profile-image",
+            produces = MediaType.IMAGE_JPEG_VALUE
+    )
+    public byte[] getUserProfileImage(
+            @PathVariable("userId") Integer userId) {
+        return userService.getUserProfileImage(userId);
     }
 
     @PatchMapping("/user/change-password-no-token")
@@ -152,24 +170,4 @@ public class UserController {
     public void changePassword(@RequestBody ChangePasswordRequestModel passwordRequest, Principal connectedUser) {
         userService.changePassword(passwordRequest, connectedUser);
     }
-
-//    @GetMapping("/user/image/download")
-//    public ResponseEntity downloadFile1(@RequestParam String fileName) throws IOException {
-//        File file = new File(fileName);
-//        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
-//        return ResponseEntity.ok()
-//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
-//                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-//                .contentLength(file.length())
-//                .body(resource);
-//    }
-//
-//    @GetMapping("/user/image/{fileName}")
-//    public ResponseEntity<?> downloadImage(@PathVariable String fileName){
-//        byte[] imageData = userService.downloadImage(fileName);
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .contentType(MediaType.valueOf("image/png"))
-//                .body(imageData);
-//
-//    }
 }

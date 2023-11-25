@@ -6,5 +6,5 @@ import lombok.Builder;
 public record WardResponseModel(
         String code,
         String fullName
-){
+) {
 }

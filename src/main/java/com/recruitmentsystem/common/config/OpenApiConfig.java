@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 
 @OpenAPIDefinition(
         info = @Info(
-                description = "OpenApi documentation for Project 3 - HUST",
+                description = "OpenApi documentation for Graduation Project - HUST",
                 title = "OpenApi specification",
                 version = "1.0"
         ),

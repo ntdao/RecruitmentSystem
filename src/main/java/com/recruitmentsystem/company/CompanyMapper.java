@@ -1,5 +1,6 @@
 package com.recruitmentsystem.company;
 
+import com.recruitmentsystem.address.address.AddressMapper;
 import com.recruitmentsystem.industry.IndustryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CompanyMapper {
+    private final AddressMapper addressMapper;
     private final IndustryService industryService;
 
     public CompanyResponseModel companyToResponseModel(Company company) {
@@ -20,7 +22,7 @@ public class CompanyMapper {
                 .companyIntroduction(company.getCompanyIntroduction())
                 .companyUrl(company.getCompanyUrl())
                 .industry(company.getIndustry().getIndustryNameVI())
-                .companyAddress(company.getCompanyAddress())
+                .companyAddress(addressMapper.addressToResponseModel(company.getAddress()))
                 .companyMST(company.getCompanyMst())
                 .companyLicense(company.getCompanyLicense())
                 .companySize(company.getCompanySize())
@@ -35,6 +37,7 @@ public class CompanyMapper {
                 .linkedinUrl(company.getLinkedinUrl())
                 .createDate(company.getCreateDate())
                 .lastModified(company.getLastModified())
+                .branches(company.getCompanyBranch())
                 .build();
     }
 
@@ -47,8 +50,8 @@ public class CompanyMapper {
                 .companyImage(request.companyImage())
                 .companyIntroduction(request.companyIntroduction())
                 .companyUrl(request.companyUrl())
-                .industry(industryService.findByName(request.industry()))
-                .companyAddress(request.companyAddress())
+                .industry(industryService.findIndustryByName(request.industry()))
+//                .companyAddress(request.companyAddress())
                 .companyMst(request.companyMST())
                 .companyLicense(request.companyLicense())
                 .companySize(request.companySize())

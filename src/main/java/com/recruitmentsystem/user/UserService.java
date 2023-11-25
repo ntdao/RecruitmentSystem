@@ -1,18 +1,24 @@
 package com.recruitmentsystem.user;
 
+import com.recruitmentsystem.account.Account;
+import com.recruitmentsystem.account.AccountRepository;
+import com.recruitmentsystem.account.AccountService;
+import com.recruitmentsystem.address.address.AddressService;
+import com.recruitmentsystem.auth.AuthenticationResponseModel;
 import com.recruitmentsystem.common.exception.InputException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
 import com.recruitmentsystem.common.myEnum.TokenType;
-import com.recruitmentsystem.account.Account;
-import com.recruitmentsystem.auth.AuthenticationResponseModel;
+import com.recruitmentsystem.file.FileService;
 import com.recruitmentsystem.pagination.MyPagination;
-import com.recruitmentsystem.account.AccountRepository;
+import com.recruitmentsystem.role.RoleService;
+import com.recruitmentsystem.s3.S3Service;
 import com.recruitmentsystem.security.jwt.JwtService;
 import com.recruitmentsystem.token.Token;
 import com.recruitmentsystem.token.TokenService;
-import com.recruitmentsystem.account.AccountService;
-import com.recruitmentsystem.file.FileService;
-import com.recruitmentsystem.role.RoleService;
+import com.recruitmentsystem.usereducation.UserEducation;
+import com.recruitmentsystem.usereducation.UserEducationDto;
+import com.recruitmentsystem.usereducation.UserEducationService;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -37,48 +43,36 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
     private final AccountRepository accountRepository;
+    private final AccountService accountService;
+    private final AddressService addressService;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final AccountService accountService;
+    private final UserEducationService userEducationService;
     private final FileService fileService;
     private final JwtService jwtService;
     private final RoleService roleService;
+    private final S3Service s3Service;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Value("${app.image.root}")
     private String root;
 
-//    public void checkDuplicateUsername(String username) {
-//        if (userRepository.existsUserByUsername(username)) {
-//            throw new ResourceAlreadyExistsException("Username already taken");
-//        }
-//    }
-
-//    public void checkDuplicateEmail(String email) {
-//        if (userRepository.existsUserByEmail(email)) {
-//            throw new ResourceAlreadyExistsException("Email already taken");
-//        }
-//    }
-
     @Transactional
     public UserResponseModel addUser(UserRequestModel request) {
-//        checkDuplicateUsername(request.username());
         accountService.checkDuplicateEmail(request.email());
-//        if (!checkDuplicateUsername(request.username()) && !checkDuplicateEmail(request.email())) {
         Account account = Account.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .role(roleService.findRoleByName(request.roleName()))
                 .enabled(true)
                 .build();
+        accountRepository.save(account);
+
+        addressService.saveAddress(request.address());
 
         User user = userMapper.userRequestModelToUser(request);
-//            user.setCreatedAt(Instant.now());
-//            user.setCreatedBy(getCurrentUser(connectedUser).getUserId());
-        accountRepository.save(account);
         user.setAccount(account);
         userRepository.save(user);
-//            userRepository.enableUser(user.getAccount().getEmail());
 
         // bị lỗi trường lastModified và lastModifiedBy
         return userMapper.userToResponseModel(user);
@@ -86,21 +80,15 @@ public class UserService {
 
     public List<UserResponseModel> findAllUsers() {
         return userRepository.findAllUser().stream()
-//                userRepository.findAll()
-//                .stream().filter(user ->
-//                        (!user.isDeleteFlag())
-//                                &&user.getAccount().getRole().getRoleId() == 3)
                 .map(userMapper::userToResponseModel).collect(Collectors.toList());
     }
 
     private List<UserResponseModel> getUsers(Integer pageNo, Integer pageSize, String sortBy) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
 
-        Page<User> pagedResult = userRepository.findAll(paging);
+        Page<User> pagedResult = userRepository.findAllUser(paging);
 
-        List<UserResponseModel> list = pagedResult.getContent()
-                .stream().filter(u -> !u.getAccount().isDeleteFlag() &&
-                        u.getAccount().getRole().getRoleId() == 3)
+        List<UserResponseModel> list = pagedResult.getContent().stream()
                 .map(userMapper::userToResponseModel).collect(Collectors.toList());
 
         if (pagedResult.hasContent()) {
@@ -122,15 +110,17 @@ public class UserService {
             totalPages = pageElements / pageSize + 1;
         }
 
-        MyPagination pagination = MyPagination.builder().total(pageElements).totalPage(totalPages).pageSize(pageSize).pageNo(pageNo).list(Collections.singletonList(list)).build();
+        MyPagination pagination = MyPagination.builder()
+                .total(pageElements)
+                .totalPage(totalPages)
+                .pageSize(pageSize)
+                .pageNo(pageNo)
+                .list(Collections.singletonList(list)).build();
         return pagination;
     }
 
-    public UserResponseModel findById(Integer id) {
-        return userRepository.findById(id)
-                .filter(user -> !user.isDeleteFlag())
-                .map(userMapper::userToResponseModel)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " does not exist"));
+    public UserResponseModel findUserResponseModelById(Integer id) {
+        return userMapper.userToResponseModel(findUserById(id));
     }
 
     private User findUserById(Integer id) {
@@ -139,28 +129,10 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " does not exist"));
     }
 
-//    private User findUserByUsername(String username) {
-//        return userRepository.findUserByUsername(username).filter(user -> !user.isDeleteFlag()).orElseThrow(() -> new ResourceNotFoundException("User with username " + username + " does not exist"));
-//    }
-
-//    private List<UserResponseModel> findAllUserByUsername(String name) {
-//        return userRepository.findAll().stream().filter(user -> (!user.isDeleteFlag() && user.getUsername().contains(name))).map(userMapper::userToResponseModel).collect(Collectors.toList());
-//    }
-
-    private List<UserResponseModel> findAllUserByFirstName(String name) {
-        return userRepository.findAll().stream().filter(user -> (!user.getAccount().isDeleteFlag() && user.getFirstName().contains(name))).map(userMapper::userToResponseModel).collect(Collectors.toList());
-    }
-
-    private List<UserResponseModel> findAllUserByLastName(String name) {
-        return userRepository.findAll().stream().filter(user -> (!user.getAccount().isDeleteFlag() && user.getLastName().contains(name))).map(userMapper::userToResponseModel).collect(Collectors.toList());
-    }
-
     public List<UserResponseModel> findAllUserByName(String name) {
-        List<UserResponseModel> list = new ArrayList<>();
-//        list.addAll(findAllUserByUsername(name));
-        list.addAll(findAllUserByFirstName(name));
-        list.addAll(findAllUserByLastName(name));
-        return list;
+        return userRepository.findAllUserByName(name).stream()
+                .map(userMapper::userToResponseModel)
+                .collect(Collectors.toList());
     }
 
 //    public User findUserByToken(String token) {
@@ -182,7 +154,6 @@ public class UserService {
 
     public User findUserByEmail(String email) {
         return userRepository.findUserByEmail(email)
-//                .filter(user -> !user.getAccount().isDeleteFlag())
                 .orElseThrow(() -> new ResourceNotFoundException("User with email " + email + " does not exist"));
     }
 
@@ -224,11 +195,6 @@ public class UserService {
             return null;
         }
 
-//      boolean isUsernameChange = !updateUser.getUsername().equals(request.username());
-//      if (isUsernameChange) {
-//          checkDuplicateUsername(request.username());
-//      }
-
         boolean isEmailChange = !updateUser.getAccount().getEmail().equals(request.email());
         if (isEmailChange) {
             accountService.checkDuplicateEmail(request.email());
@@ -247,6 +213,8 @@ public class UserService {
 //        oldUser.setAccount(updateAccount);
         System.out.println("User - Old info: " + oldUser);
         userRepository.save(oldUser);
+
+        addressService.updateAddress(updateUser.getAddress().getAddressId(), request.address());
 
         // update user
         updateUser = userMapper.userRequestModelToUser(request);
@@ -305,7 +273,7 @@ public class UserService {
         uploadProfileImage(user, file);
     }
 
-//    @Transactional
+    //    @Transactional
     public void uploadProfileImage(User user, MultipartFile file) {
         String fileDir = "img/user_profile/user_" + user.getUserId() + "/";
 
@@ -324,13 +292,48 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void uploadUserProfileImage(Principal connectedUser, MultipartFile file) {
+        User user = getCurrentUser(connectedUser);
+        String imgUrl = s3Service.uploadFile("profile-images/%s/".formatted(user.getUserId()), file);
+
+        System.out.println("User before upload image: " + user);
+
+        User oldUser = new User(user, true);
+        userRepository.save(oldUser);
+
+        // update database with imgUrl
+        user.setImgUrl(imgUrl);
+        System.out.println("User after upload image: " + user);
+
+        // save user
+        userRepository.save(user);
+    }
+
+    public void uploadUserCV(Principal connectedUser, MultipartFile file) {
+        User user = getCurrentUser(connectedUser);
+        String cvUrl = s3Service.uploadFile("cv/%s/".formatted(user.getUserId()), file);
+
+        System.out.println(cvUrl);
+    }
+
+    public byte[] getUserCV(Integer id) {
+        User user = findUserById(id);
+        byte[] cv = s3Service.downloadFile("cv/10/1700818252791-2.png");
+        return cv;
+    }
+
+    public byte[] getUserProfileImage(Integer id) {
+        User user = findUserById(id);
+
+        if (StringUtils.isBlank(user.getImgUrl())) {
+            throw new ResourceNotFoundException("User with id [%s] profile image not found".formatted(id));
+        }
+
+        byte[] profileImage = s3Service.downloadFile(user.getImgUrl());
+        return profileImage;
+    }
+
     public User getCurrentUser(Principal connectedUser) {
-//        User user = null;
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-//            String currentUsername = authentication.getName();
-//            user = findUserByUsername(currentUsername);
-//        }
         return findUserByEmail(getCurrentAccount(connectedUser).getEmail());
     }
 
@@ -345,48 +348,17 @@ public class UserService {
     }
 
     public void deleteUser(Integer id) {
-//        Account user;
-//        try {
         User user = findUserById(id);
         user.setDeleteFlag(true);
-//        } catch (ResourceNotFoundException e) {
-//            throw new ResourceNotFoundException("User with id " + id + " does not exist");
-//        }
-//        user.setDeleteFlag(true);
+
         Account account = user.getAccount();
         account.setDeleteFlag(true);
-//        user.setUpdatedAt(Instant.now());
-//        user.setUpdatedBy(getCurrentUser(connectedUser).getId());
-//        userRepository.save(user);
+
         accountRepository.save(account);
         userRepository.save(user);
+
         revokeAllAccountTokens(account.getId());
     }
-
-//    public void changePassword(String token, ChangePasswordRequestModel request) {
-////        User user = getCurrentUser();
-//        Account user = findUserByToken(token);
-//        boolean isMatch = true;
-////        boolean isMatch = passwordEncoder.matches(request.currentPassword(), user.getPassword());
-//        // kiểm tra mật khẩu hiện tại
-//        if (isMatch) {
-////            user.setPassword(passwordEncoder.encode(request.newPassword()));
-//
-//            // tao ban ghi luu thong tin cu cua user
-//            Account oldUser = new Account(user, true);
-//            userRepository.save(oldUser);
-//
-//            // update user
-////            user.setUpdatedAt(Instant.now());
-////            user.setUpdatedBy(user.getId());
-//
-//            userRepository.save(user);
-//            revokeAllUserTokens(user);
-//
-//        } else {
-//            throw new IllegalStateException("Your current password is incorrect");
-//        }
-//    }
 
     public void changePassword(ChangePasswordRequestModel request,
                                Principal connectedUser) {
@@ -458,5 +430,20 @@ public class UserService {
                 .builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken).build();
+    }
+
+    public List<UserEducationDto> getUserEducation(Principal connectedUser) {
+        User user = getCurrentUser(connectedUser);
+        return userEducationService.findByUser(user.getUserId());
+    }
+
+    public void addUserEducation(UserEducationDto userEducationDto, Principal connectedUser) {
+        User user = getCurrentUser(connectedUser);
+        System.out.println("User before add education: " + user);
+        System.out.println("List user education before add: " + user.getUserEducations());
+        List<UserEducation> list = userEducationService.addUserEducation(user.getUserEducations(), userEducationDto);
+        System.out.println("List user education after add: " + list);
+        user.setUserEducations(list);
+        userRepository.save(user);
     }
 }

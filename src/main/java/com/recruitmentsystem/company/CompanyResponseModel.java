@@ -1,5 +1,6 @@
 package com.recruitmentsystem.company;
 
+import com.recruitmentsystem.address.address.AddressResponseModel;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -12,7 +13,7 @@ public record CompanyResponseModel(
         Integer id,
         String companyShortName,
         String companyFullName,
-        String companyAddress,
+        AddressResponseModel companyAddress,
         String companyUrl,
         String companyLogo,
         String companyIntroduction,
@@ -30,7 +31,7 @@ public record CompanyResponseModel(
         String facebookUrl,
         String youtubeUrl,
         String linkedinUrl,
-        List<String> branches,
+        String branches,
         LocalDateTime createDate,
         LocalDateTime lastModified
 ) {

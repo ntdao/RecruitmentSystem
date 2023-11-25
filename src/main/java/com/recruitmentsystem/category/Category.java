@@ -23,7 +23,6 @@ public class Category {
     @Column(nullable = false)
     private String categoryName;
     private String categoryIcon;
-//    private String categoryUrl;
     private Integer total;
     public Category (Category category) {
         this.categoryName = category.getCategoryName();

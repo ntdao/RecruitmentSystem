@@ -1,4 +1,4 @@
-package com.recruitmentsystem.address.Province;
+package com.recruitmentsystem.address.province;
 
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,7 @@
 package com.recruitmentsystem.user;
 
-import com.recruitmentsystem.user.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -11,27 +12,30 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer>, PagingAndSortingRepository<User, Integer> {
-//    boolean existsUserByUsername(String username);
-
-//    boolean existsUserByEmail(String email);
-    @Query(value = "select u from User u " +
+    @Query("select u from User u " +
             "left join Account a on u.account.id = a.id " +
             "where a.deleteFlag = false and a.role.roleId = 3")
     List<User> findAllUser();
-    @Query(value = "select u from User u " +
+    @Query("select u from User u " +
             "left join Account a on u.account.id = a.id " +
-            "where u.deleteFlag = false and a.email = ?1")
+            "where a.deleteFlag = false and a.role.roleId = 3")
+    Page<User> findAllUser(Pageable paging);
+    @Query("select u from User u " +
+            "left join Account a on u.account.id = a.id " +
+            "where u.deleteFlag = false " +
+            "and a.deleteFlag = false " +
+            "and a.email = ?1")
     Optional<User> findUserByEmail(String email);
-
-//    @Modifying
-//    @Query("UPDATE User a " +
-//            "SET a.enabled = TRUE WHERE a.email = ?1")
-//    int enableUser(String email);
-
-//    @Query("Select count(*) from User u where u.deleteFlag = false")
-    @Query("select count(*) from User u")
+    @Query("select count(*) from User u" +
+            " where u.deleteFlag = false " +
+            "and u.account.role.roleId = 3")
     int countAllUser();
-
-    @Query("select max(userId) from User")
-    Integer getUserIdRequest();
+    @Query("""
+            select u from User u 
+            where u.firstName like %?1%
+            or u.lastName like %?1%
+            and u.deleteFlag = false
+            """
+    )
+    List<User> findAllUserByName(String name);
 }

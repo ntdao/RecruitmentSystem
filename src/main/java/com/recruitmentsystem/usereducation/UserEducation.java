@@ -1,6 +1,7 @@
 package com.recruitmentsystem.usereducation;
 
 import com.recruitmentsystem.degree.Degree;
+import com.recruitmentsystem.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -36,6 +37,12 @@ public class UserEducation {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Degree degree;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private User user;
     @LastModifiedDate
     @Column(insertable = false)
     private LocalDateTime lastModified;

@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -25,7 +27,6 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-//    @ResponseStatus(HttpStatus.OK)
     public AuthenticationResponseModel login(@RequestBody AuthenticationRequestModel request) {
         return authenticationService.login(request);
     }
@@ -39,8 +40,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/forgot-password")
-    public AuthenticationResponseModel forgotPassword(@RequestBody Object request) {
-        String email = request.toString().substring(7, request.toString().length() - 1);
+    public AuthenticationResponseModel forgotPassword(@RequestBody Map<String, String> request) {
+//        String email = request.toString().substring(7, request.toString().length() - 1);
+        String email = request.get("email");
         return authenticationService.forgotPassword(email);
     }
 
@@ -56,8 +58,9 @@ public class AuthenticationController {
 
     @PostMapping("/reset-password")
     public void processResetPassword(@RequestParam("token") String token,
-                                     @RequestBody Object newPassword) {
-        String password = newPassword.toString().substring(10, newPassword.toString().length() - 1);
+                                     @RequestBody Map<String, String> request) {
+//        String password = newPassword.toString().substring(10, newPassword.toString().length() - 1);
+        String password = request.get("password");
         authenticationService.updatePassword(token, password);
     }
 }

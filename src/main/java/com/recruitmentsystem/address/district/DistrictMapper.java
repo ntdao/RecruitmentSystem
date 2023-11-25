@@ -1,4 +1,4 @@
-package com.recruitmentsystem.address.District;
+package com.recruitmentsystem.address.district;
 
 import org.springframework.stereotype.Service;
 

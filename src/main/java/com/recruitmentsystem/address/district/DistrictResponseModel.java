@@ -1,4 +1,4 @@
-package com.recruitmentsystem.address.District;
+package com.recruitmentsystem.address.district;
 
 import lombok.Builder;
 
@@ -6,5 +6,5 @@ import lombok.Builder;
 public record DistrictResponseModel(
         String code,
         String fullName
-){
+) {
 }

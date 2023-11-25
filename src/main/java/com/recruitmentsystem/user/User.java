@@ -1,8 +1,10 @@
 package com.recruitmentsystem.user;
 
 import com.recruitmentsystem.account.Account;
+import com.recruitmentsystem.address.address.Address;
 import com.recruitmentsystem.common.myEnum.Gender;
 import com.recruitmentsystem.skill.Skill;
+import com.recruitmentsystem.usereducation.UserEducation;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
@@ -24,38 +26,25 @@ import java.util.List;
 @ToString
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-//@EqualsAndHashCode(callSuper = true)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(updatable = false, columnDefinition = "varchar(36)")
-//    @Type(type="uuid-char")
-//    private UUID userId;
     private Integer userId;
-    //    @Column(nullable = false)
-//    private String username;
-//    @Column(nullable = false)
-//    private String password;
     @OneToOne(cascade = CascadeType.MERGE)
     private Account account;
     private String firstName;
     private String lastName;
     private String phoneNumber;
-    private String address;
+    //    private String address;
+    @OneToOne()
+    @JoinColumn(name = "address_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Address address;
     @Enumerated(EnumType.STRING)
     private Gender gender;
     private String imgUrl;
     private LocalDate birthday;
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "role_id")
-//    @ToString.Exclude
-//    private Role role;
-//    private boolean enabled = false;
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-//    @EqualsAndHashCode.Exclude
-//    @ToString.Exclude
-//    private List<Token> tokens;
-
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
@@ -65,6 +54,12 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
     private List<Skill> userSkills;
+
+    @OneToMany(mappedBy = "user")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private List<UserEducation> userEducations;
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createDate;
@@ -80,28 +75,7 @@ public class User {
     private boolean deleteFlag = false;
     private Integer oldId;
 
-//    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-//    @JoinTable(
-//            name = "HR_branch",
-//            joinColumns = @JoinColumn(name = "user_id"),
-//            inverseJoinColumns = @JoinColumn(name = "branch_id")
-//    )
-//    private Set<CompanyBranch> branches = new HashSet<>();
-
-//    @Transient
-//    public String getImgUrl() {
-//        if (imgUrl == null) return null;
-////        return "/image/user_profile/" + id + "/" + imgUrl;
-//        return id + "/" + imgUrl;
-//    }
-
     public User(User user, boolean deleteFlag) {
-//        super(user.getEmail(),
-//                user.getPassword(),
-//                user.getRole());
-//        this.username = user.getUsername();
-//        this.password = user.getPassword();
-//        this.email = user.getEmail();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.phoneNumber = user.getPhoneNumber();
@@ -110,9 +84,7 @@ public class User {
         this.imgUrl = user.getImgUrl();
         this.birthday = user.getBirthday();
         this.account = user.getAccount();
-//        this.role = user.getRole();
-//        this.enabled = user.isEnabled();
-//        this.userSkills = user.getUserSkills();
+        this.userSkills = user.getUserSkills();
         this.createDate = user.getCreateDate();
         this.lastModified = user.getLastModified();
         this.createdBy = user.getCreatedBy();
@@ -120,30 +92,4 @@ public class User {
         this.deleteFlag = deleteFlag;
         this.oldId = user.getUserId();
     }
-
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(this.role.getRoleName());
-//        return Collections.singletonList(authority);
-//    }
-//
-//    @Override
-//    public boolean isAccountNonExpired() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isAccountNonLocked() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isCredentialsNonExpired() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isEnabled() {
-//        return enabled;
-//    }
 }

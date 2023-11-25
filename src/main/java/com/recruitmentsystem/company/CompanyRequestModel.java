@@ -1,11 +1,13 @@
 package com.recruitmentsystem.company;
 
+import com.recruitmentsystem.address.address.AddressRequestModel;
+
 public record CompanyRequestModel(
         String password,
         String roleName,
         String companyShortName,
         String companyFullName,
-        String companyAddress,
+        AddressRequestModel companyAddress,
         String companyLogo,
         String companyIntroduction,
         String companyImage,

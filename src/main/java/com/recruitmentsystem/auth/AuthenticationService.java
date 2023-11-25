@@ -2,6 +2,9 @@ package com.recruitmentsystem.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.account.*;
+import com.recruitmentsystem.address.address.Address;
+import com.recruitmentsystem.address.address.AddressRepository;
+import com.recruitmentsystem.address.address.AddressService;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
 import com.recruitmentsystem.common.myEnum.TokenType;
 import com.recruitmentsystem.role.RoleService;
@@ -31,17 +34,17 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-    private final UserRepository userRepository;
     private final AccountRepository accountRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
-    private final EmailService emailService;
-    private final AuthenticationManager authenticationManager;
-    private final UserMapper userMapper;
-    private final UserService userService;
     private final AccountService accountService;
+    private final AddressService addressService;
+    private final AuthenticationManager authenticationManager;
+    private final EmailService emailService;
+    private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
     private final TokenService tokenService;
+    private final UserMapper userMapper;
+    private final UserRepository userRepository;
 
     public void register(UserRequestModel request) {
         // check email
@@ -50,20 +53,17 @@ public class AuthenticationService {
 
         Account account = Account.builder()
                 .email(request.email())
-                .password(request.password())
+                .password(passwordEncoder.encode(request.password()))
                 .role(roleService.findRoleByName(request.roleName()))
                 .build();
-//        account.setCreatedBy(accountService.getAccountIdRegister());
+        accountRepository.save(account);
 
-        // check username and email
-//        userService.checkDuplicateUsername(request.username());
-//        userService.checkDuplicateEmail(request.email());
-//
+        addressService.saveAddress(null);
+
         User user = userMapper.userRequestModelToUser(request);
         user.setAccount(account);
-        user.setCreatedBy(accountService.getAccountIdRegister());
-        System.out.println("-------Register user-----");
-        accountRepository.save(account);
+        user.setCreatedBy(account.getId());
+
         userRepository.save(user);
 
         String token = jwtService.generateEmailToken(account);

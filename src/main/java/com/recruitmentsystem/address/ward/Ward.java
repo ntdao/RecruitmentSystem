@@ -1,7 +1,7 @@
 package com.recruitmentsystem.address.ward;
 
-import com.recruitmentsystem.address.District.District;
 import com.recruitmentsystem.address.administrative_unit.AdministrativeUnit;
+import com.recruitmentsystem.address.district.District;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,8 +25,12 @@ public class Ward {
     private String codeName;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "district_code")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private District district;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "administrative_unit_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private AdministrativeUnit administrativeUnit;
 }

@@ -53,14 +53,9 @@ public class Account implements UserDetails {
         this.email = account.getEmail();
         this.password = account.getPassword();
         this.role = account.getRole();
-//        this.createDate = account.getCreateDate();
-//        this.lastModified = account.getLastModified();
-//        this.createdBy = account.getCreatedBy();
-//        this.lastModifiedBy = account.getLastModifiedBy();
         this.deleteFlag = deleteFlag;
         this.oldId = account.getId();
         this.enabled = account.isEnabled();
-//        this.tokens = account.getTokens();
     }
 
     @Override

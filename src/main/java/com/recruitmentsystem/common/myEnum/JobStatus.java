@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 public enum JobStatus {
     RECRUITING("Đang tuyển"),
     COMPLETED("Hoàn thành"),
-    EXPIRED("Hết hạn"),
-    DELETED("Đã xóa");
+    EXPIRED("Hết hạn");
+//    DELETED("Đã xóa");
     public final String label;
 
     JobStatus(String label) {

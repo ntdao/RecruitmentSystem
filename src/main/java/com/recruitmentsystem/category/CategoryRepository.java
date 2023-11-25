@@ -1,15 +1,16 @@
 package com.recruitmentsystem.category;
 
-import com.recruitmentsystem.category.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Integer>, PagingAndSortingRepository<Category, Integer> {
+public interface CategoryRepository extends JpaRepository<Category, Integer> {
     boolean existsCategoryByCategoryName(String username);
+
+    List<Category> findByCategoryNameContains(String name);
 
     Optional<Category> findByCategoryName(String name);
 }

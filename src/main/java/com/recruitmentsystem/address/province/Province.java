@@ -1,9 +1,7 @@
-package com.recruitmentsystem.address.Province;
+package com.recruitmentsystem.address.province;
 
-import com.recruitmentsystem.address.District.District;
-import com.recruitmentsystem.address.administrative_region.AdministrativeRegion;
 import com.recruitmentsystem.address.administrative_unit.AdministrativeUnit;
-import com.recruitmentsystem.address.ward.Ward;
+import com.recruitmentsystem.address.district.District;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,9 +28,6 @@ public class Province {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "administrative_unit_id")
     private AdministrativeUnit administrativeUnit;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "administrative_region_id")
-    private AdministrativeRegion administrativeRegion;
     @OneToMany(mappedBy = "province", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

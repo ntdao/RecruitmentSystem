@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -31,8 +32,9 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors().and()
+//                .cors().and()
                 .csrf().disable()
+                .cors(Customizer.withDefaults())
 
                 .authorizeHttpRequests()
 
@@ -50,11 +52,13 @@ public class SecurityConfiguration {
                         "/swagger-ui.html",
                         "/api/image/**",
                         "/api/v*/user/**",
+                        "/api/v*/user/*/profile-image",
                         "/api/v*/categories/**",
                         "/api/v*/companies/**",
                         "/api/v*/branches/**",
                         "/api/v*/jobs/**",
-                        "/api/v*/address/**")
+                        "/api/v*/address/**",
+                        "/api/v*/industries/**")
                 .permitAll()
 
                 .requestMatchers("/api/v*/admin/manage/**").hasAuthority("ADMIN")

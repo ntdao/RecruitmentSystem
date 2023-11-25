@@ -1,7 +1,6 @@
 package com.recruitmentsystem.job;
 
-import com.recruitmentsystem.address.AddressService;
-import com.recruitmentsystem.address.Province.ProvinceResponseModel;
+import com.recruitmentsystem.address.address.AddressService;
 import com.recruitmentsystem.common.myEnum.Gender;
 import com.recruitmentsystem.jobposition.JobPositionResponseModel;
 import com.recruitmentsystem.jobposition.JobPositionService;
@@ -73,21 +72,14 @@ public class JobController {
     @DeleteMapping("/admin/manage/jobs/delete/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteJob(@PathVariable("id") Integer id,
-                          HttpServletRequest request) {
-        jobService.deleteJob(id, request.getUserPrincipal());
+    public void deleteJob(@PathVariable("id") Integer id) {
+        jobService.deleteJob(id);
     }
 
-//    @GetMapping("/hr/manage/jobs/all")
+//    @GetMapping("/company/manage/jobs/all")
 //    @PreAuthorize("hasRole('ROLE_HR')")
-//    public ResponseEntity<?> getAllJobsHR(HttpServletRequest request) {
-//        List<JobResponseModel> jobs;
-//        try {
-//            jobs = jobService.findAllJobsByHR(request.getUserPrincipal());
-//        } catch (ResourceNotFoundException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-//        }
-//        return ResponseEntity.ok(jobs);
+//    public List<JobResponseModel> getAllJobsHR(HttpServletRequest request) {
+//
 //    }
 
     @GetMapping("/company/manage/jobs/find/{id}")
@@ -99,9 +91,8 @@ public class JobController {
     @DeleteMapping("/company/manage/jobs/delete/{id}")
     @PreAuthorize("hasAuthority('COMPANY')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteJobByCompany(@PathVariable("id") Integer id,
-                                   HttpServletRequest request) {
-        jobService.deleteJob(id, request.getUserPrincipal());
+    public void deleteJobByCompany(@PathVariable("id") Integer id) {
+        jobService.deleteJob(id);
     }
 
 

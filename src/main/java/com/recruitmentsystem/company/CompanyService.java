@@ -1,13 +1,15 @@
 package com.recruitmentsystem.company;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.account.Account;
 import com.recruitmentsystem.account.AccountRepository;
 import com.recruitmentsystem.account.AccountService;
+import com.recruitmentsystem.address.address.Address;
+import com.recruitmentsystem.address.address.AddressService;
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
 import com.recruitmentsystem.pagination.MyPagination;
 import com.recruitmentsystem.role.RoleService;
-import com.recruitmentsystem.user.User;
 import com.recruitmentsystem.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,11 +31,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CompanyService {
     private final AccountRepository accountRepository;
-    private final CompanyRepository companyRepository;
     private final AccountService accountService;
+    private final AddressService addressService;
+    private final CompanyRepository companyRepository;
     private final RoleService roleService;
     private final UserService userService;
     private final CompanyMapper companyMapper;
+    private final ObjectMapper objectMapper;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private void checkDuplicateCompanyName(String shortName, String fullName) {
@@ -45,7 +49,7 @@ public class CompanyService {
         }
     }
 
-    public CompanyResponseModel addCompanyAdmin(CompanyRequestModel request, Principal connectedUser) {
+    public CompanyResponseModel addCompanyByAdmin(CompanyRequestModel request) {
         accountService.checkDuplicateEmail(request.email());
         checkDuplicateCompanyName(request.companyShortName(), request.companyFullName());
 
@@ -57,13 +61,25 @@ public class CompanyService {
                 .build();
 
         Company company = companyMapper.companyRequestModelToCompany(request);
+//        Address address = addressService.addressRequestModelToEntity(request.companyAddress());
 
         accountRepository.save(account);
+//        addressRepository.save(address);
+
+        Address address = addressService.saveAddress(request.companyAddress());
+
         company.setAccount(account);
+        company.setAddress(address);
         companyRepository.save(company);
 
         // bị lỗi trường lastModified và lastModifiedBy
         return companyMapper.companyToResponseModel(company);
+    }
+
+    public void existsById(Integer id) {
+        if (!companyRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Company with id " + id + " not found");
+        }
     }
 
     public List<CompanyResponseModel> findAllCompanies() {
@@ -87,41 +103,30 @@ public class CompanyService {
                 .orElseThrow(() -> new ResourceNotFoundException("Company with email " + email + " does not exist"));
     }
 
-    public CompanyResponseModel findCompanyDisplayModelById(Integer id) {
-        return companyRepository.findByCompanyId(id)
-                .map(companyMapper::companyToResponseModel)
-                .orElseThrow(() -> new ResourceNotFoundException("Company with id " + id + " does not exist"));
-    }
-
-    public List<Company> findCompanyByCompanyNameAdmin(String name) {
-        return companyRepository.findAllCompany()
-                .stream()
-                .filter(c ->
-                        c.getCompanyShortName().contains(name)
-                                && c.getCompanyFullName().contains(name))
-                .collect(Collectors.toList());
+    public CompanyResponseModel findCompanyResponseModelById(Integer id) {
+        return companyMapper.companyToResponseModel(findCompanyById(id));
     }
 
     public List<CompanyResponseModel> findCompanyByCompanyName(String name) {
-        return companyRepository.findAllCompany()
+        List<Company> companies = new ArrayList<>();
+        companies.addAll(companyRepository.findByCompanyShortNameContainsIgnoreCase(name));
+        companies.addAll(companyRepository.findByCompanyFullNameContainsIgnoreCase(name));
+        return companies
                 .stream()
-                .filter(c ->
-                        c.getCompanyShortName().contains(name)
-                                && c.getCompanyFullName().contains(name))
                 .map(companyMapper::companyToResponseModel)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public void updateCompanyByAdmin(Integer id, CompanyRequestModel requestModel, Principal connectedUser) {
-        // tim company theo id
+    public void updateCompanyByAdmin(Integer id, CompanyRequestModel requestModel) {
         Company updateCompany = findCompanyById(id);
         updateCompany(updateCompany, requestModel);
     }
-    public CompanyResponseModel updateCompanyByCompany(CompanyRequestModel request, Principal connectedUser) {
+
+    public void updateCompanyByCompany(CompanyRequestModel request, Principal connectedUser) {
         Account account = userService.getCurrentAccount(connectedUser);
         Company company = findCompanyByEmail(account.getEmail());
-        return null;
+        updateCompany(company, request);
     }
 
     private void updateCompany(Company updateCompany, CompanyRequestModel request) {
@@ -153,6 +158,14 @@ public class CompanyService {
         System.out.println("Company - Old info: " + oldCompany);
 
         // update company
+        Address updateAddress = oldCompany.getAddress();
+//        Address address = addressMapper.addressRequestModelToAddress(request.companyAddress());
+//        updateAddress.setAddress(address.getAddress());
+//        updateAddress.setWard(address.getWard());
+//        updateAddress.setFullAddress(address.getFullAddress());
+//        addressRepository.save(updateAddress);
+        addressService.updateAddress(updateAddress.getAddressId(), request.companyAddress());
+
         updateCompany = companyMapper.companyRequestModelToCompany(request);
         updateCompany.setCompanyId(id);
         updateCompany.setAccount(updateAccount);
@@ -169,47 +182,15 @@ public class CompanyService {
     public List<CompanyResponseModel> getTopCompanies(Integer pageNo, Integer pageSize, String sortBy) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
 
-        Page<Company> pagedResult = companyRepository.findAll(paging);
-
-        List<CompanyResponseModel> list = pagedResult.getContent()
-                .stream()
-                .filter(u -> !u.isDeleteFlag())
-                .map(companyMapper::companyToResponseModel)
-                .collect(Collectors.toList());
+        Page<Company> pagedResult = companyRepository.findAllCompany(paging);
 
         if (pagedResult.hasContent()) {
-            return list;
+            return pagedResult.getContent().stream()
+                    .map(companyMapper::companyToResponseModel)
+                    .toList();
         } else {
             return new ArrayList<>();
         }
-    }
-
-    public MyPagination<CompanyResponseModel> getAllCompanies(Integer pageNo, Integer pageSize, String sortBy) {
-        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-
-        Page<Company> pagedResult = companyRepository.findAll(paging);
-
-        List<CompanyResponseModel> list = pagedResult.getContent()
-                .stream()
-                .filter(u -> !u.isDeleteFlag())
-                .map(companyMapper::companyToResponseModel)
-                .collect(Collectors.toList());
-
-        int totalPages;
-        if (list.size() % pageSize == 0) {
-            totalPages = list.size() / pageSize;
-        } else {
-            totalPages = list.size() / pageSize + 1;
-        }
-
-        MyPagination pagination = MyPagination.builder()
-                .total(list.size())
-                .totalPage(totalPages)
-                .pageSize(pageSize)
-                .pageNo(pageNo)
-                .list(Collections.singletonList(list))
-                .build();
-        return pagination;
     }
 
     public CompanyResponseModel findCompanyDisplayModel(Principal connectedUser) {

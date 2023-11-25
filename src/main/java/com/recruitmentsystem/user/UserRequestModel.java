@@ -1,5 +1,6 @@
 package com.recruitmentsystem.user;
 
+import com.recruitmentsystem.address.address.AddressRequestModel;
 import com.recruitmentsystem.common.myEnum.Gender;
 import jakarta.annotation.Nullable;
 import lombok.Builder;
@@ -8,13 +9,12 @@ import java.time.LocalDate;
 
 @Builder
 public record UserRequestModel(
-//        String username,
         @Nullable String password,
         String email,
         String firstName,
         String lastName,
         String phoneNumber,
-        @Nullable String address,
+        @Nullable AddressRequestModel address,
         Gender gender,
         LocalDate birthday,
         @Nullable String imgUrl,
