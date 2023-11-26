@@ -219,13 +219,6 @@ public class UserService {
         // update user
         updateUser = userMapper.userRequestModelToUser(request);
         updateUser.setUserId(userId);
-//            updateUser.setPassword(oldUser.getPassword());
-//            updateUser.setRole(oldUser.getRole());
-//            updateUser.setCreatedAt(oldUser.getCreatedAt());
-//            updateUser.setCreatedBy(oldUser.getCreatedBy());
-//            updateUser.setUpdatedAt(Instant.now());
-//            updateUser.setEnabled(oldUser.isEnabled());
-//            updateUser.setUpdatedBy(updateBy);
         updateUser.setImgUrl(oldUser.getImgUrl());
         updateUser.setAccount(oldUser.getAccount());
 
@@ -235,7 +228,7 @@ public class UserService {
         String accessToken = jwtService.generateToken(updateAccount);
         String refreshToken = jwtService.generateRefreshToken(updateAccount);
 
-        revokeAllAccountTokens(accountId);
+        accountService.revokeAllAccountTokens(accountId);
 
         Token tokenAccess = Token
                 .builder()
@@ -262,11 +255,6 @@ public class UserService {
                 .refreshToken(refreshToken).build();
         return response;
     }
-
-//    public void uploadUserProfileImage(String token, MultipartFile file) {
-//        User user = findUserByToken(token);
-//        uploadProfileImage(user, file);
-//    }
 
     public void uploadUserProfileImageNoToken(Principal connectedUser, MultipartFile file) {
         User user = getCurrentUser(connectedUser);
@@ -334,17 +322,11 @@ public class UserService {
     }
 
     public User getCurrentUser(Principal connectedUser) {
-        return findUserByEmail(getCurrentAccount(connectedUser).getEmail());
-    }
-
-    public Account getCurrentAccount(Principal connectedUser) {
-        return (Account) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+        return findUserByEmail(accountService.getCurrentAccount(connectedUser).getEmail());
     }
 
     public UserResponseModel getCurrentUserDisplay(Principal connectedUser) {
-        UserResponseModel user = userMapper.userToResponseModel(getCurrentUser(connectedUser));
-        System.out.println("User info: " + user);
-        return user;
+        return userMapper.userToResponseModel(getCurrentUser(connectedUser));
     }
 
     public void deleteUser(Integer id) {
@@ -357,14 +339,14 @@ public class UserService {
         accountRepository.save(account);
         userRepository.save(user);
 
-        revokeAllAccountTokens(account.getId());
+        accountService.revokeAllAccountTokens(account.getId());
     }
 
     public void changePassword(ChangePasswordRequestModel request,
                                Principal connectedUser) {
-        Account account = getCurrentAccount(connectedUser);
         User user = getCurrentUser(connectedUser);
-        int accountId = account.getId();
+        Account account = user.getAccount();
+        int accountId = user.getAccount().getId();
 
 //         check if the current password is correct
         if (!passwordEncoder.matches(request.currentPassword(), account.getPassword())) {
@@ -410,17 +392,7 @@ public class UserService {
 //        // save the new password
 //        userRepository.save(user);
 
-        revokeAllAccountTokens(accountId);
-    }
-
-    private void revokeAllAccountTokens(Integer id) {
-        List<Token> validUserTokens = tokenService.findAllValidTokenByAccount(id);
-        if (validUserTokens.isEmpty()) return;
-        validUserTokens.forEach(token -> {
-            token.setExpired(true);
-            token.setRevoked(true);
-        });
-        tokenService.saveAll(validUserTokens);
+        accountService.revokeAllAccountTokens(accountId);
     }
 
     private AuthenticationResponseModel authenticationResponse(Integer id) {

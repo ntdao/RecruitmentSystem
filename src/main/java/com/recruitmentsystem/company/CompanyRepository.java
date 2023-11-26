@@ -41,13 +41,17 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
             """)
     Optional<Company> findByCompanyId(Integer id);
 
-    List<Company> findByCompanyShortNameContainsIgnoreCase(String name);
+    List<Company> findByCompanyShortNameContainsIgnoreCaseOrCompanyFullNameContainsIgnoreCase(String shortName, String fullName);
 
-    List<Company> findByCompanyFullNameContainsIgnoreCase(String name);
-//    @Query("""
-//        select new com.recruitmentsystem.company.CompanyTopModel(c.companyShortName, c.companyLogo) from Company c
-//        join fetch c.industry
-//        where c.deleteFlag = false
-//    """)
-//    Page<CompanyTopModel> findTopCompany(Pageable paging);
+    @Query(value = """
+            select new com.recruitmentsystem.company.CompanyTopModel(c.companyShortName, c.companyLogo, c.companyUrl) 
+            from Company c
+            where c.deleteFlag = false
+            """,
+            countQuery = """
+            select new com.recruitmentsystem.company.CompanyTopModel(c.companyShortName, c.companyLogo, c.companyUrl) 
+            from Company c
+            where c.deleteFlag = false
+    """)
+    Page<CompanyTopModel> findTopCompany(Pageable paging);
 }

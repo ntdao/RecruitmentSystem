@@ -35,10 +35,12 @@ public class CompanyService {
     private final AddressService addressService;
     private final CompanyRepository companyRepository;
     private final RoleService roleService;
-    private final UserService userService;
     private final CompanyMapper companyMapper;
-    private final ObjectMapper objectMapper;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    public Company getCurrentCompany(Principal connectedUser) {
+        return findCompanyByEmail(accountService.getCurrentAccount(connectedUser).getEmail());
+    }
 
     private void checkDuplicateCompanyName(String shortName, String fullName) {
         if (companyRepository.existsCompanyByCompanyShortName(shortName)) {
@@ -108,11 +110,9 @@ public class CompanyService {
     }
 
     public List<CompanyResponseModel> findCompanyByCompanyName(String name) {
-        List<Company> companies = new ArrayList<>();
-        companies.addAll(companyRepository.findByCompanyShortNameContainsIgnoreCase(name));
-        companies.addAll(companyRepository.findByCompanyFullNameContainsIgnoreCase(name));
-        return companies
+        return companyRepository.findByCompanyShortNameContainsIgnoreCaseOrCompanyFullNameContainsIgnoreCase(name, name)
                 .stream()
+                .filter(c -> !c.isDeleteFlag())
                 .map(companyMapper::companyToResponseModel)
                 .collect(Collectors.toList());
     }
@@ -124,7 +124,7 @@ public class CompanyService {
     }
 
     public void updateCompanyByCompany(CompanyRequestModel request, Principal connectedUser) {
-        Account account = userService.getCurrentAccount(connectedUser);
+        Account account = accountService.getCurrentAccount(connectedUser);
         Company company = findCompanyByEmail(account.getEmail());
         updateCompany(company, request);
     }
@@ -176,7 +176,13 @@ public class CompanyService {
     public void deleteCompany(Integer id) {
         Company company = findCompanyById(id);
         company.setDeleteFlag(true);
+        Account account = company.getAccount();
+        account.setDeleteFlag(true);
+
+        accountRepository.save(account);
         companyRepository.save(company);
+
+        accountService.revokeAllAccountTokens(account.getId());
     }
 
     public List<CompanyResponseModel> getTopCompanies(Integer pageNo, Integer pageSize, String sortBy) {
@@ -193,8 +199,20 @@ public class CompanyService {
         }
     }
 
+    public List<CompanyTopModel> getTopCompaniesModel(Integer pageNo, Integer pageSize, String sortBy) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+
+        Page<CompanyTopModel> pagedResult = companyRepository.findTopCompany(paging);
+
+        if (pagedResult.hasContent()) {
+            return pagedResult.getContent();
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
     public CompanyResponseModel findCompanyDisplayModel(Principal connectedUser) {
-        Account account = userService.getCurrentAccount(connectedUser);
+        Account account = accountService.getCurrentAccount(connectedUser);
         return companyMapper.companyToResponseModel(findCompanyByEmail(account.getEmail()));
     }
 }

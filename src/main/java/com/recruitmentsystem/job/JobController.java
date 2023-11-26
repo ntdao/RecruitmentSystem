@@ -1,40 +1,44 @@
 package com.recruitmentsystem.job;
 
-import com.recruitmentsystem.address.address.AddressService;
 import com.recruitmentsystem.common.myEnum.Gender;
 import com.recruitmentsystem.jobposition.JobPositionResponseModel;
 import com.recruitmentsystem.jobposition.JobPositionService;
 import com.recruitmentsystem.jobtype.JobTypeResponseModel;
 import com.recruitmentsystem.jobtype.JobTypeService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.recruitmentsystem.pagination.PageDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class JobController {
-    private final AddressService addressService;
     private final JobService jobService;
     private final JobPositionService jobPositionService;
     private final JobTypeService jobTypeService;
 
     @GetMapping("/jobs/all")
     public List<JobResponseModel> getAllJobs() {
-        return jobService.findAllJobs();
+        return jobService.findAllJob();
     }
 
     @GetMapping("/jobs/top")
-    public List<JobResponseModel> getTopJobs(
+    public List<JobTopModel> getTopJobs(
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "6") Integer pageSize,
-            @RequestParam(defaultValue = "salary") String sortBy) {
+            @RequestParam(defaultValue = "salaryMax") String sortBy) {
         return jobService.getTopJobs(pageNo, pageSize, sortBy);
+    }
+
+    @PostMapping("/jobs/find")
+    public List<JobResponseModel> getTopJobs(@RequestBody PageDto pageDto) {
+        return jobService.getJobByPaging(pageDto);
     }
 
     @GetMapping("/jobs/find/{name}")
@@ -59,65 +63,39 @@ public class JobController {
 
     @GetMapping("/admin/manage/jobs/all")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public List<JobResponseModel>  getAllJobsAdmin() {
+    public List<JobResponseModel> adminGetAllJob() {
         return jobService.findAllJobsByAdmin();
     }
 
     @GetMapping("/admin/manage/jobs/find/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public JobResponseModel getJobById(@PathVariable("id") Integer id) {
-        return jobService.findById(id);
+    public JobResponseModel adminGetJobById(@PathVariable("id") Integer id) {
+        return jobService.findJobById(id);
     }
 
     @DeleteMapping("/admin/manage/jobs/delete/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteJob(@PathVariable("id") Integer id) {
+    public void adminDeleteJob(@PathVariable("id") Integer id) {
         jobService.deleteJob(id);
     }
 
-//    @GetMapping("/company/manage/jobs/all")
-//    @PreAuthorize("hasRole('ROLE_HR')")
-//    public List<JobResponseModel> getAllJobsHR(HttpServletRequest request) {
-//
-//    }
+    @GetMapping("/company/manage/jobs/all")
+    @PreAuthorize("hasAuthority('COMPANY')")
+    public List<JobResponseModel> getCompanyJob(Principal connectedUser) {
+        return jobService.findJobByCompany(connectedUser);
+    }
 
     @GetMapping("/company/manage/jobs/find/{id}")
     @PreAuthorize("hasAuthority('COMPANY')")
-    public JobResponseModel getJobByIdHR(@PathVariable("id") Integer id) {
-        return jobService.findById(id);
+    public JobResponseModel companyGetJobById(@PathVariable("id") Integer id) {
+        return jobService.findJobById(id);
     }
 
     @DeleteMapping("/company/manage/jobs/delete/{id}")
     @PreAuthorize("hasAuthority('COMPANY')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteJobByCompany(@PathVariable("id") Integer id) {
+    public void companyDeleteJob(@PathVariable("id") Integer id) {
         jobService.deleteJob(id);
     }
-
-
-//    @PostMapping("/hr/manage/jobs/add")
-//    @PreAuthorize("hasRole('ROLE_HR')")
-//    public ResponseEntity<?> addJob(@RequestBody JobRequestModel request) {
-//        try {
-//            jobService.addJobAdmin(request);
-//        } catch (ResourceAlreadyExistsException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-//        }
-//        return ResponseEntity.ok().build();
-//    }
-//
-//    @PutMapping("/manage-jobs/update/{id}")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
-//    public ResponseEntity<?> updateJob(@PathVariable("id") Integer id,
-//                                           @RequestBody JobRequestModel request) {
-//        try {
-//            jobService.updateJobByAdmin(id, request);
-//        } catch (ResourceNotFoundException e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-//        }
-//        return ResponseEntity.ok().build();
-//    }
-
-
 }

@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 
 @Builder
 public record UserResponseModel(
-//        String username,
         Integer id,
         String email,
         String firstName,

@@ -24,10 +24,10 @@ public class CompanyController {
 
     // Lỗi lazyInit...
     @GetMapping("/companies/top")
-    public List<CompanyResponseModel> getTopCompanies(@RequestParam(defaultValue = "0") Integer pageNo,
+    public List<CompanyTopModel> getTopCompanies(@RequestParam(defaultValue = "0") Integer pageNo,
                                                       @RequestParam(defaultValue = "6") Integer pageSize,
                                                       @RequestParam(defaultValue = "companyId") String sortBy) {
-        return companyService.getTopCompanies(pageNo, pageSize, sortBy);
+        return companyService.getTopCompaniesModel(pageNo, pageSize, sortBy);
     }
 
     @GetMapping("/companies/find/{name}")
@@ -35,9 +35,9 @@ public class CompanyController {
         return companyService.findCompanyByCompanyName(name);
     }
 
-    @GetMapping("/companies/jobs/{company-id}")
+    @GetMapping("/companies/{company-id}/jobs")
     public List<JobResponseModel> getAllJob(@PathVariable("company-id") Integer id) {
-        return jobService.findAllJobsByCompanyId(id);
+        return jobService.findJobByCompanyId(id);
     }
 
     @GetMapping("/admin/manage/companies/all")

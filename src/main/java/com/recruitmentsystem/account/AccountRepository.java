@@ -25,4 +25,6 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 
     @Query("SELECT MAX(id) FROM Account")
     Integer getAccountIdRequest();
+
+    boolean existsByEmailAndDeleteFlagFalse(String email);
 }
