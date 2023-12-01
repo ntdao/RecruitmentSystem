@@ -38,8 +38,9 @@ public class CompanyService {
     private final CompanyMapper companyMapper;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public Company getCurrentCompany(Principal connectedUser) {
-        return findCompanyByEmail(accountService.getCurrentAccount(connectedUser).getEmail());
+    public Company getCurrentCompany(Principal connectedAccount) {
+        String email = accountService.getCurrentAccount(connectedAccount).getEmail();
+        return findCompanyByEmail(accountService.getCurrentAccount(connectedAccount).getEmail());
     }
 
     private void checkDuplicateCompanyName(String shortName, String fullName) {
@@ -63,12 +64,8 @@ public class CompanyService {
                 .build();
 
         Company company = companyMapper.companyRequestModelToCompany(request);
-//        Address address = addressService.addressRequestModelToEntity(request.companyAddress());
-
-        accountRepository.save(account);
-//        addressRepository.save(address);
-
         Address address = addressService.saveAddress(request.companyAddress());
+        accountRepository.save(account);
 
         company.setAccount(account);
         company.setAddress(address);
@@ -123,9 +120,9 @@ public class CompanyService {
         updateCompany(updateCompany, requestModel);
     }
 
-    public void updateCompanyByCompany(CompanyRequestModel request, Principal connectedUser) {
-        Account account = accountService.getCurrentAccount(connectedUser);
-        Company company = findCompanyByEmail(account.getEmail());
+    @Transactional
+    public void updateCompanyByCompany(CompanyRequestModel request, Principal connectedAccount) {
+        Company company = getCurrentCompany(connectedAccount);
         updateCompany(company, request);
     }
 
@@ -158,17 +155,13 @@ public class CompanyService {
         System.out.println("Company - Old info: " + oldCompany);
 
         // update company
-        Address updateAddress = oldCompany.getAddress();
-//        Address address = addressMapper.addressRequestModelToAddress(request.companyAddress());
-//        updateAddress.setAddress(address.getAddress());
-//        updateAddress.setWard(address.getWard());
-//        updateAddress.setFullAddress(address.getFullAddress());
-//        addressRepository.save(updateAddress);
-        addressService.updateAddress(updateAddress.getAddressId(), request.companyAddress());
+        addressService.updateAddress(oldCompany.getAddress().getAddressId(), request.companyAddress());
 
         updateCompany = companyMapper.companyRequestModelToCompany(request);
-        updateCompany.setCompanyId(id);
+        System.out.println(updateCompany);
+        updateCompany.setCompanyId(oldCompany.getCompanyId());
         updateCompany.setAccount(updateAccount);
+        updateCompany.setAddress(oldCompany.getAddress());
         companyRepository.save(updateCompany);
         System.out.println("Company - New info: " + updateCompany);
     }
@@ -211,8 +204,8 @@ public class CompanyService {
         }
     }
 
-    public CompanyResponseModel findCompanyDisplayModel(Principal connectedUser) {
-        Account account = accountService.getCurrentAccount(connectedUser);
+    public CompanyResponseModel findCompanyDisplayModel(Principal connectedAccount) {
+        Account account = accountService.getCurrentAccount(connectedAccount);
         return companyMapper.companyToResponseModel(findCompanyByEmail(account.getEmail()));
     }
 }

@@ -7,12 +7,11 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-//@Table
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-//@ToString
+@ToString
 @Builder
 public class Role {
     @Id
@@ -28,13 +27,5 @@ public class Role {
 
     public Role(String roleName) {
         this.roleName = roleName;
-    }
-
-    @Override
-    public String toString() {
-        return "Role{" +
-                "roleId=" + roleId +
-                ", roleName='" + roleName + '\'' +
-                '}';
     }
 }

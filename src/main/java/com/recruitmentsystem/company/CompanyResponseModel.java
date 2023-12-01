@@ -3,10 +3,7 @@ package com.recruitmentsystem.company;
 import com.recruitmentsystem.address.address.AddressResponseModel;
 import lombok.Builder;
 
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Builder
 public record CompanyResponseModel(
@@ -17,21 +14,20 @@ public record CompanyResponseModel(
         String companyUrl,
         String companyLogo,
         String companyIntroduction,
-        String industry,
+        Integer industry,
         String companyImage,
         Integer companyFoundedYear,
         String companyMST,
         String companyLicense,
         String companySize,
         String companyTag,
-        boolean isActive,
         String email,
         String phoneNumber,
         String website,
         String facebookUrl,
         String youtubeUrl,
         String linkedinUrl,
-        String branches,
+        String companyBranch,
         LocalDateTime createDate,
         LocalDateTime lastModified
 ) {

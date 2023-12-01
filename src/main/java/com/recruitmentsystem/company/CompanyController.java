@@ -80,7 +80,7 @@ public class CompanyController {
         return companyService.findCompanyDisplayModel(connectedUser);
     }
 
-    @GetMapping("/company/manage/update")
+    @PostMapping("/company/manage/update")
     @PreAuthorize("hasAuthority('COMPANY')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@RequestBody CompanyRequestModel companyRequestModel,

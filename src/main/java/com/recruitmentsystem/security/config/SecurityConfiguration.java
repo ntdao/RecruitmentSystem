@@ -55,7 +55,7 @@ public class SecurityConfiguration {
                         "/api/v*/user/*/profile-image",
                         "/api/v*/categories/**",
                         "/api/v*/companies/**",
-                        "/api/v*/branches/**",
+                        "/api/v*/companyBranch/**",
                         "/api/v*/jobs/**",
                         "/api/v*/address/**",
                         "/api/v*/industries/**")

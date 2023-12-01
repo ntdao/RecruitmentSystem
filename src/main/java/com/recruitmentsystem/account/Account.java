@@ -30,18 +30,6 @@ public class Account implements UserDetails {
     @JoinColumn(name = "role_id")
     @ToString.Exclude
     private Role role;
-//    @CreatedDate
-//    @Column(nullable = false, updatable = false)
-//    private LocalDateTime createDate;
-//    @LastModifiedDate
-//    @Column(insertable = false)
-//    private LocalDateTime lastModified;
-//    @CreatedBy
-//    @Column(nullable = false, updatable = false)
-//    private Integer createdBy;
-//    @LastModifiedBy
-//    @Column(insertable = false)
-//    private Integer lastModifiedBy;
     private boolean deleteFlag = false;
     private Integer oldId;
     private boolean enabled = false;
@@ -49,6 +37,7 @@ public class Account implements UserDetails {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private List<Token> tokens;
+
     public Account(Account account, boolean deleteFlag) {
         this.email = account.getEmail();
         this.password = account.getPassword();

@@ -135,23 +135,6 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-//    public User findUserByToken(String token) {
-//        boolean isValid = tokenService.isValidToken(token);
-//        if (isValid) {
-//            String email = jwtService.extractEmail(token);
-//            System.out.println(email);
-//            User user = findUserByEmail(email);
-//            System.out.println(user);
-//            return user;
-//        } else {
-//            throw new ResourceNotFoundException("Token is invalid");
-//        }
-//    }
-
-//    public UserResponseModel findUserDisplayByToken(String token) {
-//        return userMapper.userToResponseModel(findUserByToken(token));
-//    }
-
     public User findUserByEmail(String email) {
         return userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User with email " + email + " does not exist"));
@@ -161,12 +144,6 @@ public class UserService {
 //    public void updateUserByAdmin(Integer id, UserRequestModel request, Principal connectedUser) {
 //        User updateUser = findUserById(id);
 //        updateUser(updateUser, request);
-//    }
-
-//    @Transactional
-//    public AuthenticationResponseModel updateUserByToken(String token, UserRequestModel request) {
-//        User updateUser = findUserByToken(token);
-//        return updateUser(updateUser, request);
 //    }
 
     private boolean isUserSame(User updateUser, UserRequestModel request) {
@@ -378,19 +355,6 @@ public class UserService {
         user.setLastModifiedBy(accountId);
         userRepository.save(user);
         System.out.println("User - before change password: " + user);
-
-//        // update the password
-//        account.setPassword(passwordEncoder.encode(request.newPassword()));
-//
-//        User oldUser = new User(user, true);
-//        userRepository.save(oldUser);
-//
-//        // update user
-//        user.setUpdatedAt(Instant.now());
-//        user.setUpdatedBy(user.getId());
-//
-//        // save the new password
-//        userRepository.save(user);
 
         accountService.revokeAllAccountTokens(accountId);
     }

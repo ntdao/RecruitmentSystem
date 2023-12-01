@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-//@Table
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -35,7 +34,6 @@ public class User {
     private String firstName;
     private String lastName;
     private String phoneNumber;
-    //    private String address;
     @OneToOne()
     @JoinColumn(name = "address_id")
     @EqualsAndHashCode.Exclude

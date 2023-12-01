@@ -49,7 +49,6 @@ public class AddressService {
             return new Address();
         }
         Address address = addressMapper.addressRequestModelToAddress(request);
-        System.out.println(address);
         return address;
     }
 
