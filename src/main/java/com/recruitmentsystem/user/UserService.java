@@ -130,7 +130,8 @@ public class UserService {
     }
 
     public List<UserResponseModel> findAllUserByName(String name) {
-        return userRepository.findAllUserByName(name).stream()
+        return userRepository.findAllUserByName(name)
+                .stream()
                 .map(userMapper::userToResponseModel)
                 .collect(Collectors.toList());
     }

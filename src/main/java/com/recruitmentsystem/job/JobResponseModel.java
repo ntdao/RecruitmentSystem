@@ -2,6 +2,9 @@ package com.recruitmentsystem.job;
 
 import com.recruitmentsystem.address.address.Address;
 import com.recruitmentsystem.address.address.AddressResponseModel;
+import com.recruitmentsystem.category.CategoryResponseModel;
+import com.recruitmentsystem.jobposition.JobPositionResponseModel;
+import com.recruitmentsystem.jobtype.JobTypeResponseModel;
 import com.recruitmentsystem.skill.Skill;
 import com.recruitmentsystem.skill.SkillRepository;
 import com.recruitmentsystem.skill.SkillResponseModel;
@@ -19,12 +22,12 @@ public record JobResponseModel(
         String name,
         String companyLogo,
         List<AddressResponseModel> jobAddress,
-        String jobPosition,
+        Integer jobPosition,
         String jobDescription,
         String jobRequirement,
         String jobBenefit,
         Integer jobQuantity,
-        String jobType,
+        Integer jobType,
         String jobTag,
         String jobGender,
         String jobStatus,
@@ -32,7 +35,7 @@ public record JobResponseModel(
         String salary,
         LocalDateTime jobExpiredDate,
         String jobUrl,
-        String category,
+        Integer category,
         List<SkillResponseModel> jobSkill,
         LocalDateTime createdAt,
         String companyName

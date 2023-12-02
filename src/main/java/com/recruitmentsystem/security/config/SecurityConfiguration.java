@@ -61,15 +61,6 @@ public class SecurityConfiguration {
                         "/api/v*/industries/**")
                 .permitAll()
 
-                .requestMatchers("/api/v*/admin/manage/**").hasAuthority("ADMIN")
-//                .requestMatchers("/api/v*/manage/**/**").hasRole("ADMIN")
-//                .requestMatchers("/api/v*/manage_roles/**").hasRole("ADMIN")
-//                .requestMatchers("/api/v*/manage_companies/**").hasRole("ADMIN")
-//                .requestMatchers("/api/v*/company/manage_branches/**").hasRole("ADMIN")
-//                .requestMatchers("/api/v*/manage_categories/**").hasRole("ADMIN")
-//                .requestMatchers("/api/v*/admin/**").hasAuthority("ADMIN")
-                .requestMatchers("/api/v*/company/manage/**").hasAuthority("COMPANY")
-
                 // Tất cả các request khác đều cần phải xác thực mới được truy cập
                 .anyRequest().authenticated()
                 .and()

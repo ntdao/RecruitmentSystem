@@ -28,13 +28,13 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
             where j.deleteFlag = false
             and j.jobName like %?1%
             """,
-        countQuery = """
-            select j from Job j
-            join fetch j.jobSkills
-            join fetch j.jobAddresses
-            where j.deleteFlag = false
-            and j.jobName like %?1%
-    """)
+            countQuery = """
+                            select j from Job j
+                            join fetch j.jobSkills
+                            join fetch j.jobAddresses
+                            where j.deleteFlag = false
+                            and j.jobName like %?1%
+                    """)
     Page<Job> findJobByName(String name, Pageable paging);
 
     @Query("""
@@ -63,6 +63,7 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
             where j.deleteFlag = false
             """)
     List<Job> findAllJob();
+
     @Query(value = """
             select j from Job j
             join fetch j.jobSkills
@@ -71,13 +72,22 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
             and j.jobName like %?1%
             and j.category.categoryId in ?2
             """,
-        countQuery = """
+            countQuery = """
+                    select j from Job j
+                    join fetch j.jobSkills
+                    join fetch j.jobAddresses
+                    where j.deleteFlag = false
+                    and j.jobName like %?1%
+                    and j.category.categoryId in ?2
+                    """)
+    Page<Job> findJobByNameAndCategory(String name, List<Integer> categories, Pageable paging);
+
+    @Query("""
             select j from Job j
             join fetch j.jobSkills
             join fetch j.jobAddresses
             where j.deleteFlag = false
             and j.jobName like %?1%
-            and j.category.categoryId in ?2
             """)
-    Page<Job> findJobByNameAndCategory(String name, List<Integer> categories, Pageable paging);
+    List<Job> findByName(String name);
 }

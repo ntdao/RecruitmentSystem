@@ -53,23 +53,6 @@ public class UserController {
         return userService.addUser(userRequest);
     }
 
-//    @PutMapping("/manage/users/update/{id}")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
-//    public ResponseEntity<?> updateUser(@PathVariable("id") Integer id,
-//                                        @RequestBody UserRequestModel request,
-//                                        Principal connectedUser) {
-//        try {
-//            userService.updateUser(id, request, connectedUser);
-////        } catch (ResourceNotModifiedException e) {
-////            return ResponseEntity.ok(e.getMessage());
-//        } catch (ResourceNotFoundException e) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-//        }
-//        return ResponseEntity.ok().build();
-//    }
-
     @DeleteMapping("/admin/manage/users/delete/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -118,7 +101,6 @@ public class UserController {
     )
     @ResponseStatus(HttpStatus.CREATED)
     public void uploadImageUrl(@RequestParam("image") MultipartFile multipartFile, Principal connectedUser) {
-        System.out.println("File size: " + multipartFile.getSize());
         userService.uploadUserProfileImageNoToken(connectedUser, multipartFile);
     }
 
@@ -160,8 +142,7 @@ public class UserController {
             value = "/user/{userId}/profile-image",
             produces = MediaType.IMAGE_JPEG_VALUE
     )
-    public byte[] getUserProfileImage(
-            @PathVariable("userId") Integer userId) {
+    public byte[] getUserProfileImage(@PathVariable("userId") Integer userId) {
         return userService.getUserProfileImage(userId);
     }
 

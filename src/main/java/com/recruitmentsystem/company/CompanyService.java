@@ -1,16 +1,16 @@
 package com.recruitmentsystem.company;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.account.Account;
 import com.recruitmentsystem.account.AccountRepository;
 import com.recruitmentsystem.account.AccountService;
 import com.recruitmentsystem.address.address.Address;
+import com.recruitmentsystem.address.address.AddressRequestModel;
 import com.recruitmentsystem.address.address.AddressService;
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
-import com.recruitmentsystem.pagination.MyPagination;
 import com.recruitmentsystem.role.RoleService;
-import com.recruitmentsystem.user.UserService;
+import com.recruitmentsystem.s3.S3Service;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,10 +20,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,9 +33,10 @@ public class CompanyService {
     private final AccountRepository accountRepository;
     private final AccountService accountService;
     private final AddressService addressService;
+    private final CompanyMapper companyMapper;
     private final CompanyRepository companyRepository;
     private final RoleService roleService;
-    private final CompanyMapper companyMapper;
+    private final S3Service s3Service;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public Company getCurrentCompany(Principal connectedAccount) {
@@ -52,6 +53,7 @@ public class CompanyService {
         }
     }
 
+    @Transactional
     public CompanyResponseModel addCompanyByAdmin(CompanyRequestModel request) {
         accountService.checkDuplicateEmail(request.email());
         checkDuplicateCompanyName(request.companyShortName(), request.companyFullName());
@@ -107,9 +109,8 @@ public class CompanyService {
     }
 
     public List<CompanyResponseModel> findCompanyByCompanyName(String name) {
-        return companyRepository.findByCompanyShortNameContainsIgnoreCaseOrCompanyFullNameContainsIgnoreCase(name, name)
+        return companyRepository.findByName(name)
                 .stream()
-                .filter(c -> !c.isDeleteFlag())
                 .map(companyMapper::companyToResponseModel)
                 .collect(Collectors.toList());
     }
@@ -155,7 +156,7 @@ public class CompanyService {
         System.out.println("Company - Old info: " + oldCompany);
 
         // update company
-        addressService.updateAddress(oldCompany.getAddress().getAddressId(), request.companyAddress());
+//        addressService.updateAddress(oldCompany.getAddress().getAddressId(), request.companyAddress());
 
         updateCompany = companyMapper.companyRequestModelToCompany(request);
         System.out.println(updateCompany);
@@ -207,5 +208,34 @@ public class CompanyService {
     public CompanyResponseModel findCompanyDisplayModel(Principal connectedAccount) {
         Account account = accountService.getCurrentAccount(connectedAccount);
         return companyMapper.companyToResponseModel(findCompanyByEmail(account.getEmail()));
+    }
+
+    public String uploadCompanyImage(Principal connectedUser, MultipartFile[] files) {
+        Company company = getCurrentCompany(connectedUser);
+        String image = "";
+        for (MultipartFile file : files) {
+            String imgUrl = s3Service.uploadFile("profile-images/%s/".formatted(company.getCompanyId()), file);
+            image = imgUrl + ";";
+            System.out.println(imgUrl);
+        }
+        System.out.println("Company image url: " + image);
+        return image;
+    }
+
+    public byte[] getCompanyImage(Integer companyId) {
+        Company company = findCompanyById(companyId);
+
+        if (StringUtils.isBlank(company.getCompanyImage())) {
+            throw new ResourceNotFoundException("Company with id [%s] image not found".formatted(companyId));
+        }
+
+        return s3Service.downloadFile(company.getCompanyImage());
+    }
+
+    public void updateCompanyAddressByCompany(AddressRequestModel addressRequestModel, Principal connectedUser) {
+        Company company = getCurrentCompany(connectedUser);
+        Integer addressId = company.getAddress().getAddressId();
+        addressService.updateAddress(addressId, addressRequestModel);
+        companyRepository.save(company);
     }
 }

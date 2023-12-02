@@ -15,7 +15,7 @@ public class AddressMapper {
     private final WardService wardService;
 
     public AddressResponseModel addressToResponseModel(Address address) {
-        if (address.getWard() == null) {
+        if (address == null) {
             return null;
         }
         String wardCode = address.getWard().getWardCode();

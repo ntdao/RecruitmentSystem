@@ -26,7 +26,6 @@ public class JobMapper {
     private final JobPositionService jobPositionService;
     private final JobTypeService jobTypeService;
     private final SalaryService salaryService;
-    private final SkillService skillService;
     public JobResponseModel jobToResponseModel(Job job) {
         List<AddressResponseModel> addressList = job.getJobAddresses()
                 .stream()
@@ -45,19 +44,19 @@ public class JobMapper {
                 .companyName(job.getCompany().getCompanyFullName())
                 .companyLogo(job.getCompany().getCompanyLogo())
                 .jobAddress(addressList)
-                .jobPosition(job.getJobPosition().toString())
+                .jobPosition(job.getJobPosition().getJobPositionId())
                 .salary(job.getSalary())
                 .jobUrl(job.getJobUrl())
                 .jobRequirement(job.getJobRequirement())
                 .jobDescription(job.getJobDescription())
                 .jobBenefit(job.getJobBenefit())
                 .jobTag(job.getJobTag())
-                .jobType(job.getJobType().toString())
+                .jobType(job.getJobType().getJobTypeId())
                 .jobGender(job.getJobGender().toString())
                 .jobQuantity(job.getJobQuantity())
                 .jobExperience(job.getJobExperience())
                 .jobStatus(job.getJobStatus().toString())
-                .category(job.getCategory().getCategoryName())
+                .category(job.getCategory().getCategoryId())
                 .jobSkill(skillList)
                 .jobExpiredDate(job.getJobExpiredDate())
                 .createdAt(job.getCreateDate())
@@ -69,19 +68,22 @@ public class JobMapper {
         for (AddressRequestModel a : request.jobAddresses()) {
             addressList.add(addressService.addressRequestModelToEntity(a));
         }
-        System.out.println(addressList);
         return Job
                 .builder()
                 .jobName(request.name())
                 .jobAddresses(addressList)
-                .jobPosition(jobPositionService.findByName(request.jobPosition()))
                 .salary(salaryService.salaryRequestToResponse(request.isSalaryVisible(), request.salaryMax(), request.salaryMin()))
                 .jobUrl(request.jobUrl())
                 .jobRequirement(request.jobRequirement())
                 .jobDescription(request.jobDescription())
-                .jobType(jobTypeService.findByName(request.jobType()))
-                .category(categoryService.findCategoryByName(request.category()))
-                .jobExpiredDate(request.jobExipredDate())
+                .jobBenefit(request.jobBenefit())
+                .jobQuantity(request.jobQuantity())
+                .jobGender(request.jobGender())
+                .jobPosition(jobPositionService.findById(request.jobPosition()))
+                .jobType(jobTypeService.findById(request.jobType()))
+                .jobExperience(request.jobExperience())
+                .category(categoryService.findById(request.categoryId()))
+                .jobExpiredDate(request.jobExpiredDate())
                 .build();
     }
 }

@@ -41,8 +41,8 @@ public class JobController {
         return jobService.getJobByPaging(pageDto);
     }
 
-    @GetMapping("/jobs/find/{name}")
-    public List<JobResponseModel> getJobByName(@PathVariable("name") String name) {
+    @GetMapping("/jobs/find")
+    public List<JobResponseModel> getJobByName(@RequestParam("name") String name) {
         return jobService.findJobByJobName(name);
     }
 
@@ -67,14 +67,14 @@ public class JobController {
         return jobService.findAllJobsByAdmin();
     }
 
-    @GetMapping("/admin/manage/jobs/find/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/manage/jobs/find/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
     public JobResponseModel adminGetJobById(@PathVariable("id") Integer id) {
         return jobService.findJobById(id);
     }
 
-    @DeleteMapping("/admin/manage/jobs/delete/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping("/manage/jobs/delete/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void adminDeleteJob(@PathVariable("id") Integer id) {
         jobService.deleteJob(id);
@@ -86,16 +86,28 @@ public class JobController {
         return jobService.findJobByCompany(connectedUser);
     }
 
-    @GetMapping("/company/manage/jobs/find/{id}")
-    @PreAuthorize("hasAuthority('COMPANY')")
-    public JobResponseModel companyGetJobById(@PathVariable("id") Integer id) {
-        return jobService.findJobById(id);
+    @PostMapping("/mamage/jobs/add")
+    public void addJob(@RequestBody JobRequestModel jobRequestModel) {
+        jobService.addJob(jobRequestModel);
     }
 
-    @DeleteMapping("/company/manage/jobs/delete/{id}")
-    @PreAuthorize("hasAuthority('COMPANY')")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void companyDeleteJob(@PathVariable("id") Integer id) {
-        jobService.deleteJob(id);
+    @PostMapping("/manage/jobs/update/{jobId}")
+    public void updateJob(@PathVariable("jobId") Integer jobId,
+                          @RequestBody JobRequestModel jobRequestModel,
+                          Principal principal) {
+        jobService.updateJob(jobId, jobRequestModel);
     }
+
+//    @GetMapping("/company/manage/jobs/find/{id}")
+//    @PreAuthorize("hasAuthority('COMPANY')")
+//    public JobResponseModel companyGetJobById(@PathVariable("id") Integer id) {
+//        return jobService.findJobById(id);
+//    }
+//
+//    @DeleteMapping("/company/manage/jobs/delete/{id}")
+//    @PreAuthorize("hasAuthority('COMPANY')")
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    public void companyDeleteJob(@PathVariable("id") Integer id) {
+//        jobService.deleteJob(id);
+//    }
 }

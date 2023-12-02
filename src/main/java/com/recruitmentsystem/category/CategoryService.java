@@ -27,6 +27,7 @@ public class CategoryService {
         }
     }
 
+    @Transactional
     public void addCategory(CategoryRequestModel request) {
         checkDuplicatedCategoryName(request.name());
         Category category = categoryMapper.categoryRequestModelToCategory(request);

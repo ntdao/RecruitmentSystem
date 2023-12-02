@@ -50,10 +50,6 @@ public class AccountService {
         if (accountRepository.existsByEmailAndDeleteFlagFalse(email)) {
             throw new ResourceAlreadyExistsException("email already taken");
         }
-//        Integer id = accountRepository.findAccountIdByEmail(email);
-//        if (id != null) {
-//            throw new ResourceNotFoundException("Email already taken");
-//        }
     }
 
     public void revokeAllAccountTokens(Integer id) {

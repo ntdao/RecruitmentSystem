@@ -15,6 +15,7 @@ public class IndustryService {
     private final IndustryMapper industryMapper;
     private final IndustryRepository industryRepository;
 
+    @Transactional
     public void addIndustry(IndustryRequestModel request) {
         checkDuplicatedIndustryName(request.nameEN(), request.nameVI());
         Industry industry = industryMapper.industryRequestModelToIndustry(request);

@@ -17,6 +17,7 @@ public class MvcConfig implements WebMvcConfigurer {
                 registry.addMapping("/api/**")
                         .allowedOrigins("http://localhost:3000")
                         .allowedMethods("*")
+//                        .allowedMethods("GET,POST,PUT,DELETE,PATCH")
                         .allowedHeaders("*")
                         .allowCredentials(true)
                         .maxAge(3600);

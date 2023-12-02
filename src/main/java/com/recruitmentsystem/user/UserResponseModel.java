@@ -1,6 +1,5 @@
 package com.recruitmentsystem.user;
 
-import com.recruitmentsystem.address.address.Address;
 import com.recruitmentsystem.address.address.AddressResponseModel;
 import com.recruitmentsystem.common.myEnum.Gender;
 import lombok.Builder;

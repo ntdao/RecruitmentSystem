@@ -1,11 +1,14 @@
 package com.recruitmentsystem.company;
 
+import com.recruitmentsystem.address.address.AddressRequestModel;
 import com.recruitmentsystem.job.JobResponseModel;
 import com.recruitmentsystem.job.JobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
@@ -22,7 +25,6 @@ public class CompanyController {
         return companyService.findAllCompanies();
     }
 
-    // Lỗi lazyInit...
     @GetMapping("/companies/top")
     public List<CompanyTopModel> getTopCompanies(@RequestParam(defaultValue = "0") Integer pageNo,
                                                       @RequestParam(defaultValue = "6") Integer pageSize,
@@ -30,8 +32,8 @@ public class CompanyController {
         return companyService.getTopCompaniesModel(pageNo, pageSize, sortBy);
     }
 
-    @GetMapping("/companies/find/{name}")
-    public List<CompanyResponseModel> getCompanyByName(@PathVariable("name") String name) {
+    @GetMapping("/companies/find")
+    public List<CompanyResponseModel> getCompanyByName(@RequestParam("name") String name) {
         return companyService.findCompanyByCompanyName(name);
     }
 
@@ -42,8 +44,8 @@ public class CompanyController {
 
     @GetMapping("/admin/manage/companies/all")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public List<Company> getAllCompaniesAdmin() {
-        return companyService.findAllCompaniesAdmin();
+    public List<CompanyResponseModel> getAllCompaniesAdmin() {
+        return companyService.findAllCompanies();
     }
 
     @GetMapping("/admin/manage/companies/find/{id}")
@@ -86,5 +88,30 @@ public class CompanyController {
     public void update(@RequestBody CompanyRequestModel companyRequestModel,
                                        Principal connectedUser) {
         companyService.updateCompanyByCompany(companyRequestModel, connectedUser);
+    }
+
+    @PostMapping("/company/manage/update-address")
+    @PreAuthorize("hasAuthority('COMPANY')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateCompanyAddress(@RequestBody AddressRequestModel addressRequestModel,
+                       Principal connectedUser) {
+        companyService.updateCompanyAddressByCompany(addressRequestModel, connectedUser);
+    }
+
+    @PostMapping(
+            value = "/company/image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public String uploadUserProfileImage(@RequestParam("file") MultipartFile[] files,
+                                       Principal connectedUser) {
+        return companyService.uploadCompanyImage(connectedUser, files);
+    }
+
+    @GetMapping(
+            value = "/company/{companyId}/image",
+            produces = MediaType.IMAGE_JPEG_VALUE
+    )
+    public byte[] getUserProfileImage(@PathVariable("companyId") Integer companyId) {
+        return companyService.getCompanyImage(companyId);
     }
 }

@@ -58,6 +58,9 @@ public class CompanyMapper {
                 .facebookUrl(request.facebookUrl())
                 .youtubeUrl(request.youtubeUrl())
                 .linkedinUrl(request.linkedinUrl())
+                .companyLogo(request.companyLogo())
+                .companyLicense(request.companyLicense())
+                .companyImage(request.companyImage())
                 .build();
     }
 }

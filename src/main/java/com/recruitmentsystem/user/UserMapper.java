@@ -1,9 +1,13 @@
 package com.recruitmentsystem.user;
 
+import com.recruitmentsystem.address.address.AddressMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserMapper {
+    private final AddressMapper addressMapper;
     public UserResponseModel userToResponseModel(User user) {
         return UserResponseModel
                 .builder()
@@ -12,13 +16,13 @@ public class UserMapper {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .phoneNumber(user.getPhoneNumber())
-//                .address(addressMapper.addressToResponseModel(user.getAddress()))
                 .gender(user.getGender())
                 .birthday(user.getBirthday())
                 .imgUrl(user.getImgUrl())
                 .createDate(user.getCreateDate())
                 .lastModified(user.getLastModified())
                 .roleName(user.getAccount().getAuthorities().toString())
+                .address(addressMapper.addressToResponseModel(user.getAddress()))
                 .build();
     }
 
@@ -31,7 +35,6 @@ public class UserMapper {
                     .builder()
                     .firstName(request.firstName())
                     .lastName(request.lastName())
-//                    .address(addressService.addressRequestModelToEntity(request.address()))
                     .phoneNumber(request.phoneNumber())
                     .gender(request.gender())
                     .birthday(request.birthday())
@@ -42,7 +45,6 @@ public class UserMapper {
                     .firstName(request.firstName())
                     .lastName(request.lastName())
                     .phoneNumber(request.phoneNumber())
-//                    .address(addressService.addressRequestModelToEntity(request.address()))
                     .gender(request.gender())
                     .birthday(request.birthday())
                     .imgUrl("img/user_profile/avatar.png")

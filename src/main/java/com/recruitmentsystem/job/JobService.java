@@ -1,9 +1,9 @@
 package com.recruitmentsystem.job;
 
-import com.recruitmentsystem.account.AccountService;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
 import com.recruitmentsystem.common.myEnum.JobStatus;
 import com.recruitmentsystem.company.Company;
+import com.recruitmentsystem.company.CompanyRepository;
 import com.recruitmentsystem.company.CompanyService;
 import com.recruitmentsystem.pagination.PageDto;
 import com.recruitmentsystem.user.User;
@@ -23,18 +23,23 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class JobService {
-    private final AccountService accountService;
     private final JobRepository jobRepository;
     private final JobMapper jobMapper;
+    private final CompanyRepository companyRepository;
     private final CompanyService companyService;
 
-    public void addJob(JobRequestModel requestModel) {
-        Job job = jobMapper.jobRequestModelToJob(requestModel);
-        jobRepository.save(job);
-    }
+    @Transactional
+    public void addJob(JobRequestModel request) {
+        companyService.existsById(request.companyId());
 
-    public List<Job> findAll() {
-        return jobRepository.findAllJob();
+        Job job = jobMapper.jobRequestModelToJob(request);
+
+        var companyProxy = companyRepository.getReferenceById(request.companyId());
+
+        System.out.println(companyProxy);
+        job.setCompany(companyProxy);
+
+        jobRepository.save(job);
     }
 
     public List<JobResponseModel> findAllJob() {
@@ -48,7 +53,8 @@ public class JobService {
     public List<JobResponseModel> findAllJobsByAdmin() {
         return jobRepository.findAllJob()
                 .stream()
-                .map(jobMapper::jobToResponseModel).collect(Collectors.toList());
+                .map(jobMapper::jobToResponseModel)
+                .collect(Collectors.toList());
     }
 
     private List<Job> findByCompanyId(Integer companyId) {
@@ -82,26 +88,20 @@ public class JobService {
     }
 
     public List<JobResponseModel> findJobByJobName(String name) {
-        return jobRepository.findAllJob()
+        return jobRepository.findByName(name)
                 .stream()
-                .filter(j -> j.getJobName().contains(name))
                 .map(jobMapper::jobToResponseModel)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public void updateJob(Integer id, JobRequestModel requestModel, Principal connectedUser) {
-
+    public void updateJob(Integer id, JobRequestModel requestModel) {
         Job updateJob = findById(id);
         Job oldJob = new Job(id, updateJob, true);
         jobRepository.save(oldJob);
 
         updateJob = jobMapper.jobRequestModelToJob(requestModel);
         updateJob.setJobId(id);
-//        updateJob.setCreatedAt(oldJob.getCreatedAt());
-//        updateJob.setCreatedBy(oldJob.getCreatedBy());
-//        updateJob.setUpdatedAt(Instant.now());
-//        updateJob.setUpdatedBy(userService.getCurrentUser(connectedUser).getId());
         jobRepository.save(updateJob);
     }
 

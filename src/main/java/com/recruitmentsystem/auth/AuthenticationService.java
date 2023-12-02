@@ -36,7 +36,6 @@ import java.util.List;
 public class AuthenticationService {
     private final AccountRepository accountRepository;
     private final AccountService accountService;
-    private final AddressService addressService;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
     private final JwtService jwtService;
@@ -47,9 +46,7 @@ public class AuthenticationService {
     private final UserRepository userRepository;
 
     public void register(UserRequestModel request) {
-        // check email
-        String email = request.email();
-        accountService.checkDuplicateEmail(email);
+        accountService.checkDuplicateEmail(request.email());
 
         Account account = Account.builder()
                 .email(request.email())
@@ -58,10 +55,7 @@ public class AuthenticationService {
                 .build();
         accountRepository.save(account);
 
-        addressService.saveAddress(null);
-
         User user = userMapper.userRequestModelToUser(request);
-        user.setAccount(account);
         user.setCreatedBy(account.getId());
 
         userRepository.save(user);
@@ -88,7 +82,7 @@ public class AuthenticationService {
             throw new IllegalStateException("token expired");
         }
         tokenService.setConfirmedAt(token);
-//        userRepository.enableUser(confirmationToken.getAccount().getUsername());
+        accountRepository.enableUser(confirmationToken.getAccount().getUsername());
     }
 
     public AuthenticationResponseModel login(AuthenticationRequestModel request) {

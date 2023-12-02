@@ -41,7 +41,14 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
             """)
     Optional<Company> findByCompanyId(Integer id);
 
-    List<Company> findByCompanyShortNameContainsIgnoreCaseOrCompanyFullNameContainsIgnoreCase(String shortName, String fullName);
+    @Query("""
+            select c from Company c 
+            join fetch c.industry
+            where c.deleteFlag = false
+            and (c.companyShortName like concat('%', :name, '%')
+            or c.companyFullName like concat('%', :name, '%'))
+            """)
+    List<Company> findByName(String name);
 
     @Query(value = """
             select new com.recruitmentsystem.company.CompanyTopModel(c.companyShortName, c.companyLogo, c.companyUrl) 

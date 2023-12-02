@@ -1,6 +1,7 @@
 package com.recruitmentsystem.job;
 
 import com.recruitmentsystem.address.address.AddressRequestModel;
+import com.recruitmentsystem.common.myEnum.Gender;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -10,24 +11,22 @@ import java.util.List;
 @Builder
 public record JobRequestModel(
         String name,
-        String company,
-        String branch,
+        Integer companyId,
         List<AddressRequestModel> jobAddresses,
-        String jobPosition,
+        Integer jobPosition,
         String jobDescription,
         String jobRequirement,
         Integer salaryMax,
         Integer salaryMin,
         boolean isSalaryVisible,
-        LocalDateTime jobExipredDate,
+        LocalDateTime jobExpiredDate,
         String jobUrl,
         String jobBenefit,
         Integer jobQuantity,
-        String jobType,
+        Integer jobType,
         String jobTag,
-        String jobGender,
-        String jobStatus,
+        Gender jobGender,
         String jobExperience,
-        String category
+        Integer categoryId
 ) {
 }

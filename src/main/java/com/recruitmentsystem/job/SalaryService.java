@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SalaryService {
     public String salaryRequestToResponse(boolean isSalaryVisible, Integer salaryMax, Integer salaryMin) {
-        String prettySalary;
+        String prettySalary = salaryMin + " - " + salaryMax + " đồng";
         if (!isSalaryVisible) {
             prettySalary = "Thỏa thuận";
         }
@@ -16,7 +16,6 @@ public class SalaryService {
         if (salaryMax == null) {
             prettySalary = "Từ " + salaryMin + " đồng";
         }
-        prettySalary = salaryMin + " - " + salaryMax + " đồng";
         return prettySalary;
     }
 }
