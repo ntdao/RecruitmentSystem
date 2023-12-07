@@ -11,8 +11,7 @@ import java.time.LocalDate;
 public record UserRequestModel(
         @Nullable String password,
         String email,
-        String firstName,
-        String lastName,
+        String fullName,
         String phoneNumber,
         @Nullable AddressRequestModel address,
         Gender gender,

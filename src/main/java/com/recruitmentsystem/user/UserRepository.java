@@ -11,9 +11,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer>, PagingAndSortingRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("select u from User u " +
             "left join Account a on u.account.id = a.id " +
+            "join fetch u.userEducations " +
             "where a.deleteFlag = false " +
             "and u.deleteFlag = false " +
             "and a.role.roleId = 3")
@@ -34,8 +35,7 @@ public interface UserRepository extends JpaRepository<User, Integer>, PagingAndS
     int countAllUser();
     @Query("""
             select u from User u 
-            where (u.firstName like %?1%
-            or u.lastName like %?1%)
+            where u.fullName like :name%
             and u.deleteFlag = false
             and u.account.role.roleId = 3
             """

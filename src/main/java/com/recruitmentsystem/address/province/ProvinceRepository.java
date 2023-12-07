@@ -9,12 +9,12 @@ import java.util.Optional;
 @Repository
 public interface ProvinceRepository extends JpaRepository<Province, String> {
     @Query("""
-            select p.provinceCode from provinces p
+            select p from provinces p
             right join districts d on d.province.provinceCode = p.provinceCode
             right join wards w on w.district.districtCode = d.districtCode
             where w.wardCode = :code
             """)
-    Optional<String> findProvinceByWardCode(String code);
+    Optional<Province> findProvinceByWardCode(String code);
 
     Optional<Province> findByProvinceCode(String code);
 }

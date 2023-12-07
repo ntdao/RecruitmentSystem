@@ -1,5 +1,6 @@
 package com.recruitmentsystem.user;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.recruitmentsystem.account.Account;
 import com.recruitmentsystem.address.address.Address;
 import com.recruitmentsystem.common.myEnum.Gender;
@@ -31,8 +32,7 @@ public class User {
     private Integer userId;
     @OneToOne(cascade = CascadeType.MERGE)
     private Account account;
-    private String firstName;
-    private String lastName;
+    private String fullName;
     private String phoneNumber;
     @OneToOne()
     @JoinColumn(name = "address_id")
@@ -56,6 +56,7 @@ public class User {
     @OneToMany(mappedBy = "user")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @JsonManagedReference
     private List<UserEducation> userEducations;
 
     @CreatedDate
@@ -74,8 +75,7 @@ public class User {
     private Integer oldId;
 
     public User(User user, boolean deleteFlag) {
-        this.firstName = user.getFirstName();
-        this.lastName = user.getLastName();
+        this.fullName = user.getFullName();
         this.phoneNumber = user.getPhoneNumber();
         this.address = user.getAddress();
         this.gender = user.getGender();

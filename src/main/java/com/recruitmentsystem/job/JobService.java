@@ -6,7 +6,6 @@ import com.recruitmentsystem.company.Company;
 import com.recruitmentsystem.company.CompanyRepository;
 import com.recruitmentsystem.company.CompanyService;
 import com.recruitmentsystem.pagination.PageDto;
-import com.recruitmentsystem.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,10 +34,17 @@ public class JobService {
         Job job = jobMapper.jobRequestModelToJob(request);
 
         var companyProxy = companyRepository.getReferenceById(request.companyId());
-
         System.out.println(companyProxy);
         job.setCompany(companyProxy);
 
+        jobRepository.save(job);
+    }
+
+    @Transactional
+    public void addJob(JobRequestModel request, Principal principal) {
+        Company company = companyService.getCurrentCompany(principal);
+        Job job = jobMapper.jobRequestModelToJob(request);
+        job.setCompany(company);
         jobRepository.save(job);
     }
 
@@ -71,11 +77,11 @@ public class JobService {
     }
 
     public List<JobResponseModel> findJobByCompanyId(Integer companyId) {
-       return findByCompanyId(companyId)
-               .stream()
-               .filter(j -> j.getJobStatus() == JobStatus.RECRUITING)
-               .map(jobMapper::jobToResponseModel)
-               .toList();
+        return findByCompanyId(companyId)
+                .stream()
+                .filter(j -> j.getJobStatus() == JobStatus.RECRUITING)
+                .map(jobMapper::jobToResponseModel)
+                .toList();
     }
 
     public Job findById(Integer id) {

@@ -150,8 +150,7 @@ public class UserService {
     private boolean isUserSame(User updateUser, UserRequestModel request) {
         return (request.email().equals(updateUser.getAccount().getEmail())
                 && request.address().equals(updateUser.getAddress())
-                && request.firstName().equals(updateUser.getFirstName())
-                && request.lastName().equals(updateUser.getLastName())
+                && request.fullName().equals(updateUser.getFullName())
                 && request.birthday().isEqual(updateUser.getBirthday())
                 && request.gender() == updateUser.getGender()
                 && request.phoneNumber().equals(updateUser.getPhoneNumber()));
@@ -360,18 +359,17 @@ public class UserService {
         accountService.revokeAllAccountTokens(accountId);
     }
 
-    private AuthenticationResponseModel authenticationResponse(Integer id) {
-        String accessToken = tokenService.findAccessTokenByAccount(id);
-        String refreshToken = tokenService.findRefreshTokenByAccount(id);
-        return AuthenticationResponseModel
-                .builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken).build();
-    }
+//    private AuthenticationResponseModel authenticationResponse(Integer id) {
+//        String accessToken = tokenService.findAccessTokenByAccount(id);
+//        String refreshToken = tokenService.findRefreshTokenByAccount(id);
+//        return AuthenticationResponseModel
+//                .builder()
+//                .accessToken(accessToken)
+//                .refreshToken(refreshToken).build();
+//    }
 
-    public List<UserEducationDto> getUserEducation(Principal connectedUser) {
-        User user = getCurrentUser(connectedUser);
-        return userEducationService.findByUser(user.getUserId());
+    public List<UserEducationDto> getUserEducation(Integer id) {
+        return userEducationService.findByUser(id);
     }
 
     public void addUserEducation(UserEducationDto userEducationDto, Principal connectedUser) {

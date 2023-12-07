@@ -74,10 +74,10 @@ public class UserController {
         return userService.getCurrentUserDisplay(connectedUser);
     }
 
-    @GetMapping("/user/get-user-education")
-    public List<UserEducationDto> getUserEducation(Principal connectedUser) {
-        return userService.getUserEducation(connectedUser);
-    }
+//    @GetMapping("/user/get-user-education")
+//    public List<UserEducationDto> getUserEducation(Principal connectedUser) {
+//        return userService.getUserEducation(connectedUser);
+//    }
 
     @PostMapping("/user/add-user-education")
     public void addUserEducation(@RequestBody UserEducationDto userEducationDto,

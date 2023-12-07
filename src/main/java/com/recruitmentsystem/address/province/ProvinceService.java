@@ -20,7 +20,7 @@ public class ProvinceService {
                 .collect(Collectors.toList());
     }
 
-    public String findProvinceByWardCode(String code) {
+    public Province findProvinceByWardCode(String code) {
         return provinceRepository.findProvinceByWardCode(code)
                 .orElseThrow(() -> new ResourceNotFoundException("Cannot find province by ward code " + code));
     }

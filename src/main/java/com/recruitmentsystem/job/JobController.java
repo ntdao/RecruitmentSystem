@@ -86,12 +86,15 @@ public class JobController {
         return jobService.findJobByCompany(connectedUser);
     }
 
-    @PostMapping("/mamage/jobs/add")
-    public void addJob(@RequestBody JobRequestModel jobRequestModel) {
-        jobService.addJob(jobRequestModel);
+    @PostMapping("/company/mamage/jobs/add")
+    @PreAuthorize("hasAuthority('COMPANY')")
+    public void addJob(@RequestBody JobRequestModel jobRequestModel,
+                       Principal principal) {
+        jobService.addJob(jobRequestModel, principal);
     }
 
     @PostMapping("/manage/jobs/update/{jobId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
     public void updateJob(@PathVariable("jobId") Integer jobId,
                           @RequestBody JobRequestModel jobRequestModel,
                           Principal principal) {

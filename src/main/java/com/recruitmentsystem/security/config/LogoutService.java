@@ -1,5 +1,9 @@
 package com.recruitmentsystem.security.config;
 
+import com.recruitmentsystem.account.Account;
+import com.recruitmentsystem.account.AccountService;
+import com.recruitmentsystem.auth.AuthenticationService;
+import com.recruitmentsystem.security.jwt.JwtService;
 import com.recruitmentsystem.token.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,8 +16,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class LogoutService implements LogoutHandler {
-
-    private final TokenRepository tokenRepository;
+    private final AccountService accountService;
+    private final JwtService jwtService;
 
     @Override
     public void logout(
@@ -23,17 +27,24 @@ public class LogoutService implements LogoutHandler {
     ) {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
+        final String email;
         if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
             return;
         }
         jwt = authHeader.substring(7);
-        var storedToken = tokenRepository.findByToken(jwt)
-                .orElse(null);
-        if (storedToken != null) {
-            storedToken.setExpired(true);
-            storedToken.setRevoked(true);
-            tokenRepository.save(storedToken);
+        email = jwtService.extractEmail(jwt);
+
+        if (email != null) {
+            Account account = accountService.findAccountByEmail(email);
+            accountService.revokeAllAccountTokens(account.getId());
             SecurityContextHolder.clearContext();
         }
+//        var storedToken = tokenRepository.findByToken(jwt).orElse(null);
+//        if (storedToken != null) {
+//            storedToken.setExpired(true);
+//            storedToken.setRevoked(true);
+//            tokenRepository.save(storedToken);
+//            SecurityContextHolder.clearContext();
+//        }
     }
 }

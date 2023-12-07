@@ -1,5 +1,6 @@
 package com.recruitmentsystem.usereducation;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.recruitmentsystem.degree.Degree;
 import com.recruitmentsystem.user.User;
 import jakarta.persistence.*;
@@ -31,7 +32,7 @@ public class UserEducation {
     @Column(nullable = false)
     private String endDate;
     private String description;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "degree_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
@@ -41,6 +42,7 @@ public class UserEducation {
     @JoinColumn(name = "user_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @JsonBackReference
     private User user;
     @LastModifiedDate
     @Column(insertable = false)

@@ -6,6 +6,7 @@ import lombok.Builder;
 public record AddressResponseModel(
         Integer id,
         String provinceCode,
+        String province,
         String districtCode,
         String wardCode,
         String address,

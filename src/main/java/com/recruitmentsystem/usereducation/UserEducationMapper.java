@@ -4,6 +4,9 @@ import com.recruitmentsystem.degree.DegreeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class UserEducationMapper {
@@ -16,6 +19,12 @@ public class UserEducationMapper {
                 .endDate(userEducation.getEndDate())
                 .degreeName(userEducation.getDegree().getDegreeNameVI())
                 .build();
+    }
+
+    public List<UserEducationDto> entitiesToDtos(List<UserEducation> educations) {
+        return educations.stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
     }
 
     public UserEducation dtoToEntity(UserEducationDto userEducationDto) {

@@ -61,13 +61,13 @@ public class CompanyController {
         return companyService.addCompanyByAdmin(companyRequest);
     }
 
-    @PutMapping("/admin/manage/companies/update/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateCompany(@PathVariable("id") Integer id,
-                              @RequestBody CompanyRequestModel companyRequest) {
-        companyService.updateCompanyByAdmin(id, companyRequest);
-    }
+//    @PutMapping("/admin/manage/companies/update/{id}")
+//    @PreAuthorize("hasAuthority('ADMIN')")
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    public void updateCompany(@PathVariable("id") Integer id,
+//                              @RequestBody CompanyRequestModel companyRequest) {
+//        companyService.updateCompanyByAdmin(id, companyRequest);
+//    }
 
     @DeleteMapping("/admin/manage/companies/delete/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -88,6 +88,22 @@ public class CompanyController {
     public void update(@RequestBody CompanyRequestModel companyRequestModel,
                                        Principal connectedUser) {
         companyService.updateCompanyByCompany(companyRequestModel, connectedUser);
+    }
+
+    @PostMapping("/company/manage/update-desc")
+    @PreAuthorize("hasAuthority('COMPANY')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateDesc(@RequestBody CompanyRequestModel companyRequestModel,
+                       Principal connectedUser) {
+        companyService.updateDescByCompany(companyRequestModel, connectedUser);
+    }
+
+    @PostMapping("/company/manage/update-contact")
+    @PreAuthorize("hasAuthority('COMPANY')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateContact(@RequestBody CompanyRequestModel companyRequestModel,
+                       Principal connectedUser) {
+        companyService.updateContactByCompany(companyRequestModel, connectedUser);
     }
 
     @PostMapping("/company/manage/update-address")

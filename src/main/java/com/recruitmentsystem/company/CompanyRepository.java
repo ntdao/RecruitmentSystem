@@ -45,18 +45,18 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
             select c from Company c 
             join fetch c.industry
             where c.deleteFlag = false
-            and (c.companyShortName like concat('%', :name, '%')
-            or c.companyFullName like concat('%', :name, '%'))
+            and (c.companyShortName like %:name%
+            or c.companyFullName like %:name%)
             """)
     List<Company> findByName(String name);
 
     @Query(value = """
-            select new com.recruitmentsystem.company.CompanyTopModel(c.companyShortName, c.companyLogo, c.companyUrl) 
+            select new com.recruitmentsystem.company.CompanyTopModel(c.companyShortName, c.companyLogo, c.companyUrl, c.industry.industryNameVI) 
             from Company c
             where c.deleteFlag = false
             """,
             countQuery = """
-            select new com.recruitmentsystem.company.CompanyTopModel(c.companyShortName, c.companyLogo, c.companyUrl) 
+            select new com.recruitmentsystem.company.CompanyTopModel(c.companyShortName, c.companyLogo, c.companyUrl, c.industry.industryNameVI) 
             from Company c
             where c.deleteFlag = false
     """)

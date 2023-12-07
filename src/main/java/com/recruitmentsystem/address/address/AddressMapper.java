@@ -1,6 +1,7 @@
 package com.recruitmentsystem.address.address;
 
 import com.recruitmentsystem.address.district.DistrictService;
+import com.recruitmentsystem.address.province.Province;
 import com.recruitmentsystem.address.province.ProvinceService;
 import com.recruitmentsystem.address.ward.Ward;
 import com.recruitmentsystem.address.ward.WardService;
@@ -15,14 +16,17 @@ public class AddressMapper {
     private final WardService wardService;
 
     public AddressResponseModel addressToResponseModel(Address address) {
-        if (address == null) {
+        // kiem tra address
+        if (address == null || address.getWard() == null) {
             return null;
         }
         String wardCode = address.getWard().getWardCode();
+        Province province = provinceService.findProvinceByWardCode(wardCode);
         return AddressResponseModel
                 .builder()
                 .id(address.getAddressId())
-                .provinceCode(provinceService.findProvinceByWardCode(wardCode))
+                .provinceCode(province.getProvinceCode())
+                .province(province.getName())
                 .districtCode(districtService.findDistrictByWardCode(wardCode))
                 .wardCode(wardCode)
                 .address(address.getAddress())

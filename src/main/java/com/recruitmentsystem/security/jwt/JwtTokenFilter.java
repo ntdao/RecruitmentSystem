@@ -64,7 +64,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             } else {
                 System.out.println("--------------Token is invalid-------------");
-//                throw new ResourceNotFoundException("Token is invalid");
             }
         }
         filterChain.doFilter(request, response);
