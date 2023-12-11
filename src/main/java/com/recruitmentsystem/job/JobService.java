@@ -1,7 +1,7 @@
 package com.recruitmentsystem.job;
 
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
-import com.recruitmentsystem.common.myEnum.JobStatus;
+import com.recruitmentsystem.common.enums.JobStatus;
 import com.recruitmentsystem.company.Company;
 import com.recruitmentsystem.company.CompanyRepository;
 import com.recruitmentsystem.company.CompanyService;

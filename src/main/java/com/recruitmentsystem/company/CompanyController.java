@@ -115,19 +115,53 @@ public class CompanyController {
     }
 
     @PostMapping(
+            value = "/company/logo",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public String uploadCompanyLogo(@RequestParam("file") MultipartFile[] files,
+                                            Principal connectedUser) {
+        return companyService.uploadCompanyImage(connectedUser, files, "company-logo");
+    }
+
+    @PostMapping(
             value = "/company/image",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public String uploadUserProfileImage(@RequestParam("file") MultipartFile[] files,
+    public String uploadCompanyImage(@RequestParam("file") MultipartFile[] files,
                                        Principal connectedUser) {
-        return companyService.uploadCompanyImage(connectedUser, files);
+        return companyService.uploadCompanyImage(connectedUser, files, "company-images");
+    }
+
+    @PostMapping(
+            value = "/company/license",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public String uploadCompanyLicense(@RequestParam("file") MultipartFile[] files,
+                                         Principal connectedUser) {
+        return companyService.uploadCompanyImage(connectedUser, files, "company-license");
+    }
+
+    @GetMapping(
+            value = "/company/{companyId}/logo",
+            produces = MediaType.IMAGE_JPEG_VALUE
+    )
+    public byte[] getCompanyLogo(@PathVariable("companyId") Integer companyId) {
+        return companyService.getCompanyImage(companyId, "company-logo");
     }
 
     @GetMapping(
             value = "/company/{companyId}/image",
             produces = MediaType.IMAGE_JPEG_VALUE
     )
-    public byte[] getUserProfileImage(@PathVariable("companyId") Integer companyId) {
-        return companyService.getCompanyImage(companyId);
+    public byte[] getCompanyImage(@PathVariable("companyId") Integer companyId) {
+        return companyService.getCompanyImage(companyId, "company-images");
+    }
+
+    @GetMapping(
+            value = "/company/{companyId}/license",
+            produces = MediaType.IMAGE_JPEG_VALUE
+    )
+    public byte[] getCompanyLicense(@PathVariable("companyId") Integer companyId) {
+        return companyService.getCompanyImage(companyId, "company-license");
     }
 }

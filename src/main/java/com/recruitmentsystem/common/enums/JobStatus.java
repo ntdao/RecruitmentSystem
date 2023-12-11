@@ -1,4 +1,4 @@
-package com.recruitmentsystem.common.myEnum;
+package com.recruitmentsystem.common.enums;
 
 import java.util.Arrays;
 import java.util.List;

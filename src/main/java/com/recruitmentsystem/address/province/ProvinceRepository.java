@@ -16,5 +16,9 @@ public interface ProvinceRepository extends JpaRepository<Province, String> {
             """)
     Optional<Province> findProvinceByWardCode(String code);
 
-    Optional<Province> findByProvinceCode(String code);
+    @Query("""
+            select p.fullName from provinces p
+            where p.provinceCode = :code
+            """)
+    Optional<String> findByProvinceCode(String code);
 }

@@ -1,10 +1,9 @@
 package com.recruitmentsystem.job;
 
 import com.recruitmentsystem.address.address.AddressRequestModel;
-import com.recruitmentsystem.common.myEnum.Gender;
+import com.recruitmentsystem.common.enums.Gender;
 import lombok.Builder;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 

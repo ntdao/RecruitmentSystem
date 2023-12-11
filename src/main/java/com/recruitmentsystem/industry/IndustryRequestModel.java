@@ -1,7 +1,7 @@
 package com.recruitmentsystem.industry;
 
 public record IndustryRequestModel (
-        String nameEN,
-        String nameVI
+        String industryName,
+        String industryNameVI
 ){
 }

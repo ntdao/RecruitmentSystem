@@ -13,6 +13,7 @@ public interface UserEducationRepository extends JpaRepository<UserEducation, In
             join fetch ue.degree
             join fetch ue.user
             where ue.user.userId = :id
+            and ue.user.deleteFlag = false 
             """)
     List<UserEducation> findUserEducationByUser(Integer id);
 }

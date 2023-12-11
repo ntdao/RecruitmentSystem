@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CategoryMapper {
     public CategoryResponseModel categoryToResponseModel(Category category) {
-        return CategoryResponseModel
+        return (category == null) ? null : CategoryResponseModel
                 .builder()
                 .id(category.getCategoryId())
                 .name(category.getCategoryName())

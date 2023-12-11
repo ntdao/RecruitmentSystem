@@ -37,11 +37,11 @@ public class Company {
     @Column(columnDefinition = "text")
     private String companyIntroduction;
     private String companyImage;
-    @OneToOne()
+    @OneToOne
     @JoinColumn(name = "address_id")
-    private Address address;
-    // fetch = LAZY -> error lazy init...
-    @ManyToOne() // fetch type mặc định là EAGER
+    @ToString.Exclude
+    private Address companyAddress;
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "industry_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
@@ -51,7 +51,8 @@ public class Company {
     private String companyLicense;
     private String companySize;
     private String companyTag;
-    @OneToOne(cascade = CascadeType.MERGE)
+    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Account account;
     private String phoneNumber;
     private String website;
@@ -78,30 +79,30 @@ public class Company {
     private boolean deleteFlag = false;
     private Integer oldId;
 
-    public Company(Company company, boolean deleteFlag) {
-        this.companyShortName = company.getCompanyShortName();
-        this.companyFullName = company.getCompanyFullName();
-        this.companyLogo = company.getCompanyLogo();
-        this.companyIntroduction = company.getCompanyIntroduction();
-        this.companyImage = company.getCompanyImage();
-        this.address = company.getAddress();
-        this.industry = company.getIndustry();
-        this.companyFoundedYear = company.getCompanyFoundedYear();
-        this.companyMst = company.getCompanyMst();
-        this.companyLicense = company.getCompanyLicense();
-        this.companySize = company.getCompanySize();
-        this.companyTag = company.getCompanyTag();
-        this.phoneNumber = company.getPhoneNumber();
-        this.website = company.getWebsite();
-        this.facebookUrl = company.getFacebookUrl();
-        this.youtubeUrl = company.getYoutubeUrl();
-        this.linkedinUrl = company.getLinkedinUrl();
-        this.companyUrl = company.getCompanyUrl();
-        this.createDate = company.getCreateDate();
-        this.createdBy = company.getCreatedBy();
-        this.lastModified = company.getLastModified();
-        this.lastModifiedBy = company.getLastModifiedBy();
-        this.deleteFlag = deleteFlag;
-        this.oldId = company.getCompanyId();
-    }
+//    public Company(Company company, boolean deleteFlag) {
+//        this.companyShortName = company.getCompanyShortName();
+//        this.companyFullName = company.getCompanyFullName();
+//        this.companyLogo = company.getCompanyLogo();
+//        this.companyIntroduction = company.getCompanyIntroduction();
+//        this.companyImage = company.getCompanyImage();
+//        this.companyAddress = company.getCompanyAddress();
+//        this.industry = company.getIndustry();
+//        this.companyFoundedYear = company.getCompanyFoundedYear();
+//        this.companyMst = company.getCompanyMst();
+//        this.companyLicense = company.getCompanyLicense();
+//        this.companySize = company.getCompanySize();
+//        this.companyTag = company.getCompanyTag();
+//        this.phoneNumber = company.getPhoneNumber();
+//        this.website = company.getWebsite();
+//        this.facebookUrl = company.getFacebookUrl();
+//        this.youtubeUrl = company.getYoutubeUrl();
+//        this.linkedinUrl = company.getLinkedinUrl();
+//        this.companyUrl = company.getCompanyUrl();
+//        this.createDate = company.getCreateDate();
+//        this.createdBy = company.getCreatedBy();
+//        this.lastModified = company.getLastModified();
+//        this.lastModifiedBy = company.getLastModifiedBy();
+//        this.deleteFlag = deleteFlag;
+//        this.oldId = company.getCompanyId();
+//    }
 }

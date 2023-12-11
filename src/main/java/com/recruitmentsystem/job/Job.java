@@ -2,8 +2,8 @@ package com.recruitmentsystem.job;
 
 import com.recruitmentsystem.address.address.Address;
 import com.recruitmentsystem.category.Category;
-import com.recruitmentsystem.common.myEnum.Gender;
-import com.recruitmentsystem.common.myEnum.JobStatus;
+import com.recruitmentsystem.common.enums.Gender;
+import com.recruitmentsystem.common.enums.JobStatus;
 import com.recruitmentsystem.company.Company;
 import com.recruitmentsystem.jobposition.JobPosition;
 import com.recruitmentsystem.jobtype.JobType;
@@ -17,7 +17,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -76,12 +75,12 @@ public class Job {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "job_type_id")
     private JobType jobType;
-    //    @ManyToOne(fetch = FetchType.LAZY)
+//    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "job_status_id")
 //    private JobStatus jobStatus;
     @Enumerated(EnumType.STRING)
     private JobStatus jobStatus;
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY) // fetch type mặc định là LAZY
+    @ManyToMany(cascade = CascadeType.ALL) // fetch type mặc định là LAZY
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @JoinTable(

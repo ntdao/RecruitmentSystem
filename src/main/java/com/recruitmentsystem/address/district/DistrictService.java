@@ -25,7 +25,7 @@ public class DistrictService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cannot find district by ward code " + code));
     }
 
-    public District findDistrictByDistrictCode(String code) {
+    public String findDistrictByDistrictCode(String code) {
         return districtRepository.findByDistrictCode(code)
                 .orElseThrow(() -> new ResourceNotFoundException("District with code " + code + " not found"));
     }

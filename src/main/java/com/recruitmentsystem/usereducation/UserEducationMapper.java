@@ -1,10 +1,12 @@
 package com.recruitmentsystem.usereducation;
 
+import com.amazonaws.services.qldb.model.S3ObjectEncryptionType;
 import com.recruitmentsystem.degree.DegreeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,13 +20,14 @@ public class UserEducationMapper {
                 .startDate(userEducation.getStartDate())
                 .endDate(userEducation.getEndDate())
                 .degreeName(userEducation.getDegree().getDegreeNameVI())
+                .description(userEducation.getDescription())
                 .build();
     }
 
-    public List<UserEducationDto> entitiesToDtos(List<UserEducation> educations) {
+    public Set<UserEducationDto> entitiesToDtos(Set<UserEducation> educations) {
         return educations.stream()
                 .map(this::entityToDto)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     public UserEducation dtoToEntity(UserEducationDto userEducationDto) {

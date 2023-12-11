@@ -1,5 +1,6 @@
 package com.recruitmentsystem.company;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.account.Account;
 import com.recruitmentsystem.account.AccountRepository;
 import com.recruitmentsystem.account.AccountService;
@@ -8,7 +9,6 @@ import com.recruitmentsystem.address.address.AddressRequestModel;
 import com.recruitmentsystem.address.address.AddressService;
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
-import com.recruitmentsystem.industry.IndustryMapper;
 import com.recruitmentsystem.industry.IndustryService;
 import com.recruitmentsystem.role.RoleService;
 import com.recruitmentsystem.s3.S3Service;
@@ -43,7 +43,6 @@ public class CompanyService {
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public Company getCurrentCompany(Principal connectedAccount) {
-        String email = accountService.getCurrentAccount(connectedAccount).getEmail();
         return findCompanyByEmail(accountService.getCurrentAccount(connectedAccount).getEmail());
     }
 
@@ -73,7 +72,7 @@ public class CompanyService {
         accountRepository.save(account);
 
         company.setAccount(account);
-        company.setAddress(address);
+        company.setCompanyAddress(address);
         companyRepository.save(company);
 
         // bị lỗi trường lastModified và lastModifiedBy
@@ -88,6 +87,7 @@ public class CompanyService {
 
     public List<CompanyResponseModel> findAllCompanies() {
         List<Company> companies = companyRepository.findAllCompany();
+        System.out.println(companies);
         return companies.stream()
                 .map(companyMapper::companyToResponseModel)
                 .collect(Collectors.toList());
@@ -220,18 +220,11 @@ public class CompanyService {
         return companyMapper.companyToResponseModel(findCompanyByEmail(account.getEmail()));
     }
 
-    public String uploadCompanyLogo(Principal connectedUser, MultipartFile file) {
-        Company company = getCurrentCompany(connectedUser);
-        String image = s3Service.uploadFile("company-logo/%s/".formatted(company.getCompanyId()), file);
-        System.out.println(image);
-        return image;
-    }
-
-    public String uploadCompanyImage(Principal connectedUser, MultipartFile[] files) {
+    public String uploadCompanyImage(Principal connectedUser, MultipartFile[] files, String field) {
         Company company = getCurrentCompany(connectedUser);
         String image = "";
         for (MultipartFile file : files) {
-            String imgUrl = s3Service.uploadFile("company-images/%s/".formatted(company.getCompanyId()), file);
+            String imgUrl = s3Service.uploadFile("%s/%s/".formatted(field, company.getCompanyId()), file);
             image = imgUrl + ";";
             System.out.println(imgUrl);
         }
@@ -239,19 +232,42 @@ public class CompanyService {
         return image;
     }
 
-    public byte[] getCompanyImage(Integer companyId) {
+    public String addImage() {
+        return null;
+    }
+
+    public String removeImage() {
+        return null;
+    }
+
+    public byte[] getCompanyImage(Integer companyId, String field) {
         Company company = findCompanyById(companyId);
-
-        if (StringUtils.isBlank(company.getCompanyImage())) {
-            throw new ResourceNotFoundException("Company with id [%s] image not found".formatted(companyId));
+        String fileName = "";
+        switch (field) {
+            case "company-logo":
+                fileName = company.getCompanyLogo();
+                break;
+            case "company-images":
+                fileName = company.getCompanyImage();
+                break;
+            case "company-license":
+                fileName = company.getCompanyLicense();
+                break;
+            default:
         }
+        if (StringUtils.isBlank(fileName)) {
+            throw new ResourceNotFoundException("Company with id [%s] [%s] not found".formatted(companyId, field));
+        }
+        return s3Service.downloadFile(fileName);
+    }
 
-        return s3Service.downloadFile(company.getCompanyImage());
+    public void deleteCompanyImage(String fileName) {
+        s3Service.deleteFile(fileName);
     }
 
     public void updateCompanyAddressByCompany(AddressRequestModel addressRequestModel, Principal connectedUser) {
         Company company = getCurrentCompany(connectedUser);
-        Integer addressId = company.getAddress().getAddressId();
+        Integer addressId = company.getCompanyAddress().getAddressId();
         addressService.updateAddress(addressId, addressRequestModel);
         companyRepository.save(company);
     }
@@ -261,7 +277,7 @@ public class CompanyService {
         Company company = getCurrentCompany(connectedUser);
         Account updateAccount = company.getAccount();
 
-        if(! company.getAccount().getEmail().equals(request.email())) {
+        if (!company.getAccount().getEmail().equals(request.email())) {
             accountService.checkDuplicateEmail(request.email());
         }
         Account oldAccount = new Account(updateAccount, true);

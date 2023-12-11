@@ -1,5 +1,6 @@
 package com.recruitmentsystem.jobposition;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.recruitmentsystem.job.Job;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,6 +26,7 @@ public class JobPosition {
     @OneToMany(mappedBy = "jobPosition", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @JsonIgnore
     private List<Job> jobs;
 }
 

@@ -1,8 +1,8 @@
-package com.recruitmentsystem.usereducation;
+package com.recruitmentsystem.userworkinghistory;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.recruitmentsystem.degree.Degree;
+import com.recruitmentsystem.jobposition.JobPosition;
 import com.recruitmentsystem.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,27 +19,21 @@ import java.time.LocalDateTime;
 @ToString
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class UserEducation {
+public class UserWorkingHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
-    private Integer userEducationId;
+    private Integer userWorkingHistoryId;
     @Column(nullable = false)
-    private String schoolName;
+    private String companyName;
     @Column(nullable = false)
-    private String major;
+    private String jobName;
     @Column(nullable = false)
     private String startDate;
     @Column(nullable = false)
     private String endDate;
     @Column(columnDefinition = "text")
     private String description;
-    @ManyToOne
-    @JoinColumn(name = "degree_id")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Degree degree;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @EqualsAndHashCode.Exclude

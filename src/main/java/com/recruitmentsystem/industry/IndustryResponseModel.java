@@ -4,8 +4,8 @@ import lombok.Builder;
 
 @Builder
 public record IndustryResponseModel (
-        Integer id,
-        String nameEN,
-        String nameVI
+        Integer industryId,
+        String industryName,
+        String industryNameVI
 ){
 }

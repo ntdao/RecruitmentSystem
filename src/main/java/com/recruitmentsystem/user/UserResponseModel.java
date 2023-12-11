@@ -1,8 +1,9 @@
 package com.recruitmentsystem.user;
 
 import com.recruitmentsystem.address.address.AddressResponseModel;
-import com.recruitmentsystem.common.myEnum.Gender;
+import com.recruitmentsystem.category.CategoryResponseModel;
 import com.recruitmentsystem.usereducation.UserEducationDto;
+import com.recruitmentsystem.userworkinghistory.UserWorkingHistoryDto;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -22,6 +23,11 @@ public record UserResponseModel(
         LocalDateTime createDate,
         LocalDateTime lastModified,
         String roleName,
-        List<UserEducationDto> education
+        List<UserEducationDto> education,
+        List<UserWorkingHistoryDto> workingHistory,
+        String desiredJob,
+        String educationLevel,
+        CategoryResponseModel category,
+        String cvUrl
 ) {
 }

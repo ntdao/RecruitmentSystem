@@ -1,5 +1,6 @@
 package com.recruitmentsystem.industry;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.recruitmentsystem.company.Company;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,5 +26,6 @@ public class Industry {
     @OneToMany(mappedBy = "industry", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @JsonIgnore
     private List<Company> companies;
 }

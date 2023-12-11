@@ -1,6 +1,6 @@
 package com.recruitmentsystem.job;
 
-import com.recruitmentsystem.common.myEnum.Gender;
+import com.recruitmentsystem.common.enums.Gender;
 import com.recruitmentsystem.jobposition.JobPositionResponseModel;
 import com.recruitmentsystem.jobposition.JobPositionService;
 import com.recruitmentsystem.jobtype.JobTypeResponseModel;

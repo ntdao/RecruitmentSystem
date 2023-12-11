@@ -22,5 +22,9 @@ public interface DistrictRepository extends JpaRepository<District, String> {
             """)
     Optional<String> findDistrictByWardCode(String code);
 
-    Optional<District> findByDistrictCode(String code);
+    @Query("""
+            select d.fullName from districts d
+            where d.districtCode = :code
+            """)
+    Optional<String> findByDistrictCode(String code);
 }

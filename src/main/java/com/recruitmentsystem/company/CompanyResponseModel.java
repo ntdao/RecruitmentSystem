@@ -1,6 +1,7 @@
 package com.recruitmentsystem.company;
 
 import com.recruitmentsystem.address.address.AddressResponseModel;
+import com.recruitmentsystem.industry.IndustryResponseModel;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -14,7 +15,7 @@ public record CompanyResponseModel(
         String companyUrl,
         String companyLogo,
         String companyIntroduction,
-        Integer industry,
+        IndustryResponseModel industry,
         String companyImage,
         Integer companyFoundedYear,
         String companyMST,

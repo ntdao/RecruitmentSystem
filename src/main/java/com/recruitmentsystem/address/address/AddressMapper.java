@@ -5,12 +5,14 @@ import com.recruitmentsystem.address.province.Province;
 import com.recruitmentsystem.address.province.ProvinceService;
 import com.recruitmentsystem.address.ward.Ward;
 import com.recruitmentsystem.address.ward.WardService;
+import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class AddressMapper {
+    private final AddressRepository addressRepository;
     private final DistrictService districtService;
     private final ProvinceService provinceService;
     private final WardService wardService;
@@ -21,13 +23,13 @@ public class AddressMapper {
             return null;
         }
         String wardCode = address.getWard().getWardCode();
-        Province province = provinceService.findProvinceByWardCode(wardCode);
+        Tuple tuple = addressRepository.getProvinceDistrictByWard(wardCode);
         return AddressResponseModel
                 .builder()
                 .id(address.getAddressId())
-                .provinceCode(province.getProvinceCode())
-                .province(province.getName())
-                .districtCode(districtService.findDistrictByWardCode(wardCode))
+                .provinceCode(tuple.get("provinceCode", String.class))
+                .province(tuple.get("provinceName", String.class))
+                .districtCode(tuple.get("districtCode", String.class))
                 .wardCode(wardCode)
                 .address(address.getAddress())
                 .fullAddress(address.getFullAddress())
@@ -38,8 +40,8 @@ public class AddressMapper {
         Ward ward = wardService.findWardByWardCode(request.wardCode());
         String fullAddress = request.address() + ", "
                 + ward.getFullName() + ", "
-                + districtService.findDistrictByDistrictCode(request.districtCode()).getFullName() + ", "
-                + provinceService.findProvinceByProvinceCode(request.provinceCode()).getFullName();
+                + districtService.findDistrictByDistrictCode(request.districtCode()) + ", "
+                + provinceService.findProvinceByProvinceCode(request.provinceCode());
         return Address
                 .builder()
                 .ward(ward)

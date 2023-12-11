@@ -4,8 +4,8 @@ import lombok.Builder;
 
 @Builder
 public record JobTypeResponseModel(
-        Integer id,
-        String nameEN,
-        String nameVI
+        Integer jobTypeId,
+        String jobTypeName,
+        String jobTypeNameVI
 ) {
 }

@@ -5,9 +5,9 @@ import com.recruitmentsystem.account.AccountRepository;
 import com.recruitmentsystem.account.AccountService;
 import com.recruitmentsystem.address.address.AddressService;
 import com.recruitmentsystem.auth.AuthenticationResponseModel;
+import com.recruitmentsystem.common.enums.TokenType;
 import com.recruitmentsystem.common.exception.InputException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
-import com.recruitmentsystem.common.myEnum.TokenType;
 import com.recruitmentsystem.file.FileService;
 import com.recruitmentsystem.pagination.MyPagination;
 import com.recruitmentsystem.role.RoleService;
@@ -25,7 +25,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,6 +36,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -197,6 +197,7 @@ public class UserService {
         updateUser = userMapper.userRequestModelToUser(request);
         updateUser.setUserId(userId);
         updateUser.setImgUrl(oldUser.getImgUrl());
+        updateUser.setCvUrl(oldUser.getCvUrl());
         updateUser.setAccount(oldUser.getAccount());
 
         System.out.println("User - New info: " + updateUser);
@@ -238,7 +239,7 @@ public class UserService {
         uploadProfileImage(user, file);
     }
 
-    //    @Transactional
+    @Transactional
     public void uploadProfileImage(User user, MultipartFile file) {
         String fileDir = "img/user_profile/user_" + user.getUserId() + "/";
 
@@ -257,8 +258,10 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
     public void uploadUserProfileImage(Principal connectedUser, MultipartFile file) {
         User user = getCurrentUser(connectedUser);
+        String oldImgUrl = user.getImgUrl();
         String imgUrl = s3Service.uploadFile("profile-images/%s/".formatted(user.getUserId()), file);
 
         System.out.println("User before upload image: " + user);
@@ -272,6 +275,8 @@ public class UserService {
 
         // save user
         userRepository.save(user);
+        // delete old image
+        s3Service.deleteFile(oldImgUrl);
     }
 
     public void uploadUserCV(Principal connectedUser, MultipartFile file) {
@@ -351,6 +356,7 @@ public class UserService {
         System.out.println("Account - after change password: " + newAccount);
 
         System.out.println("User - before change password: " + user);
+        // kiem tra xem co can thiet hay khong
         user.setLastModified(LocalDateTime.now());
         user.setLastModifiedBy(accountId);
         userRepository.save(user);
@@ -359,16 +365,7 @@ public class UserService {
         accountService.revokeAllAccountTokens(accountId);
     }
 
-//    private AuthenticationResponseModel authenticationResponse(Integer id) {
-//        String accessToken = tokenService.findAccessTokenByAccount(id);
-//        String refreshToken = tokenService.findRefreshTokenByAccount(id);
-//        return AuthenticationResponseModel
-//                .builder()
-//                .accessToken(accessToken)
-//                .refreshToken(refreshToken).build();
-//    }
-
-    public List<UserEducationDto> getUserEducation(Integer id) {
+    public Set<UserEducationDto> getUserEducation(Integer id) {
         return userEducationService.findByUser(id);
     }
 
@@ -376,9 +373,19 @@ public class UserService {
         User user = getCurrentUser(connectedUser);
         System.out.println("User before add education: " + user);
         System.out.println("List user education before add: " + user.getUserEducations());
-        List<UserEducation> list = userEducationService.addUserEducation(user.getUserEducations(), userEducationDto);
+        Set<UserEducation> list = userEducationService.addUserEducation(user.getUserEducations(), userEducationDto);
         System.out.println("List user education after add: " + list);
         user.setUserEducations(list);
         userRepository.save(user);
+    }
+
+    public void updateUserEducation(Integer id, UserEducationDto userEducationDto, Principal connectedUser) {
+        User user = getCurrentUser(connectedUser);
+        Set<UserEducation> list = userEducationService.updateUserEducation(id, userEducationDto, user.getUserEducations());
+    }
+
+    public void deleteUserEducation(Integer id, Principal connectedUser) {
+        User user = getCurrentUser(connectedUser);
+        Set<UserEducation> list = userEducationService.deleteUserEducation(id, user.getUserEducations());
     }
 }

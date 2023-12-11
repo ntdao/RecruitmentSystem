@@ -1,5 +1,6 @@
 package com.recruitmentsystem.industry;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -12,13 +13,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class IndustryService {
-    private final IndustryMapper industryMapper;
+    private final ObjectMapper objectMapper;
     private final IndustryRepository industryRepository;
 
     @Transactional
     public void addIndustry(IndustryRequestModel request) {
-        checkDuplicatedIndustryName(request.nameEN(), request.nameVI());
-        Industry industry = industryMapper.industryRequestModelToIndustry(request);
+        checkDuplicatedIndustryName(request.industryName(), request.industryNameVI());
+        Industry industry = objectMapper.convertValue(request, Industry.class);
         industryRepository.save(industry);
     }
 
@@ -43,7 +44,7 @@ public class IndustryService {
     public List<IndustryResponseModel> findAllIndustryResponseModel() {
         return industryRepository.findAll()
                 .stream()
-                .map(industryMapper::industryToResponseModel)
+                .map(i -> objectMapper.convertValue(i, IndustryResponseModel.class))
                 .collect(Collectors.toList());
     }
 
@@ -62,17 +63,17 @@ public class IndustryService {
     }
 
     public IndustryResponseModel findIndustryResponseModelById(Integer id) {
-        return industryMapper.industryToResponseModel(findById(id));
+        return objectMapper.convertValue(findById(id), IndustryResponseModel.class);
     }
 
     public IndustryResponseModel findIndustryResponseModelByName(String name) {
-        return industryMapper.industryToResponseModel(findIndustryByName(name));
+        return objectMapper.convertValue(findIndustryByName(name), IndustryResponseModel.class);
     }
 
     @Transactional
     public void updateIndustry(Integer id, IndustryRequestModel request) {
         Industry updateIndustry = findById(id);
-        Industry industryRequest = industryMapper.industryRequestModelToIndustry(request);
+        Industry industryRequest = objectMapper.convertValue(request, Industry.class);
         industryRequest.setIndustryId(id);
         industryRepository.save(updateIndustry);
     }

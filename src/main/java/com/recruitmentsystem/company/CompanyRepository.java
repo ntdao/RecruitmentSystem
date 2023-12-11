@@ -24,7 +24,10 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
     Optional<Company> findCompanyByEmail(String email);
 
     @Query("""
-                select c from Company c join fetch c.industry
+                select c from Company c 
+                join fetch c.industry
+                join fetch c.companyAddress
+                join fetch c.account
                 where c.deleteFlag = false
             """)
     List<Company> findAllCompany();

@@ -2,7 +2,7 @@ package com.recruitmentsystem.category;
 
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
-import com.recruitmentsystem.common.myEnum.OrderBy;
+import com.recruitmentsystem.common.enums.OrderBy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

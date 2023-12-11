@@ -1,7 +1,7 @@
 package com.recruitmentsystem.user;
 
 import com.recruitmentsystem.address.address.AddressRequestModel;
-import com.recruitmentsystem.common.myEnum.Gender;
+import com.recruitmentsystem.common.enums.Gender;
 import jakarta.annotation.Nullable;
 import lombok.Builder;
 
@@ -17,6 +17,11 @@ public record UserRequestModel(
         Gender gender,
         LocalDate birthday,
         @Nullable String imgUrl,
-        String roleName
+        String roleName,
+        String desiredJob,
+        String cvUrl,
+        String educationLevel,
+        String workingHistory,
+        Integer category
 ) {
 }

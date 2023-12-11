@@ -1,6 +1,6 @@
 package com.recruitmentsystem.auth;
 
-import com.recruitmentsystem.common.myEnum.Gender;
+import com.recruitmentsystem.common.enums.Gender;
 
 import java.time.LocalDate;
 

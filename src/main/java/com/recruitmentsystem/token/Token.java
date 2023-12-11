@@ -1,6 +1,6 @@
 package com.recruitmentsystem.token;
 
-import com.recruitmentsystem.common.myEnum.TokenType;
+import com.recruitmentsystem.common.enums.TokenType;
 import com.recruitmentsystem.account.Account;
 import jakarta.persistence.*;
 import lombok.*;

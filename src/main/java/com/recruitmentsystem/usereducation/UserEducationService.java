@@ -1,10 +1,10 @@
 package com.recruitmentsystem.usereducation;
 
-import com.recruitmentsystem.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -12,19 +12,39 @@ import java.util.stream.Collectors;
 public class UserEducationService {
     private final UserEducationMapper userEducationMapper;
     private final UserEducationRepository userEducationRepository;
-    public List<UserEducation> addUserEducation(List<UserEducation> list, UserEducationDto userEducationDto) {
+
+    public Set<UserEducation> addUserEducation(Set<UserEducation> list, UserEducationDto userEducationDto) {
         UserEducation userEducation = userEducationMapper.dtoToEntity(userEducationDto);
         list.add(userEducation);
         return list;
     }
-    public List<UserEducation> findAll() {
-        return userEducationRepository.findAll();
-    }
 
-    public List<UserEducationDto> findByUser(Integer userId) {
+    public Set<UserEducationDto> findByUser(Integer userId) {
         return userEducationRepository.findUserEducationByUser(userId)
                 .stream()
                 .map(userEducationMapper::entityToDto)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
+    }
+
+    public Set<UserEducation> deleteUserEducation(Integer educationId, Set<UserEducation> educations) {
+        educations.forEach(e -> {
+            if (e.getUserEducationId() == educationId) {
+                educations.remove(e);
+                userEducationRepository.deleteById(educationId);
+            }
+        });
+        return educations;
+    }
+
+    public Set<UserEducation> updateUserEducation(Integer educationId, UserEducationDto dto, Set<UserEducation> educations) {
+//        for (int i = 0; i < educations.size(); i++) {
+//            if (educations.(i).getUserEducationId() == educationId) {
+//                educations.remove(i);
+//                UserEducation edu = userEducationMapper.dtoToEntity(dto);
+//                edu.setUserEducationId(educationId);
+//                educations.add(i, edu);
+//            }
+//        }
+        return educations;
     }
 }

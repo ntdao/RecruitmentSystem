@@ -1,11 +1,11 @@
 package com.recruitmentsystem.application;
 
-import com.recruitmentsystem.account.Account;
-import com.recruitmentsystem.category.Category;
+import com.recruitmentsystem.job.Job;
+import com.recruitmentsystem.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
+@Entity(name = "user_apply_job")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -15,16 +15,16 @@ import lombok.*;
 public class Application {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(updatable = false)
     private Integer applicationId;
-    @Column(nullable = false)
-    private String fileSave;
-
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//    @Column(nullable = false)
+//    private String cvUrl;
+    private Integer status;
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private Account user;
-
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "category_id")
-    private Category category;
+    @ToString.Exclude
+    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "job_id")
+    @ToString.Exclude
+    private Job job;
 }

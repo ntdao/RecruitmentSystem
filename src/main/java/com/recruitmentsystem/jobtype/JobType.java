@@ -1,7 +1,11 @@
 package com.recruitmentsystem.jobtype;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.recruitmentsystem.job.Job;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -19,4 +23,9 @@ public class JobType {
     private String jobTypeName;
     @Column(name = "job_type_name_vi")
     private String jobTypeNameVI;
+    @OneToMany(mappedBy = "jobType", cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
+    private List<Job> jobs;
 }

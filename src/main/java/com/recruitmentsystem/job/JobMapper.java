@@ -1,8 +1,11 @@
 package com.recruitmentsystem.job;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.address.address.*;
 import com.recruitmentsystem.category.CategoryService;
+import com.recruitmentsystem.jobposition.JobPositionResponseModel;
 import com.recruitmentsystem.jobposition.JobPositionService;
+import com.recruitmentsystem.jobtype.JobTypeResponseModel;
 import com.recruitmentsystem.jobtype.JobTypeService;
 import com.recruitmentsystem.skill.SkillMapper;
 import com.recruitmentsystem.skill.SkillResponseModel;
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class JobMapper {
+    private final ObjectMapper objectMapper;
     private final AddressMapper addressMapper;
     private final SkillMapper skillMapper;
     private final AddressService addressService;
@@ -44,14 +48,14 @@ public class JobMapper {
                 .companyName(job.getCompany().getCompanyFullName())
                 .companyLogo(job.getCompany().getCompanyLogo())
                 .jobAddress(addressList)
-                .jobPosition(job.getJobPosition().getJobPositionId())
+                .jobPosition(objectMapper.convertValue(job.getJobPosition(), JobPositionResponseModel.class))
                 .salary(job.getSalary())
                 .jobUrl(job.getJobUrl())
                 .jobRequirement(job.getJobRequirement())
                 .jobDescription(job.getJobDescription())
                 .jobBenefit(job.getJobBenefit())
                 .jobTag(job.getJobTag())
-                .jobType(job.getJobType().getJobTypeId())
+                .jobType(objectMapper.convertValue(job.getJobType(), JobTypeResponseModel.class))
                 .jobGender(job.getJobGender().toString())
                 .jobQuantity(job.getJobQuantity())
                 .jobExperience(job.getJobExperience())

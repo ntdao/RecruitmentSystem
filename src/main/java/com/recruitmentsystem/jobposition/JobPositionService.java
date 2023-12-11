@@ -1,5 +1,6 @@
 package com.recruitmentsystem.jobposition;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.common.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.common.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -12,11 +13,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class JobPositionService {
-    private final JobPositionMapper jobPositionMapper;
+    private final ObjectMapper objectMapper;
     private final JobPositionRepository jobPositionRepository;
     public void addJobPosition(JobPositionRequestModel request) {
-        checkDuplicatedJobPositionName(request.nameEN(), request.nameVI());
-        JobPosition jobPosition = jobPositionMapper.jobPositionRequestModelToJobPosition(request);
+        checkDuplicatedJobPositionName(request.jobPositionName(), request.jobPositionNameVI());
+        JobPosition jobPosition = objectMapper.convertValue(request, JobPosition.class);
         jobPositionRepository.save(jobPosition);
     }
     private void checkDuplicatedJobPositionName(String nameEN, String nameVI) {
@@ -37,7 +38,7 @@ public class JobPositionService {
     public List<JobPositionResponseModel> findAllJobPositionResponseModel() {
         return jobPositionRepository.findAll()
                 .stream()
-                .map(jobPositionMapper::jobPositionToResponseModel)
+                .map(j -> objectMapper.convertValue(j, JobPositionResponseModel.class))
                 .collect(Collectors.toList());
     }
     public JobPosition findById(Integer id) {
@@ -49,15 +50,15 @@ public class JobPositionService {
                 .orElseThrow(() -> new ResourceNotFoundException("JobPosition with name " + name + " does not exist"));
     }
     public JobPositionResponseModel findJobPositionResponseModelById(Integer id) {
-        return jobPositionMapper.jobPositionToResponseModel(findById(id));
+        return objectMapper.convertValue(findById(id), JobPositionResponseModel.class);
     }
     public JobPositionResponseModel findJobPositionResponseModelByName(String name) {
-        return jobPositionMapper.jobPositionToResponseModel(findByName(name));
+        return objectMapper.convertValue(findByName(name), JobPositionResponseModel.class);
     }
     @Transactional
     public void updateJobPosition(Integer id, JobPositionRequestModel request) {
         JobPosition updateJobPosition = findById(id);
-        JobPosition jobPositionRequest = jobPositionMapper.jobPositionRequestModelToJobPosition(request);
+        JobPosition jobPositionRequest = objectMapper.convertValue(request, JobPosition.class);
         jobPositionRequest.setJobPositionId(id);
         jobPositionRepository.save(updateJobPosition);
     }

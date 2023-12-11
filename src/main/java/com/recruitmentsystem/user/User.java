@@ -3,9 +3,11 @@ package com.recruitmentsystem.user;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.recruitmentsystem.account.Account;
 import com.recruitmentsystem.address.address.Address;
-import com.recruitmentsystem.common.myEnum.Gender;
+import com.recruitmentsystem.category.Category;
+import com.recruitmentsystem.common.enums.Gender;
 import com.recruitmentsystem.skill.Skill;
 import com.recruitmentsystem.usereducation.UserEducation;
+import com.recruitmentsystem.userworkinghistory.UserWorkingHistory;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
@@ -16,7 +18,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -34,7 +38,7 @@ public class User {
     private Account account;
     private String fullName;
     private String phoneNumber;
-    @OneToOne()
+    @OneToOne
     @JoinColumn(name = "address_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
@@ -52,13 +56,24 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
     private List<Skill> userSkills;
-
     @OneToMany(mappedBy = "user")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @JsonManagedReference
-    private List<UserEducation> userEducations;
-
+    private Set<UserEducation> userEducations = new HashSet<>();
+    @OneToMany(mappedBy = "user")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonManagedReference
+    private Set<UserWorkingHistory> workingHistories = new HashSet<>();
+    @OneToOne
+    @JoinColumn(name = "category_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Category category;
+    private String desiredJob;
+    private String cvUrl;
+    private String educationLevel;
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createDate;
@@ -83,6 +98,12 @@ public class User {
         this.birthday = user.getBirthday();
         this.account = user.getAccount();
         this.userSkills = user.getUserSkills();
+        this.userEducations = user.getUserEducations();
+        this.workingHistories = user.getWorkingHistories();
+        this.category = user.getCategory();
+        this.desiredJob = user.getDesiredJob();
+        this.cvUrl = user.getCvUrl();
+        this.educationLevel = user.getEducationLevel();
         this.createDate = user.getCreateDate();
         this.lastModified = user.getLastModified();
         this.createdBy = user.getCreatedBy();

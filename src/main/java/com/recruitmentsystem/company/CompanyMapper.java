@@ -1,6 +1,8 @@
 package com.recruitmentsystem.company;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.address.address.AddressMapper;
+import com.recruitmentsystem.industry.IndustryResponseModel;
 import com.recruitmentsystem.industry.IndustryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,6 +11,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CompanyMapper {
     private final AddressMapper addressMapper;
+//    private final IndustryMapper industryMapper;
+    private final ObjectMapper objectMapper;
     private final IndustryService industryService;
 
     public CompanyResponseModel companyToResponseModel(Company company) {
@@ -21,8 +25,8 @@ public class CompanyMapper {
                 .companyImage(company.getCompanyImage())
                 .companyIntroduction(company.getCompanyIntroduction())
                 .companyUrl(company.getCompanyUrl())
-                .industry(company.getIndustry().getIndustryId())
-                .companyAddress(addressMapper.addressToResponseModel(company.getAddress()))
+                .industry(objectMapper.convertValue(company.getIndustry(), IndustryResponseModel.class))
+                .companyAddress(addressMapper.addressToResponseModel(company.getCompanyAddress()))
                 .companyMST(company.getCompanyMst())
                 .companyLicense(company.getCompanyLicense())
                 .companySize(company.getCompanySize())

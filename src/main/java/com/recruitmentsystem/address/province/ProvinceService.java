@@ -25,7 +25,7 @@ public class ProvinceService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cannot find province by ward code " + code));
     }
 
-    public Province findProvinceByProvinceCode(String code) {
+    public String findProvinceByProvinceCode(String code) {
         return provinceRepository.findByProvinceCode(code)
                 .orElseThrow(() -> new ResourceNotFoundException("Province with code " + code + " not found"));
     }
