@@ -5,7 +5,7 @@ import com.recruitmentsystem.category.Category;
 import com.recruitmentsystem.common.enums.Gender;
 import com.recruitmentsystem.common.enums.JobStatus;
 import com.recruitmentsystem.company.Company;
-import com.recruitmentsystem.jobposition.JobPosition;
+//import com.recruitmentsystem.jobposition.JobPosition;
 import com.recruitmentsystem.jobtype.JobType;
 import com.recruitmentsystem.skill.Skill;
 import jakarta.persistence.*;
@@ -36,14 +36,14 @@ public class Job {
     private String jobName;
     @Column(columnDefinition = "text")
     private String jobDescription;
-    @Column(columnDefinition = "text")
-    private String jobBenefit;
+//    @Column(columnDefinition = "text")
+//    private String jobBenefit;
     @Column(columnDefinition = "text")
     private String jobRequirement;
     private boolean isSalaryVisible;
     private String salary;
-    private Integer salaryMin;
-    private Integer salaryMax;
+//    private Integer salaryMin;
+//    private Integer salaryMax;
     private LocalDateTime jobExpiredDate;
     private String jobUrl;
     private String jobTag;
@@ -52,6 +52,7 @@ public class Job {
     private Gender jobGender;
     @Column(columnDefinition = "text")
     private String jobExperience;
+    private String minEducationLevel;
     //    @Column(columnDefinition = "text")
 //    private String jobAddress;
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -69,9 +70,9 @@ public class Job {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "job_position_id")
-    private JobPosition jobPosition;
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "job_position_id")
+//    private JobPosition jobPosition;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "job_type_id")
     private JobType jobType;
@@ -111,11 +112,11 @@ public class Job {
     public Job(Integer id, Job job, boolean deleteFlag) {
         this.jobName = job.getJobName();
         this.jobDescription = job.getJobDescription();
-        this.jobBenefit = job.getJobBenefit();
+//        this.jobBenefit = job.getJobBenefit();
         this.jobRequirement = job.getJobRequirement();
         this.salary = job.getSalary();
-        this.salaryMin = job.getSalaryMin();
-        this.salaryMax = job.getSalaryMax();
+//        this.salaryMin = job.getSalaryMin();
+//        this.salaryMax = job.getSalaryMax();
         this.jobExpiredDate = job.getJobExpiredDate();
         this.jobUrl = job.getJobUrl();
         this.jobTag = job.getJobTag();
@@ -125,9 +126,10 @@ public class Job {
         this.jobAddresses = job.getJobAddresses();
         this.company = job.getCompany();
         this.category = job.getCategory();
-        this.jobPosition = job.getJobPosition();
+//        this.jobPosition = job.getJobPosition();
         this.jobType = job.getJobType();
         this.jobStatus = job.getJobStatus();
+        this.minEducationLevel = job.getMinEducationLevel();
         this.jobSkills = job.getJobSkills();
         this.createDate = job.getCreateDate();
         this.lastModified = job.getLastModified();

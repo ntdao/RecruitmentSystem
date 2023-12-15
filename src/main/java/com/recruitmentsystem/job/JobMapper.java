@@ -3,21 +3,17 @@ package com.recruitmentsystem.job;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.address.address.*;
 import com.recruitmentsystem.category.CategoryService;
-import com.recruitmentsystem.jobposition.JobPositionResponseModel;
-import com.recruitmentsystem.jobposition.JobPositionService;
+//import com.recruitmentsystem.jobposition.JobPositionService;
 import com.recruitmentsystem.jobtype.JobTypeResponseModel;
 import com.recruitmentsystem.jobtype.JobTypeService;
 import com.recruitmentsystem.skill.SkillMapper;
 import com.recruitmentsystem.skill.SkillResponseModel;
-import com.recruitmentsystem.skill.SkillService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +23,7 @@ public class JobMapper {
     private final SkillMapper skillMapper;
     private final AddressService addressService;
     private final CategoryService categoryService;
-    private final JobPositionService jobPositionService;
+//    private final JobPositionService jobPositionService;
     private final JobTypeService jobTypeService;
     private final SalaryService salaryService;
     public JobResponseModel jobToResponseModel(Job job) {
@@ -48,12 +44,10 @@ public class JobMapper {
                 .companyName(job.getCompany().getCompanyFullName())
                 .companyLogo(job.getCompany().getCompanyLogo())
                 .jobAddress(addressList)
-                .jobPosition(objectMapper.convertValue(job.getJobPosition(), JobPositionResponseModel.class))
                 .salary(job.getSalary())
                 .jobUrl(job.getJobUrl())
                 .jobRequirement(job.getJobRequirement())
                 .jobDescription(job.getJobDescription())
-                .jobBenefit(job.getJobBenefit())
                 .jobTag(job.getJobTag())
                 .jobType(objectMapper.convertValue(job.getJobType(), JobTypeResponseModel.class))
                 .jobGender(job.getJobGender().toString())
@@ -80,14 +74,13 @@ public class JobMapper {
                 .jobUrl(request.jobUrl())
                 .jobRequirement(request.jobRequirement())
                 .jobDescription(request.jobDescription())
-                .jobBenefit(request.jobBenefit())
                 .jobQuantity(request.jobQuantity())
                 .jobGender(request.jobGender())
-                .jobPosition(jobPositionService.findById(request.jobPosition()))
                 .jobType(jobTypeService.findById(request.jobType()))
                 .jobExperience(request.jobExperience())
                 .category(categoryService.findById(request.categoryId()))
                 .jobExpiredDate(request.jobExpiredDate())
+                .minEducationLevel(request.minEducationLevel())
                 .build();
     }
 }

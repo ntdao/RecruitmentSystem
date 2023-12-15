@@ -29,15 +29,15 @@ public class JobService {
 
     @Transactional
     public void addJob(JobRequestModel request) {
-        companyService.existsById(request.companyId());
-
-        Job job = jobMapper.jobRequestModelToJob(request);
-
-        var companyProxy = companyRepository.getReferenceById(request.companyId());
-        System.out.println(companyProxy);
-        job.setCompany(companyProxy);
-
-        jobRepository.save(job);
+//        companyService.existsById(request.companyId());
+//
+//        Job job = jobMapper.jobRequestModelToJob(request);
+//
+//        var companyProxy = companyRepository.getReferenceById(request.companyId());
+//        System.out.println(companyProxy);
+//        job.setCompany(companyProxy);
+//
+//        jobRepository.save(job);
     }
 
     @Transactional

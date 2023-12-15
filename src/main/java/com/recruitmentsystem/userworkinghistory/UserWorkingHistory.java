@@ -1,8 +1,6 @@
 package com.recruitmentsystem.userworkinghistory;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.recruitmentsystem.degree.Degree;
-import com.recruitmentsystem.jobposition.JobPosition;
 import com.recruitmentsystem.user.User;
 import jakarta.persistence.*;
 import lombok.*;

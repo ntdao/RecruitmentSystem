@@ -18,7 +18,7 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
 
     @Query("""
                     select c from Company c join fetch c.industry
-                    left join Account a on c.account.id = a.id
+                    join fetch c.account a
                     where c.deleteFlag = false and a.email = ?1
             """)
     Optional<Company> findCompanyByEmail(String email);

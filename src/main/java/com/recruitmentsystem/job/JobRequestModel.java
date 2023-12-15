@@ -10,9 +10,8 @@ import java.util.List;
 @Builder
 public record JobRequestModel(
         String name,
-        Integer companyId,
         List<AddressRequestModel> jobAddresses,
-        Integer jobPosition,
+//        Integer jobPosition,
         String jobDescription,
         String jobRequirement,
         Integer salaryMax,
@@ -20,12 +19,13 @@ public record JobRequestModel(
         boolean isSalaryVisible,
         LocalDateTime jobExpiredDate,
         String jobUrl,
-        String jobBenefit,
+//        String jobBenefit,
         Integer jobQuantity,
         Integer jobType,
-        String jobTag,
+//        String jobTag,
         Gender jobGender,
         String jobExperience,
-        Integer categoryId
+        Integer categoryId,
+        String minEducationLevel
 ) {
 }

@@ -1,8 +1,8 @@
 package com.recruitmentsystem.job;
 
 import com.recruitmentsystem.common.enums.Gender;
-import com.recruitmentsystem.jobposition.JobPositionResponseModel;
-import com.recruitmentsystem.jobposition.JobPositionService;
+//import com.recruitmentsystem.jobposition.JobPositionResponseModel;
+//import com.recruitmentsystem.jobposition.JobPositionService;
 import com.recruitmentsystem.jobtype.JobTypeResponseModel;
 import com.recruitmentsystem.jobtype.JobTypeService;
 import com.recruitmentsystem.pagination.PageDto;
@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JobController {
     private final JobService jobService;
-    private final JobPositionService jobPositionService;
+//    private final JobPositionService jobPositionService;
     private final JobTypeService jobTypeService;
 
     @GetMapping("/jobs/all")
@@ -51,10 +51,10 @@ public class JobController {
         return jobTypeService.findAllJobTypeResponseModel();
     }
 
-    @GetMapping("/jobs/job-position")
-    public List<JobPositionResponseModel> getAllJobPosition() {
-        return jobPositionService.findAllJobPositionResponseModel();
-    }
+//    @GetMapping("/jobs/job-position")
+//    public List<JobPositionResponseModel> getAllJobPosition() {
+//        return jobPositionService.findAllJobPositionResponseModel();
+//    }
 
     @GetMapping("/jobs/job-gender")
     public ResponseEntity<?> getAllJobGender() {
