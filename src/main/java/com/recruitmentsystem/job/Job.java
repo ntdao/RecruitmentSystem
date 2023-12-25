@@ -40,10 +40,10 @@ public class Job {
 //    private String jobBenefit;
     @Column(columnDefinition = "text")
     private String jobRequirement;
-    private boolean isSalaryVisible;
+//    private boolean isSalaryVisible;
     private String salary;
-//    private Integer salaryMin;
-//    private Integer salaryMax;
+    private Integer salaryMin;
+    private Integer salaryMax;
     private LocalDateTime jobExpiredDate;
     private String jobUrl;
     private String jobTag;

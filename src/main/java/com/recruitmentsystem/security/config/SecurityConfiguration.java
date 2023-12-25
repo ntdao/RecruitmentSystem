@@ -64,6 +64,7 @@ public class SecurityConfiguration {
                 .permitAll()
 
                 // Tất cả các request khác đều cần phải xác thực mới được truy cập
+//                .requestMatchers("/api/v*/company/**").hasAuthority("COMPANY")
                 .anyRequest().authenticated()
                 .and()
                 // disable session

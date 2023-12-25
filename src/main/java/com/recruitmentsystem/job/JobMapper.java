@@ -11,6 +11,8 @@ import com.recruitmentsystem.skill.SkillResponseModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -62,24 +64,32 @@ public class JobMapper {
     }
 
     public Job jobRequestModelToJob(JobRequestModel request) {
-        Set<Address> addressList = new HashSet<>();
-        for (AddressRequestModel a : request.jobAddresses()) {
-            addressList.add(addressService.addressRequestModelToEntity(a));
-        }
+
+//        Set<Address> addressList = new HashSet<>();
+//        for (AddressRequestModel a : request.jobAddresses()) {
+//            addressList.add(addressService.addressRequestModelToEntity(a));
+//        }
+
+        String str = request.jobExpiredDate() + " 00:00";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
+
         return Job
                 .builder()
                 .jobName(request.name())
-                .jobAddresses(addressList)
-                .salary(salaryService.salaryRequestToResponse(request.isSalaryVisible(), request.salaryMax(), request.salaryMin()))
+//                .jobAddresses(addressList)
+                .salary(request.salary())
+                .salaryMin(Integer.parseInt(request.salaryMin()))
+                .salaryMax(Integer.parseInt(request.salaryMax()))
                 .jobUrl(request.jobUrl())
                 .jobRequirement(request.jobRequirement())
                 .jobDescription(request.jobDescription())
-                .jobQuantity(request.jobQuantity())
+                .jobQuantity(Integer.parseInt(request.jobQuantity()))
                 .jobGender(request.jobGender())
-                .jobType(jobTypeService.findById(request.jobType()))
+                .jobType(jobTypeService.findById(Integer.parseInt(request.jobType())))
                 .jobExperience(request.jobExperience())
-                .category(categoryService.findById(request.categoryId()))
-                .jobExpiredDate(request.jobExpiredDate())
+                .category(categoryService.findById(Integer.parseInt(request.categoryId())))
+                .jobExpiredDate(dateTime)
                 .minEducationLevel(request.minEducationLevel())
                 .build();
     }
