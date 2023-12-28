@@ -1,10 +1,8 @@
 package com.recruitmentsystem.security.config;
 
-import com.recruitmentsystem.account.Account;
-import com.recruitmentsystem.account.AccountService;
-import com.recruitmentsystem.auth.AuthenticationService;
+import com.recruitmentsystem.entity.Account;
+import com.recruitmentsystem.service.AccountService;
 import com.recruitmentsystem.security.jwt.JwtService;
-import com.recruitmentsystem.token.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

@@ -18,13 +18,13 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity
-        (
-        prePostEnabled = true,
-		securedEnabled = true,
-		jsr250Enabled = true
-)
-//@EnableMethodSecurity
+//@EnableGlobalMethodSecurity
+//        (
+//                prePostEnabled = true,
+//                securedEnabled = true,
+//                jsr250Enabled = true
+//        )
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
     private final JwtTokenFilter jwtTokenFilter;
@@ -34,15 +34,16 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-//                .cors().and()
                 .csrf().disable()
                 .cors(Customizer.withDefaults())
-
                 .authorizeHttpRequests()
+
+                .requestMatchers("/api/v*/admin/manage/**").hasAuthority("ADMIN")
+                .requestMatchers("/api/v*/company/manage/**").hasAuthority("COMPANY")
+                .requestMatchers("/api/v*/manage/**").hasAnyAuthority("ADMIN", "COMPANY")
 
                 // Cho phép tất cả mọi người truy cập vào địa chỉ này
                 .requestMatchers(
-                        "/api/v*/auth/**",
                         "/v*/api-docs",
                         "/v*/api-docs/**",
                         "/swagger-resources",
@@ -52,19 +53,11 @@ public class SecurityConfiguration {
                         "/swagger-ui/**",
                         "/webjars/**",
                         "/swagger-ui.html",
-                        "/api/image/**",
-                        "/api/v*/user/**",
-                        "/api/v*/user/*/profile-image",
-                        "/api/v*/categories/**",
-                        "/api/v*/companies/**",
-                        "/api/v*/companyBranch/**",
-                        "/api/v*/jobs/**",
-                        "/api/v*/address/**",
-                        "/api/v*/industries/**")
+                        "/api/**"
+                )
                 .permitAll()
 
                 // Tất cả các request khác đều cần phải xác thực mới được truy cập
-//                .requestMatchers("/api/v*/company/**").hasAuthority("COMPANY")
                 .anyRequest().authenticated()
                 .and()
                 // disable session

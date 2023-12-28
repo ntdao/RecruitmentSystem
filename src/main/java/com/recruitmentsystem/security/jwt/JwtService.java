@@ -1,6 +1,6 @@
 package com.recruitmentsystem.security.jwt;
 
-import com.recruitmentsystem.token.TokenService;
+import com.recruitmentsystem.security.token.TokenService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

@@ -10,6 +10,6 @@ public class PageDto {
     private Integer pageSize;
     private String sortBy;
     private String sortDir;
-    private String name;
-    private List<Integer> categories;
+    private String key;
+    private List<Integer> keys;
 }

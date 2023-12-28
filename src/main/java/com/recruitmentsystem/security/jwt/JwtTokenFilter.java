@@ -1,6 +1,6 @@
 package com.recruitmentsystem.security.jwt;
 
-import com.recruitmentsystem.token.TokenRepository;
+import com.recruitmentsystem.security.token.TokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.security.sasl.AuthenticationException;
 import java.io.IOException;
 
 @Component
@@ -47,7 +48,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-//            System.out.println(userDetails);
             var isTokenValid = tokenRepository.findByToken(jwtToken)
                     .map(t -> !t.isExpired() && !t.isRevoked())
                     .orElse(false);
@@ -57,13 +57,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                         null,
                         userDetails.getAuthorities()
                 );
-//                System.out.println(authToken);
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             } else {
-                System.out.println("--------------Token is invalid-------------");
+                throw new AuthenticationException("Token is invalid");
             }
         }
         filterChain.doFilter(request, response);

@@ -1,7 +1,7 @@
 package com.recruitmentsystem.security.config;
 
-import com.recruitmentsystem.account.AccountRepository;
-import com.recruitmentsystem.auditing.ApplicationAuditAware;
+import com.recruitmentsystem.repository.AccountRepository;
+import com.recruitmentsystem.config.AuditAwareImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,7 +42,7 @@ public class ApplicationConfiguration {
     }
     @Bean
     public AuditorAware<Integer> auditorAware() {
-        return new ApplicationAuditAware();
+        return new AuditAwareImpl();
     }
 
     @Bean
