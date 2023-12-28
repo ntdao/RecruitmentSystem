@@ -49,7 +49,7 @@ public class CompanyMapper {
                 .companyShortName(request.companyShortName())
                 .companyFullName(request.companyFullName())
                 .companyIntroduction(request.companyIntroduction())
-                .industry(industryService.findById(Integer.parseInt(request.industryId())))
+                .industry(industryService.findById(Integer.parseInt(request.companyIndustry())))
                 .companyMst(request.companyMST())
                 .companySize(request.companySize())
                 .companyFoundedYear(Integer.parseInt(request.companyFoundedYear()))
