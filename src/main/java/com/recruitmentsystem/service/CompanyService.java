@@ -12,8 +12,8 @@ import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.mapper.CompanyMapper;
 import com.recruitmentsystem.repository.AccountRepository;
 import com.recruitmentsystem.repository.CompanyRepository;
-import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +33,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CompanyService {
+    @Value("${aws.s3.prefix}")
+    private String prefix;
     private final AccountRepository accountRepository;
     private final AccountService accountService;
     private final AddressService addressService;
@@ -227,18 +228,18 @@ public class CompanyService {
 
         if (!company.getAccount().getEmail().equals(request.email())) {
             accountService.checkDuplicateEmail(request.email());
-        }
-        Account oldAccount = new Account(updateAccount, true);
-        System.out.println("Account - before update: " + oldAccount);
-        accountRepository.save(oldAccount);
+            Account oldAccount = new Account(updateAccount, true);
+            System.out.println("Account - before update: " + oldAccount);
+            accountRepository.save(oldAccount);
 
-        updateAccount.setEmail(request.email());
-        System.out.println("Account - after update: " + updateAccount);
-        accountRepository.save(updateAccount);
+            updateAccount.setEmail(request.email());
+            System.out.println("Account - after update: " + updateAccount);
+            accountRepository.save(updateAccount);
+        }
 
         // tao ban ghi luu thong tin cu cua company
         Company oldCompany = new Company(company, true);
-        System.out.println("Company - Old info: " + company);
+        System.out.println("Company - Old info: " + oldCompany);
 
         // update company
         company.setPhoneNumber(request.phoneNumber());
@@ -246,7 +247,7 @@ public class CompanyService {
         company.setFacebookUrl(request.facebookUrl());
         company.setYoutubeUrl(request.youtubeUrl());
         company.setLinkedinUrl(request.linkedinUrl());
-
+        company.setCompanyId(oldCompany.getCompanyId());
         companyRepository.save(company);
         System.out.println("Company - New info: " + company);
     }
@@ -258,7 +259,7 @@ public class CompanyService {
 
         company.setCompanyIntroduction(request.companyIntroduction());
         company.setCompanyImage(request.companyImage());
-
+        company.setCompanyId(company.getCompanyId());
         companyRepository.save(company);
         System.out.println("Company - New info: " + company);
     }
@@ -306,97 +307,10 @@ public class CompanyService {
         return companyMapper.companyToResponseModel(findCompanyByEmail(account.getEmail()));
     }
 
-    public String uploadCompanyImage(Principal connectedUser, MultipartFile[] files, String field) {
+    public String uploadCompanyImage(Principal connectedUser, MultipartFile file, String field) {
         Company company = getCurrentCompany(connectedUser);
-        String image = "";
-        for (MultipartFile file : files) {
-            String imgUrl = s3Service.uploadFile("%s/%s/".formatted(field, company.getCompanyId()), file);
-            image = imgUrl + ";";
-            System.out.println(imgUrl);
-        }
+        String image = prefix + s3Service.uploadFile("%s/%s/".formatted(field, company.getCompanyId()), file);
         System.out.println("Company image url: " + image);
         return image;
     }
-
-    public String addImage() {
-        return null;
-    }
-
-    public String removeImage() {
-        return null;
-    }
-
-    public byte[] getCompanyImage(Integer companyId, String field) {
-        Company company = findCompanyById(companyId);
-        String fileName = "";
-        switch (field) {
-            case "company-logo":
-                fileName = company.getCompanyLogo();
-                break;
-            case "company-images":
-                fileName = company.getCompanyImage();
-                break;
-            case "company-license":
-                fileName = company.getCompanyLicense();
-                break;
-            default:
-        }
-        if (StringUtils.isBlank(fileName)) {
-            throw new ResourceNotFoundException("Company with id [%s] [%s] not found".formatted(companyId, field));
-        }
-        return s3Service.downloadFile(fileName);
-    }
-
-    public void deleteCompanyImage(String fileName) {
-        s3Service.deleteFile(fileName);
-    }
-
-//    public void updateCompanyAddressByCompany(AddressDto addressRequestModel, Principal connectedUser) {
-//        Company company = getCurrentCompany(connectedUser);
-//        Integer addressId = company.getCompanyAddress().getAddressId();
-//        addressService.updateAddress(addressId, addressRequestModel);
-//        companyRepository.save(company);
-//    }
-//
-//    @Transactional
-//    public void updateContactByCompany(CompanyRequestModel request, Principal connectedUser) {
-//        Company company = getCurrentCompany(connectedUser);
-//        Account updateAccount = company.getAccount();
-//
-//        if (!company.getAccount().getEmail().equals(request.email())) {
-//            accountService.checkDuplicateEmail(request.email());
-//        }
-//        Account oldAccount = new Account(updateAccount, true);
-//        System.out.println("Account - before update: " + oldAccount);
-//        accountRepository.save(oldAccount);
-//
-//        updateAccount.setEmail(request.email());
-//        System.out.println("Account - after update: " + updateAccount);
-//        accountRepository.save(updateAccount);
-//
-//        // tao ban ghi luu thong tin cu cua company
-////        Company oldCompany = new Company(company, true);
-//        System.out.println("Company - Old info: " + company);
-//
-//        // update company
-//        company.setPhoneNumber(request.phoneNumber());
-//        company.setWebsite(request.website());
-//        company.setFacebookUrl(request.facebookUrl());
-//        company.setYoutubeUrl(request.youtubeUrl());
-//        company.setLinkedinUrl(request.linkedinUrl());
-//
-//        companyRepository.save(company);
-//        System.out.println("Company - New info: " + company);
-//    }
-//
-//    public void updateDescByCompany(CompanyRequestModel request, Principal connectedUser) {
-//        Company company = getCurrentCompany(connectedUser);
-//        System.out.println("Company - Old info: " + company);
-//
-//        company.setCompanyIntroduction(request.companyIntroduction());
-//        company.setCompanyImage(request.companyImage());
-//
-//        companyRepository.save(company);
-//        System.out.println("Company - New info: " + company);
-//    }
 }

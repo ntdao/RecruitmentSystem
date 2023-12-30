@@ -82,7 +82,7 @@ public class CompanyController {
         companyService.updateDescByCompany(companyRequestModel, connectedUser);
     }
 
-    @PostMapping("/company/manage/update-contact")
+    @PostMapping("/company/manage/update-media")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateContact(@RequestBody CompanyRequestModel companyRequestModel,
                               Principal connectedUser) {
@@ -100,50 +100,51 @@ public class CompanyController {
             value = "/company/manage/logo",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public String uploadCompanyLogo(@RequestParam("file") MultipartFile[] files,
+    public String uploadCompanyLogo(@RequestParam("file") MultipartFile file,
                                     Principal connectedUser) {
-        return companyService.uploadCompanyImage(connectedUser, files, "company-logo");
+        return companyService.uploadCompanyImage(connectedUser, file, "company-logo");
     }
 
     @PostMapping(
             value = "/company/manage/image",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public String uploadCompanyImage(@RequestParam("file") MultipartFile[] files,
+    public String uploadCompanyImage(@RequestParam("file") MultipartFile file,
                                      Principal connectedUser) {
-        return companyService.uploadCompanyImage(connectedUser, files, "company-images");
+        return companyService.uploadCompanyImage(connectedUser, file, "company-images");
     }
 
     @PostMapping(
             value = "/company/manage/license",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public String uploadCompanyLicense(@RequestParam("file") MultipartFile[] files,
+    public String uploadCompanyLicense(@RequestParam("file") MultipartFile file,
                                        Principal connectedUser) {
-        return companyService.uploadCompanyImage(connectedUser, files, "company-license");
+        return companyService.uploadCompanyImage(connectedUser, file, "company-license");
     }
 
-    @GetMapping(
-            value = "/company/{companyId}/logo",
-            produces = MediaType.IMAGE_JPEG_VALUE
-    )
-    public byte[] getCompanyLogo(@PathVariable("companyId") Integer companyId) {
-        return companyService.getCompanyImage(companyId, "company-logo");
-    }
-
-    @GetMapping(
-            value = "/company/{companyId}/image",
-            produces = MediaType.IMAGE_JPEG_VALUE
-    )
-    public byte[] getCompanyImage(@PathVariable("companyId") Integer companyId) {
-        return companyService.getCompanyImage(companyId, "company-images");
-    }
-
-    @GetMapping(
-            value = "/company/{companyId}/license",
-            produces = MediaType.IMAGE_JPEG_VALUE
-    )
-    public byte[] getCompanyLicense(@PathVariable("companyId") Integer companyId) {
-        return companyService.getCompanyImage(companyId, "company-license");
-    }
+//    @GetMapping(
+//            value = "/company/{companyId}/logo",
+//            produces = MediaType.IMAGE_JPEG_VALUE
+//    )
+//    public byte[] getCompanyLogo(@PathVariable("companyId") Integer companyId) {
+//        return companyService.getCompanyImage(companyId, "company-logo").get(0);
+//    }
+//
+//    @GetMapping(
+//            value = "/company/{companyId}/image",
+//            produces = MediaType.IMAGE_JPEG_VALUE
+//    )
+//    public List<byte[]> getCompanyImage(@PathVariable("companyId") Integer companyId) {
+//        return companyService.getCompanyImage(companyId, "company-images");
+//    }
+//
+//    @GetMapping(
+//            value = "/company/{companyId}/license/{index}",
+//            produces = MediaType.IMAGE_JPEG_VALUE
+//    )
+//    public byte[] getCompanyLicense(@PathVariable("companyId") Integer companyId,
+//                                          @PathVariable("index") Integer index) {
+//        return companyService.getCompanyImage(companyId, "company-license").get(index);
+//    }
 }

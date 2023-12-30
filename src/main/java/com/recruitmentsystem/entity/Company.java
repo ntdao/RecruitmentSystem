@@ -31,6 +31,7 @@ public class Company {
     private String companyLogo;
     @Column(columnDefinition = "text")
     private String companyIntroduction;
+    @Column(columnDefinition = "text")
     private String companyImage;
     @OneToOne
     @JoinColumn(name = "address_id")
@@ -43,6 +44,7 @@ public class Company {
     private Industry industry;
     private Integer companyFoundedYear;
     private String companyMst;
+    @Column(columnDefinition = "text")
     private String companyLicense;
     private String companySize;
     @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
