@@ -74,4 +74,16 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             and u.userId = :id
             """)
     Optional<User> findUserById(Integer id);
+
+    @Query("""
+            select u from User u
+            left join fetch u.userEducations
+            left join fetch u.workingHistories
+            left join fetch u.userSkills
+            join fetch u.account
+            where u.deleteFlag = false
+            and u.account.deleteFlag = false
+            and u.userId in :ids
+            """)
+    List<User> findListUserByIds(List<Integer> ids);
 }

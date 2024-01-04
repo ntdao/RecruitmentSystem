@@ -40,6 +40,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    @Value("${aws.s3.prefix}")
+    private String prefix;
     private final AccountRepository accountRepository;
     private final AccountService accountService;
     private final AddressService addressService;
@@ -96,10 +98,19 @@ public class UserService {
     }
 
     private User findUserById(Integer id) {
-        User user = userRepository.findUserById(id).orElse(null);
-        System.out.println(user);
-        return user;
-//                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " does not exist"));
+        return userRepository.findUserById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " does not exist"));
+    }
+
+    private List<User> findListUserByIds(List<Integer> ids) {
+        return userRepository.findListUserByIds(ids);
+    }
+
+    public List<UserResponseModel> findUsersByIds(List<Integer> ids) {
+        return findListUserByIds(ids)
+                .stream()
+                .map(userMapper::userToResponseModel)
+                .toList();
     }
 
     public List<UserResponseModel> findAllUserByName(String name) {
@@ -215,7 +226,7 @@ public class UserService {
     public void uploadUserProfileImage(Principal connectedUser, MultipartFile file) {
         User user = getCurrentUser(connectedUser);
         String oldImgUrl = user.getImgUrl();
-        String imgUrl = s3Service.uploadFile("profile-images/%s/".formatted(user.getUserId()), file);
+        String imgUrl = prefix + s3Service.uploadFile("profile-images/%s/".formatted(user.getUserId()), file);
 
         System.out.println("User before upload image: " + user);
 
@@ -232,11 +243,10 @@ public class UserService {
         s3Service.deleteFile(oldImgUrl);
     }
 
-    public void uploadUserCV(Principal connectedUser, MultipartFile file) {
+    public String uploadUserCV(Principal connectedUser, MultipartFile file) {
         User user = getCurrentUser(connectedUser);
-        String cvUrl = s3Service.uploadFile("cv/%s/".formatted(user.getUserId()), file);
-
-        System.out.println(cvUrl);
+        String cvUrl = prefix + s3Service.uploadFile("cv/%s/".formatted(user.getUserId()), file);
+        return cvUrl;
     }
 
     public byte[] getUserCV(Integer id) {

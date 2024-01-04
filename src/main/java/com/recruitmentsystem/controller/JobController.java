@@ -47,6 +47,11 @@ public class JobController {
         return jobService.findJobByJobName(name);
     }
 
+    @GetMapping("/jobs/{jobId}")
+    public JobResponseModel getJobById(@PathVariable("jobId") Integer jobId) {
+        return jobService.findJobById(jobId);
+    }
+
     @GetMapping("/jobs/job-type")
     public List<JobTypeDto> getAllJobType() {
         return jobTypeService.findAllJobTypeResponseModel();
@@ -57,8 +62,8 @@ public class JobController {
         return ResponseEntity.ok(Gender.getAll());
     }
 
-    @GetMapping("/jobs/{company-id}/all")
-    public List<JobResponseModel> getAllJob(@PathVariable("company-id") Integer id) {
+    @GetMapping("/jobs/{companyId}/all")
+    public List<JobResponseModel> getAllJob(@PathVariable("companyId") Integer id) {
         return jobService.findJobByCompanyId(id);
     }
     @GetMapping("/admin/manage/jobs/all")
@@ -66,14 +71,14 @@ public class JobController {
         return jobService.findAllJobsByAdmin();
     }
 
-    @GetMapping("/manage/jobs/find/{id}")
-    public JobResponseModel adminGetJobById(@PathVariable("id") Integer id) {
+    @GetMapping("/manage/jobs/find/{jobId}")
+    public JobResponseModel adminGetJobById(@PathVariable("jobId") Integer id) {
         return jobService.findJobById(id);
     }
 
-    @DeleteMapping("/manage/jobs/delete/{id}")
+    @DeleteMapping("/manage/jobs/delete/{jobId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void adminDeleteJob(@PathVariable("id") Integer id) {
+    public void adminDeleteJob(@PathVariable("jobId") Integer id) {
         jobService.deleteJob(id);
     }
 

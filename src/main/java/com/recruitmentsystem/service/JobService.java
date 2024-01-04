@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 public class JobService {
     private final JobRepository jobRepository;
     private final JobMapper jobMapper;
-    private final CompanyRepository companyRepository;
     private final CompanyService companyService;
 
     @Transactional

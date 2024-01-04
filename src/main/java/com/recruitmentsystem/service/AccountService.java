@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 import java.util.List;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 @Service
 @RequiredArgsConstructor
 public class AccountService {

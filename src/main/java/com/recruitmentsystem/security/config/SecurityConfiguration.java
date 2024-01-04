@@ -38,9 +38,9 @@ public class SecurityConfiguration {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests()
 
-                .requestMatchers("/api/v*/admin/manage/**").hasAuthority("ADMIN")
-                .requestMatchers("/api/v*/company/manage/**").hasAuthority("COMPANY")
-                .requestMatchers("/api/v*/manage/**").hasAnyAuthority("ADMIN", "COMPANY")
+//                .requestMatchers("/api/v*/admin/manage/**").hasAuthority("ADMIN")
+//                .requestMatchers("/api/v*/company/manage/**").hasAuthority("COMPANY")
+//                .requestMatchers("/api/v*/manage/**").hasAnyAuthority("ADMIN", "COMPANY")
 
                 // Cho phép tất cả mọi người truy cập vào địa chỉ này
                 .requestMatchers(

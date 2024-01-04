@@ -1,4 +1,4 @@
 package com.recruitmentsystem.controller;
 
-public class ApplicationController {
+public class InterviewController {
 }

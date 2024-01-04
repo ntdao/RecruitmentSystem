@@ -1,6 +1,5 @@
 package com.recruitmentsystem.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.recruitmentsystem.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;

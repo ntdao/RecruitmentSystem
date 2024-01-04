@@ -12,17 +12,10 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, String> {
     @Query("""
             select a 
-            from Account  a 
+            from Account a 
             where a.email = :email and a.deleteFlag = false
             """)
     Optional<Account> findTopByEmail(String email);
-
-    @Query("""
-            select a.id 
-            from Account  a 
-            where a.email = :email and a.deleteFlag = false
-            """)
-    Integer findAccountIdByEmail(String email);
 
     boolean existsByEmailAndDeleteFlagFalse(String email);
 
@@ -32,4 +25,11 @@ public interface AccountRepository extends JpaRepository<Account, String> {
             where a.email = :username
             """)
     void enableUser(String username);
+
+    @Query("""
+            select a 
+            from Account a 
+            where a.id = :accountId and a.deleteFlag = false
+            """)
+    Optional<Account> findAccountById(Integer accountId);
 }
