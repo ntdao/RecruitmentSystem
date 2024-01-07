@@ -23,6 +23,7 @@ public class AddressService {
 
     public Address updateAddress(Integer addressId, AddressDto request) {
         Address address = addressRequestModelToEntity(request);
+        System.out.println(address);
         address.setAddressId(addressId);
         return addressRepository.save(address);
     }

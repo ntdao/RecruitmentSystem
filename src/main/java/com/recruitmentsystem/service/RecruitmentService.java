@@ -1,6 +1,7 @@
 package com.recruitmentsystem.service;
 
 import com.recruitmentsystem.dto.InterviewDto;
+import com.recruitmentsystem.dto.RecruitmentDto;
 import com.recruitmentsystem.dto.UserResponseModel;
 import com.recruitmentsystem.entity.Interview;
 import com.recruitmentsystem.entity.Recruitment;
@@ -26,6 +27,7 @@ public class RecruitmentService {
     private final UserService userService;
 
     public void candidateApplyJob(Principal principal, Integer jobId) {
+        System.out.println(principal);
         User user = userService.getCurrentUser(principal);
         Job job = jobService.findById(jobId);
         Recruitment recruitment = Recruitment.builder()
@@ -76,5 +78,9 @@ public class RecruitmentService {
         Recruitment recruitment = findById(recruitmentId);
         recruitment.setInterviews((Set<Interview>) interviewService.addInterview(dto));
         recruitmentRepository.save(recruitment);
+    }
+
+    public List<RecruitmentDto> getAllByCandidateId(Integer candidateId) {
+        return null;
     }
 }

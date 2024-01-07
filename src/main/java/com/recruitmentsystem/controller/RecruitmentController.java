@@ -1,7 +1,9 @@
 package com.recruitmentsystem.controller;
 
 import com.recruitmentsystem.dto.InterviewDto;
+import com.recruitmentsystem.dto.RecruitmentDto;
 import com.recruitmentsystem.dto.UserResponseModel;
+import com.recruitmentsystem.security.config.ApplicationConfiguration;
 import com.recruitmentsystem.service.RecruitmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +23,11 @@ public class RecruitmentController {
     @PostMapping("/apply-job/{jobId}")
     public void candidateApplyJob(@PathVariable("jobId") Integer jobId, Principal principal) {
         recruitmentService.candidateApplyJob(principal, jobId);
+    }
+
+    @GetMapping("/{candidateId}/all")
+    public List<RecruitmentDto> getAllApplicationByCandidateid(@PathVariable("candidateId") Integer candidateId) {
+        return recruitmentService.getAllByCandidateId(candidateId);
     }
 
     @GetMapping("/job/{jobId}/all-candidate")

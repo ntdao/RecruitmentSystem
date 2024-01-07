@@ -1,7 +1,5 @@
 package com.recruitmentsystem.dto;
 
-import com.recruitmentsystem.enums.Gender;
-import jakarta.annotation.Nullable;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -13,7 +11,7 @@ public record UserRequestModel(
         String fullName,
         String phoneNumber,
         AddressDto address,
-        Gender gender,
+        String gender,
         LocalDate birthday,
         String imgUrl,
         String roleName,

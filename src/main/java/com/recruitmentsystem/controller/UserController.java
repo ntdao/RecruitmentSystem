@@ -80,9 +80,6 @@ public class UserController {
     public ResponseEntity<?> updateUser(@RequestBody UserRequestModel userRequestModel,
                                      Principal connectedUser) {
         AuthenticationResponseModel response = userService.updateUserByUser(userRequestModel, connectedUser);
-        if (response == null) {
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-        }
         return ResponseEntity.ok(response);
     }
 
@@ -106,9 +103,9 @@ public class UserController {
             value = "/user/profile-image",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public void uploadUserProfileImage(@RequestParam("file") MultipartFile file,
+    public String uploadUserProfileImage(@RequestParam("file") MultipartFile file,
                                            Principal connectedUser) {
-        userService.uploadUserProfileImage(connectedUser, file);
+        return userService.uploadUserProfileImage(connectedUser, file);
     }
 
     @PostMapping(

@@ -33,6 +33,11 @@ public class CompanyController {
         return companyService.findCompanyByCompanyName(name);
     }
 
+    @GetMapping("/company/{companyId}")
+    public CompanyResponseModel getCompanyByCompanyId(@PathVariable("companyId") Integer companyId) {
+        return companyService.findCompanyByCompanyId(companyId);
+    }
+
     @GetMapping("/admin/manage/companies/all")
     public List<CompanyResponseModel> getAllCompaniesAdmin() {
         return companyService.findAllCompanies();

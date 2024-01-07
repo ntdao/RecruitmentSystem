@@ -128,7 +128,6 @@ public class UserService {
     @Transactional
     public AuthenticationResponseModel updateUserByUser(UserRequestModel request, Principal connectedUser) {
         User updateUser = getCurrentUser(connectedUser);
-        System.out.println("Update user: " + updateUser);
         return updateUser(updateUser, request);
     }
 
@@ -140,15 +139,14 @@ public class UserService {
         boolean isEmailChange = !updateUser.getAccount().getEmail().equals(request.email());
         if (isEmailChange) {
             accountService.checkDuplicateEmail(request.email());
+            Account oldAccount = new Account(updateAccount, true);
+            System.out.println("Account - before update: " + oldAccount);
+            accountRepository.save(oldAccount);
+
+            updateAccount.setEmail(request.email());
+            System.out.println("Account - after update: " + updateAccount);
+            accountRepository.save(updateAccount);
         }
-
-        Account oldAccount = new Account(updateAccount, true);
-        System.out.println("Account - before update: " + oldAccount);
-        accountRepository.save(oldAccount);
-
-        updateAccount.setEmail(request.email());
-        System.out.println("Account - after update: " + updateAccount);
-        accountRepository.save(updateAccount);
 
         // tao ban ghi luu thong tin cu cua user
         User oldUser = new User(updateUser, true);
@@ -156,14 +154,17 @@ public class UserService {
         System.out.println("User - Old info: " + oldUser);
         userRepository.save(oldUser);
 
-        addressService.updateAddress(updateUser.getAddress().getAddressId(), request.address());
-
         // update user
         updateUser = userMapper.userRequestModelToUser(request);
         updateUser.setUserId(userId);
-        updateUser.setImgUrl(oldUser.getImgUrl());
         updateUser.setCvUrl(oldUser.getCvUrl());
         updateUser.setAccount(oldUser.getAccount());
+
+        if (request.address() == null) {
+            updateUser.setAddress(oldUser.getAddress());
+        } else {
+            addressService.updateAddress(oldUser.getAddress().getAddressId(), request.address());
+        }
 
         System.out.println("User - New info: " + updateUser);
         userRepository.save(updateUser);
@@ -223,24 +224,9 @@ public class UserService {
     }
 
     @Transactional
-    public void uploadUserProfileImage(Principal connectedUser, MultipartFile file) {
+    public String uploadUserProfileImage(Principal connectedUser, MultipartFile file) {
         User user = getCurrentUser(connectedUser);
-        String oldImgUrl = user.getImgUrl();
-        String imgUrl = prefix + s3Service.uploadFile("profile-images/%s/".formatted(user.getUserId()), file);
-
-        System.out.println("User before upload image: " + user);
-
-        User oldUser = new User(user, true);
-        userRepository.save(oldUser);
-
-        // update database with imgUrl
-        user.setImgUrl(imgUrl);
-        System.out.println("User after upload image: " + user);
-
-        // save user
-        userRepository.save(user);
-        // delete old image
-        s3Service.deleteFile(oldImgUrl);
+        return prefix + s3Service.uploadFile("profile-images/%s/".formatted(user.getUserId()), file);
     }
 
     public String uploadUserCV(Principal connectedUser, MultipartFile file) {

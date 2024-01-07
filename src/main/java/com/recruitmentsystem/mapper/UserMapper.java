@@ -3,6 +3,7 @@ package com.recruitmentsystem.mapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.dto.*;
 import com.recruitmentsystem.entity.User;
+import com.recruitmentsystem.enums.Gender;
 import com.recruitmentsystem.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class UserMapper {
     private final CategoryService categoryService;
 
     public UserResponseModel userToResponseModel(User user) {
-        AddressDto addresses = addressMapper.addressToResponseModel(user.getAddress());
+        AddressDto address = addressMapper.addressToResponseModel(user.getAddress());
         Set<UserEducationDto> educations = educationMapper.entitiesToDtos(user.getUserEducations());
         List<UserWorkingHistoryDto> histories = user.getWorkingHistories()
                         .stream()
@@ -43,7 +44,7 @@ public class UserMapper {
                 .createDate(user.getCreateDate())
                 .lastModified(user.getLastModified())
                 .roleName(user.getAccount().getAuthorities().toString())
-                .address(addresses)
+                .address(address)
                 .education(educations.stream().toList())
                 .workingHistory(histories)
                 .skill(skills)
@@ -55,15 +56,14 @@ public class UserMapper {
     }
 
     public User userRequestModelToUser(UserRequestModel request) {
-        if (request.address() == null
-                && request.password() == null
+        if (request.password() == null
                 && request.imgUrl() == null
                 && request.roleName() == null) {
             return User
                     .builder()
                     .fullName(request.fullName())
                     .phoneNumber(request.phoneNumber())
-                    .gender(request.gender())
+                    .gender(Gender.valueOf(request.gender()))
                     .birthday(request.birthday())
                     .desiredJob(request.desiredJob())
                     .educationLevel(request.educationLevel())
@@ -74,7 +74,7 @@ public class UserMapper {
                     .builder()
                     .fullName(request.fullName())
                     .phoneNumber(request.phoneNumber())
-                    .gender(request.gender())
+                    .gender(Gender.valueOf(request.gender()))
                     .birthday(request.birthday())
                     .imgUrl(request.imgUrl())
                     .desiredJob(request.desiredJob())

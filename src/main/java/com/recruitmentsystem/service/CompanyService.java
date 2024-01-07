@@ -105,6 +105,10 @@ public class CompanyService {
                 .orElseThrow(() -> new ResourceNotFoundException("Company with id " + id + " does not exist"));
     }
 
+    public CompanyResponseModel findCompanyByCompanyId(Integer id) {
+        return companyMapper.companyToResponseModel(findCompanyById(id));
+    }
+
     public Company findCompanyByEmail(String email) {
         return companyRepository.findCompanyByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Company with email " + email + " does not exist"));

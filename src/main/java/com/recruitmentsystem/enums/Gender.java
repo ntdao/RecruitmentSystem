@@ -22,6 +22,6 @@ public enum Gender {
 
     @Override
     public String toString() {
-        return this.label;
+        return this.name();
     }
 }

@@ -47,7 +47,7 @@ public class JobController {
         return jobService.findJobByJobName(name);
     }
 
-    @GetMapping("/jobs/{jobId}")
+    @GetMapping("/job/{jobId}")
     public JobResponseModel getJobById(@PathVariable("jobId") Integer jobId) {
         return jobService.findJobById(jobId);
     }
