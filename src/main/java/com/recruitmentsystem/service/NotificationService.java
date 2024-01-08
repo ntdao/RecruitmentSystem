@@ -13,23 +13,23 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
-    private final AccountService accountService;
     private final NotificationRepository notificationRepository;
     private final ObjectMapper objectMapper;
+
     public int countAllNotification(Integer id) {
         return notificationRepository.countByAccountId(id);
     }
+
     public int countNewNotification(Integer id) {
         return notificationRepository.countNewByAccountId(id);
     }
-    // làm phân trang?
+
     public List<NotificationDto> getAccountNotification(Integer id) {
         return notificationRepository.getAccountNotification(id)
                 .stream()

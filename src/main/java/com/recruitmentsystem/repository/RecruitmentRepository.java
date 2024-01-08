@@ -1,5 +1,6 @@
 package com.recruitmentsystem.repository;
 
+import com.recruitmentsystem.dto.RecruitmentDto;
 import com.recruitmentsystem.entity.Recruitment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -7,11 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RecruitmentRepository extends JpaRepository<Recruitment, Integer> {
     @Query("""
-            select distinct a.user.userId from candidate_apply_job a
+            select a.applicationId from candidate_apply_job a
             where a.job.jobId = :jobId
             and a.applicationStatus in :status
             """)
@@ -31,4 +33,36 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, Intege
             where j.company.companyId = :companyId
             """)
     List<Integer> findAllCandidatesByCompany(Integer companyId);
+
+    @Query("""
+            select caj from candidate_apply_job caj
+            join fetch caj.job
+            join fetch caj.user u
+            where caj.user.userId = :candidateId
+            """)
+    List<Recruitment> findAllByCandidateId(Integer candidateId);
+
+    @Query("""
+            select exists (select a.applicationId 
+            from candidate_apply_job a
+            where a.user.userId = :userId  
+            and a.job.jobId = :jobId)
+            """)
+    boolean isApplied(Integer userId, Integer jobId);
+
+    @Query("""
+            select caj from candidate_apply_job caj
+            join fetch caj.job
+            join fetch caj.user u
+            where caj.applicationId = :applicationId
+            """)
+    Optional<Recruitment> findByApplicationId(Integer applicationId);
+
+    @Query("""
+            select caj from candidate_apply_job caj
+            join fetch caj.job
+            join fetch caj.user u
+            where caj.applicationId in :ids
+            """)
+    List<Recruitment> findAllByIds(List<Integer> ids);
 }

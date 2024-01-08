@@ -1,5 +1,6 @@
 package com.recruitmentsystem.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.recruitmentsystem.security.token.Token;
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,6 +38,7 @@ public class Account implements UserDetails {
     @OneToMany(mappedBy = "account")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @JsonIgnore
     private List<Token> tokens;
 
     public Account(Account account, boolean deleteFlag) {

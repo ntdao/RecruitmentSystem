@@ -7,6 +7,7 @@ import com.recruitmentsystem.security.config.ApplicationConfiguration;
 import com.recruitmentsystem.service.RecruitmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -25,68 +26,68 @@ public class RecruitmentController {
         recruitmentService.candidateApplyJob(principal, jobId);
     }
 
-    @GetMapping("/{candidateId}/all")
-    public List<RecruitmentDto> getAllApplicationByCandidateid(@PathVariable("candidateId") Integer candidateId) {
-        return recruitmentService.getAllByCandidateId(candidateId);
+    @PostMapping("/check-apply/{jobId}")
+    public boolean checkApplyJob(@PathVariable("jobId") Integer jobId, Principal principal) {
+        return recruitmentService.checkApplyJob(principal, jobId);
+    }
+
+    @GetMapping("/candidate/all")
+    public List<RecruitmentDto> getAllApplicationByCandidateId(Principal principal) {
+        return recruitmentService.getAllByCandidateId(principal);
+    }
+
+    @GetMapping("/{applicationId}")
+    public RecruitmentDto getByApplicationId(@PathVariable("applicationId") Integer applicationId) {
+        return recruitmentService.getDtoByApplicationId(applicationId);
     }
 
     @GetMapping("/job/{jobId}/all-candidate")
-    @PreAuthorize("hasAuthority('COMPANY')")
-    public List<UserResponseModel> getAllByJob(@PathVariable("jobId") Integer jobId) {
+    public List<RecruitmentDto> getAllByJob(@PathVariable("jobId") Integer jobId) {
         return recruitmentService.getAllByJob(jobId, Arrays.asList(0, 1, 2));
     }
 
     @GetMapping("/job/{jobId}/all-consider-cv")
-    @PreAuthorize("hasAuthority('COMPANY')")
-    public List<UserResponseModel> getAllConsiderCVByJob(@PathVariable("jobId") Integer jobId) {
+    public List<RecruitmentDto> getAllConsiderCVByJob(@PathVariable("jobId") Integer jobId) {
         return recruitmentService.getAllByJob(jobId, Arrays.asList(0));
     }
 
     @GetMapping("/job/{jobId}/all-pass-cv")
-    @PreAuthorize("hasAuthority('COMPANY')")
-    public List<UserResponseModel> getAllPassCVByJob(@PathVariable("jobId") Integer jobId) {
+    public List<RecruitmentDto> getAllPassCVByJob(@PathVariable("jobId") Integer jobId) {
         return recruitmentService.getAllByJob(jobId, Arrays.asList(1));
     }
 
     @GetMapping("/job/{jobId}/all-fail-cv")
-    @PreAuthorize("hasAuthority('COMPANY')")
-    public List<UserResponseModel> getAllFailCVByJob(@PathVariable("jobId") Integer jobId) {
+    public List<RecruitmentDto> getAllFailCVByJob(@PathVariable("jobId") Integer jobId) {
         return recruitmentService.getAllByJob(jobId, Arrays.asList(2));
     }
 
     @GetMapping("/job/{jobId}/all-interview")
-    @PreAuthorize("hasAuthority('COMPANY')")
-    public List<UserResponseModel> getAllInterviewByJob(@PathVariable("jobId") Integer jobId) {
+    public List<RecruitmentDto> getAllInterviewByJob(@PathVariable("jobId") Integer jobId) {
         return recruitmentService.getAllByJob(jobId, Arrays.asList(3,4,5));
     }
 
     @GetMapping("/job/{jobId}/all-consider-interview")
-    @PreAuthorize("hasAuthority('COMPANY')")
-    public List<UserResponseModel> getAllConsiderInterviewByJob(@PathVariable("jobId") Integer jobId) {
+    public List<RecruitmentDto> getAllConsiderInterviewByJob(@PathVariable("jobId") Integer jobId) {
         return recruitmentService.getAllByJob(jobId, Arrays.asList(3));
     }
 
     @GetMapping("/job/{jobId}/all-pass-interview")
-    @PreAuthorize("hasAuthority('COMPANY')")
-    public List<UserResponseModel> getAllPassInterviewByJob(@PathVariable("jobId") Integer jobId) {
+    public List<RecruitmentDto> getAllPassInterviewByJob(@PathVariable("jobId") Integer jobId) {
         return recruitmentService.getAllByJob(jobId, Arrays.asList(4));
     }
 
     @GetMapping("/job/{jobId}/all-fail-interview")
-    @PreAuthorize("hasAuthority('COMPANY')")
-    public List<UserResponseModel> getAllFailInterviewByJob(@PathVariable("jobId") Integer jobId) {
+    public List<RecruitmentDto> getAllFailInterviewByJob(@PathVariable("jobId") Integer jobId) {
         return recruitmentService.getAllByJob(jobId, Arrays.asList(5));
     }
 
     @PostMapping("/change-status/{applicationId}")
-    @PreAuthorize("hasAuthority('COMPANY')")
     public void changeStatus(@PathVariable("applicationId") Integer applicationId,
                              @RequestBody Map<String, Integer> request) {
         recruitmentService.changeStatus(applicationId, request.get("status"));
     }
 
     @PostMapping("/add-interview")
-    @PreAuthorize("hasAuthority('COMPANY')")
     public void addInterview(@PathVariable("applicationId") Integer applicationId,
                              @RequestBody InterviewDto dto) {
        recruitmentService.addInterview(applicationId, dto);
