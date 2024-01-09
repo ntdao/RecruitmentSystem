@@ -33,8 +33,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CompanyService {
-    @Value("${aws.s3.prefix}")
-    private String prefix;
     private final AccountRepository accountRepository;
     private final AccountService accountService;
     private final AddressService addressService;
@@ -44,6 +42,8 @@ public class CompanyService {
     private final RoleService roleService;
     private final S3Service s3Service;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Value("${aws.s3.prefix}")
+    private String prefix;
 
     public Company getCurrentCompany(Principal connectedAccount) {
         return findCompanyByEmail(accountService.getCurrentAccount(connectedAccount).getEmail());
@@ -70,7 +70,7 @@ public class CompanyService {
                 .enabled(true)
                 .build();
 
-        Company company = companyMapper.companyRequestModelToCompany(request);
+        Company company = companyMapper.dtoToEntity(request);
         Address address = addressService.saveAddress(request.companyAddress());
         accountRepository.save(account);
 
@@ -79,7 +79,7 @@ public class CompanyService {
         companyRepository.save(company);
 
         // bị lỗi trường lastModified và lastModifiedBy
-        return companyMapper.companyToResponseModel(company);
+        return companyMapper.entityToDto(company);
     }
 
     public void existsById(Integer id) {
@@ -92,7 +92,7 @@ public class CompanyService {
         List<Company> companies = companyRepository.findAllCompany();
         System.out.println(companies);
         return companies.stream()
-                .map(companyMapper::companyToResponseModel)
+                .map(companyMapper::entityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -106,7 +106,7 @@ public class CompanyService {
     }
 
     public CompanyResponseModel findCompanyByCompanyId(Integer id) {
-        return companyMapper.companyToResponseModel(findCompanyById(id));
+        return companyMapper.entityToDto(findCompanyById(id));
     }
 
     public Company findCompanyByEmail(String email) {
@@ -115,14 +115,14 @@ public class CompanyService {
     }
 
     public CompanyResponseModel findCompanyResponseModelById(Integer id) {
-        return companyMapper.companyToResponseModel(findCompanyById(id));
+        return companyMapper.entityToDto(findCompanyById(id));
     }
 
     public List<CompanyResponseModel> findCompanyByCompanyName(String name) {
         System.out.println(name);
         return companyRepository.findByName(name)
                 .stream()
-                .map(companyMapper::companyToResponseModel)
+                .map(companyMapper::entityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -175,7 +175,7 @@ public class CompanyService {
         if (request.companyAddress() != null) {
             address = addressService.updateAddress(addressId, request.companyAddress());
         } else {
-            updateCompany = companyMapper.companyRequestModelToCompany(request);
+            updateCompany = companyMapper.dtoToEntity(request);
         }
         updateCompany.setCompanyId(id);
         updateCompany.setAccount(updateAccount);
@@ -287,7 +287,7 @@ public class CompanyService {
 
         if (pagedResult.hasContent()) {
             return pagedResult.getContent().stream()
-                    .map(companyMapper::companyToResponseModel)
+                    .map(companyMapper::entityToDto)
                     .toList();
         } else {
             return new ArrayList<>();
@@ -308,7 +308,7 @@ public class CompanyService {
 
     public CompanyResponseModel findCompanyDisplayModel(Principal connectedAccount) {
         Account account = accountService.getCurrentAccount(connectedAccount);
-        return companyMapper.companyToResponseModel(findCompanyByEmail(account.getEmail()));
+        return companyMapper.entityToDto(findCompanyByEmail(account.getEmail()));
     }
 
     public String uploadCompanyImage(Principal connectedUser, MultipartFile file, String field) {

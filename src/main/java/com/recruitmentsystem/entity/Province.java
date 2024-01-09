@@ -1,7 +1,5 @@
 package com.recruitmentsystem.entity;
 
-import com.recruitmentsystem.entity.AdministrativeUnit;
-import com.recruitmentsystem.entity.District;
 import jakarta.persistence.*;
 import lombok.*;
 

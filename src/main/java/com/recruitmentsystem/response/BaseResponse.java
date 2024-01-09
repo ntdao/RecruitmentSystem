@@ -14,6 +14,8 @@ public class BaseResponse {
 
     @JsonProperty("message")
     private String message;
+    @JsonIgnore
+    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     public BaseResponse() {
         this.err_code = "0";
@@ -34,10 +36,6 @@ public class BaseResponse {
         this.err_code = err_code;
     }
 
-    public void setAdditionalProperties(Map<String, Object> additionalProperties) {
-        this.additionalProperties = additionalProperties;
-    }
-
     @JsonProperty("message")
     public String getMessage() {
         return message;
@@ -48,12 +46,13 @@ public class BaseResponse {
         this.message = message;
     }
 
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
+    }
+
+    public void setAdditionalProperties(Map<String, Object> additionalProperties) {
+        this.additionalProperties = additionalProperties;
     }
 
     @JsonAnySetter

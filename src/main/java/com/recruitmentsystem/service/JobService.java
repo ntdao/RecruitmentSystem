@@ -1,15 +1,14 @@
 package com.recruitmentsystem.service;
 
-import com.recruitmentsystem.entity.Job;
-import com.recruitmentsystem.exception.ResourceNotFoundException;
-import com.recruitmentsystem.entity.Company;
 import com.recruitmentsystem.dto.JobRequestModel;
 import com.recruitmentsystem.dto.JobResponseModel;
 import com.recruitmentsystem.dto.JobTopModel;
+import com.recruitmentsystem.entity.Company;
+import com.recruitmentsystem.entity.Job;
+import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.mapper.JobMapper;
-import com.recruitmentsystem.repository.CompanyRepository;
-import com.recruitmentsystem.repository.JobRepository;
 import com.recruitmentsystem.pagination.PageDto;
+import com.recruitmentsystem.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,7 +32,7 @@ public class JobService {
     @Transactional
     public void addJob(JobRequestModel request, Principal principal) {
         Company company = companyService.getCurrentCompany(principal);
-        Job job = jobMapper.jobRequestModelToJob(request);
+        Job job = jobMapper.dtoToEntity(request);
         job.setCompany(company);
         jobRepository.save(job);
     }
@@ -42,14 +41,14 @@ public class JobService {
         return jobRepository.findAllJob()
                 .stream()
                 .filter(j -> j.getJobStatus() == 0)
-                .map(jobMapper::jobToResponseModel)
+                .map(jobMapper::entityToDto)
                 .collect(Collectors.toList());
     }
 
     public List<JobResponseModel> findAllJobsByAdmin() {
         return jobRepository.findAllJob()
                 .stream()
-                .map(jobMapper::jobToResponseModel)
+                .map(jobMapper::entityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -62,7 +61,7 @@ public class JobService {
         Company company = companyService.getCurrentCompany(connectedAccount);
         return findByCompanyId(company.getCompanyId())
                 .stream()
-                .map(jobMapper::jobToResponseModel)
+                .map(jobMapper::entityToDto)
                 .toList();
     }
 
@@ -70,7 +69,7 @@ public class JobService {
         return findByCompanyId(companyId)
                 .stream()
                 .filter(j -> j.getJobStatus() == 0)
-                .map(jobMapper::jobToResponseModel)
+                .map(jobMapper::entityToDto)
                 .toList();
     }
 
@@ -80,13 +79,13 @@ public class JobService {
     }
 
     public JobResponseModel findJobById(Integer id) {
-        return jobMapper.jobToResponseModel(findById(id));
+        return jobMapper.entityToDto(findById(id));
     }
 
     public List<JobResponseModel> findJobByJobName(String name) {
         return jobRepository.findByName(name)
                 .stream()
-                .map(jobMapper::jobToResponseModel)
+                .map(jobMapper::entityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -96,7 +95,7 @@ public class JobService {
         Job oldJob = new Job(id, updateJob, true);
         jobRepository.save(oldJob);
 
-        updateJob = jobMapper.jobRequestModelToJob(requestModel);
+        updateJob = jobMapper.dtoToEntity(requestModel);
         updateJob.setJobId(id);
         jobRepository.save(updateJob);
     }
@@ -135,7 +134,7 @@ public class JobService {
         if (pagedResult.hasContent()) {
             return pagedResult.getContent()
                     .stream()
-                    .map(jobMapper::jobToResponseModel)
+                    .map(jobMapper::entityToDto)
                     .toList();
         } else {
             return new ArrayList<>();

@@ -28,10 +28,10 @@ public class JobMapper {
     private final JobTypeService jobTypeService;
     private final SkillService skillService;
 
-    public JobResponseModel jobToResponseModel(Job job) {
+    public JobResponseModel entityToDto(Job job) {
         List<AddressDto> addressList = job.getJobAddresses()
                 .stream()
-                .map(addressMapper::addressToResponseModel)
+                .map(addressMapper::entityToDto)
                 .toList();
 
         List<SkillDto> skillList = job.getJobSkills()
@@ -63,7 +63,7 @@ public class JobMapper {
                 .build();
     }
 
-    public Job jobRequestModelToJob(JobRequestModel request) {
+    public Job dtoToEntity(JobRequestModel request) {
 
         Set<Address> address = new HashSet<>();
         for (AddressDto a : request.jobAddresses()) {

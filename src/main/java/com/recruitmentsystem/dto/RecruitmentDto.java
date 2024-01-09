@@ -3,7 +3,6 @@ package com.recruitmentsystem.dto;
 import lombok.Builder;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Builder
 public record RecruitmentDto(
@@ -17,8 +16,7 @@ public record RecruitmentDto(
         String companyLogo,
         String jobQuantity,
         String jobCandidate,
-        String jobInterviewee,
-        LocalDateTime applicationTime,
+        String applicationTimeAgo,
         Integer applicationStatus
 ) {
 }

@@ -10,28 +10,28 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AddressRepository extends JpaRepository<Address, Integer> {
     @Query("""
-            select a from address a
+            select a from Address a
             right join Company c 
             on c.companyAddress.addressId = a.addressId
             where c.companyId = :id
             """)
     Address findByCompanyId(Integer id);
 
-    @Modifying
-    @Query("""
-            update address set address = :address,
-            fullAddress = :fullAddress,
-            ward.wardCode = :wardCode
-            where addressId = :addressId
-            """)
-    void updateAddress(Integer addressId, String address, String fullAddress, String wardCode);
+//    @Modifying
+//    @Query("""
+//            update Address set Address = :address,
+//            fullAddress = :fullAddress,
+//            ward.wardCode = :wardCode
+//            where addressId = :addressId
+//            """)
+//    void updateAddress(Integer addressId, String address, String fullAddress, String wardCode);
 
     @Query("""
-            select a from address a
-            right join User u
-            on u.address.addressId = a.addressId
+            select a from Address a
+            right join Candidate c
+            on c.address.addressId = a.addressId
             """)
-    Address findByUserId(Integer id);
+    Address findByCandidateId(Integer id);
 
     @Query("""
             select p.fullName as provinceName, p.provinceCode as provinceCode, d.districtCode as districtCode from provinces p

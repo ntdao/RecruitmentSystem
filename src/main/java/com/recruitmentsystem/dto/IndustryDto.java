@@ -7,5 +7,5 @@ public record IndustryDto(
         Integer industryId,
         String industryName,
         String industryNameVI
-){
+) {
 }

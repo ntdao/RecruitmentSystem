@@ -3,8 +3,8 @@ package com.recruitmentsystem.mapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.dto.CompanyRequestModel;
 import com.recruitmentsystem.dto.CompanyResponseModel;
-import com.recruitmentsystem.entity.Company;
 import com.recruitmentsystem.dto.IndustryDto;
+import com.recruitmentsystem.entity.Company;
 import com.recruitmentsystem.service.IndustryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ public class CompanyMapper {
     private final ObjectMapper objectMapper;
     private final IndustryService industryService;
 
-    public CompanyResponseModel companyToResponseModel(Company company) {
+    public CompanyResponseModel entityToDto(Company company) {
         return CompanyResponseModel
                 .builder()
                 .companyId(company.getCompanyId())
@@ -26,7 +26,7 @@ public class CompanyMapper {
                 .companyImage(company.getCompanyImage())
                 .companyIntroduction(company.getCompanyIntroduction())
                 .companyIndustry(objectMapper.convertValue(company.getIndustry(), IndustryDto.class))
-                .companyAddress(addressMapper.addressToResponseModel(company.getCompanyAddress()))
+                .companyAddress(addressMapper.entityToDto(company.getCompanyAddress()))
                 .companyMST(company.getCompanyMst())
                 .companyLicense(company.getCompanyLicense())
                 .companySize(company.getCompanySize())
@@ -43,7 +43,7 @@ public class CompanyMapper {
                 .build();
     }
 
-    public Company companyRequestModelToCompany(CompanyRequestModel request) {
+    public Company dtoToEntity(CompanyRequestModel request) {
         return Company
                 .builder()
                 .companyShortName(request.companyShortName())

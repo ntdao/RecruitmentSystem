@@ -27,9 +27,9 @@ public class Recruitment {
     // 0 - đang xem xét, 1 - đậu hồ sơ, 2 - rớt hồ sơ, 3 - đang phỏng vấn, 4 - đậu pv, 5 - rớt pv
     private Integer applicationStatus;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "candidate_id")
     @ToString.Exclude
-    private User user;
+    private Candidate candidate;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_id")
     @ToString.Exclude

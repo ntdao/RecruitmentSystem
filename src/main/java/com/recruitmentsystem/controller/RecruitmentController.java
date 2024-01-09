@@ -2,12 +2,8 @@ package com.recruitmentsystem.controller;
 
 import com.recruitmentsystem.dto.InterviewDto;
 import com.recruitmentsystem.dto.RecruitmentDto;
-import com.recruitmentsystem.dto.UserResponseModel;
-import com.recruitmentsystem.security.config.ApplicationConfiguration;
 import com.recruitmentsystem.service.RecruitmentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -41,55 +37,60 @@ public class RecruitmentController {
         return recruitmentService.getDtoByApplicationId(applicationId);
     }
 
-    @GetMapping("/job/{jobId}/all-candidate")
+    @GetMapping("/manage/job/{jobId}/all-candidate")
     public List<RecruitmentDto> getAllByJob(@PathVariable("jobId") Integer jobId) {
         return recruitmentService.getAllByJob(jobId, Arrays.asList(0, 1, 2));
     }
 
-    @GetMapping("/job/{jobId}/all-consider-cv")
+    @GetMapping("/manage/job/{jobId}/candidate-quantity")
+    public Integer getCandidateQuantityByJob(@PathVariable("jobId") Integer jobId) {
+        return recruitmentService.getCandidateQuantityByJob(jobId);
+    }
+
+    @GetMapping("/manage/job/{jobId}/all-consider-cv")
     public List<RecruitmentDto> getAllConsiderCVByJob(@PathVariable("jobId") Integer jobId) {
-        return recruitmentService.getAllByJob(jobId, Arrays.asList(0));
+        return recruitmentService.getAllByJob(jobId, List.of(0));
     }
 
-    @GetMapping("/job/{jobId}/all-pass-cv")
+    @GetMapping("/manage/job/{jobId}/all-pass-cv")
     public List<RecruitmentDto> getAllPassCVByJob(@PathVariable("jobId") Integer jobId) {
-        return recruitmentService.getAllByJob(jobId, Arrays.asList(1));
+        return recruitmentService.getAllByJob(jobId, List.of(1));
     }
 
-    @GetMapping("/job/{jobId}/all-fail-cv")
+    @GetMapping("/manage/job/{jobId}/all-fail-cv")
     public List<RecruitmentDto> getAllFailCVByJob(@PathVariable("jobId") Integer jobId) {
-        return recruitmentService.getAllByJob(jobId, Arrays.asList(2));
+        return recruitmentService.getAllByJob(jobId, List.of(2));
     }
 
-    @GetMapping("/job/{jobId}/all-interview")
+    @GetMapping("/manage/job/{jobId}/all-interview")
     public List<RecruitmentDto> getAllInterviewByJob(@PathVariable("jobId") Integer jobId) {
-        return recruitmentService.getAllByJob(jobId, Arrays.asList(3,4,5));
+        return recruitmentService.getAllByJob(jobId, Arrays.asList(3, 4, 5));
     }
 
-    @GetMapping("/job/{jobId}/all-consider-interview")
+    @GetMapping("/manage/job/{jobId}/all-consider-interview")
     public List<RecruitmentDto> getAllConsiderInterviewByJob(@PathVariable("jobId") Integer jobId) {
-        return recruitmentService.getAllByJob(jobId, Arrays.asList(3));
+        return recruitmentService.getAllByJob(jobId, List.of(3));
     }
 
-    @GetMapping("/job/{jobId}/all-pass-interview")
+    @GetMapping("/manage/job/{jobId}/all-pass-interview")
     public List<RecruitmentDto> getAllPassInterviewByJob(@PathVariable("jobId") Integer jobId) {
-        return recruitmentService.getAllByJob(jobId, Arrays.asList(4));
+        return recruitmentService.getAllByJob(jobId, List.of(4));
     }
 
-    @GetMapping("/job/{jobId}/all-fail-interview")
+    @GetMapping("/manage/job/{jobId}/all-fail-interview")
     public List<RecruitmentDto> getAllFailInterviewByJob(@PathVariable("jobId") Integer jobId) {
-        return recruitmentService.getAllByJob(jobId, Arrays.asList(5));
+        return recruitmentService.getAllByJob(jobId, List.of(5));
     }
 
-    @PostMapping("/change-status/{applicationId}")
+    @PostMapping("/manage/change-status/{applicationId}")
     public void changeStatus(@PathVariable("applicationId") Integer applicationId,
                              @RequestBody Map<String, Integer> request) {
         recruitmentService.changeStatus(applicationId, request.get("status"));
     }
 
-    @PostMapping("/add-interview")
+    @PostMapping("/manage/add-interview/{applicationId}")
     public void addInterview(@PathVariable("applicationId") Integer applicationId,
                              @RequestBody InterviewDto dto) {
-       recruitmentService.addInterview(applicationId, dto);
+        recruitmentService.addInterview(applicationId, dto);
     }
 }

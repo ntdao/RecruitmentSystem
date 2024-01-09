@@ -1,11 +1,16 @@
 package com.recruitmentsystem.controller;
 
-import com.recruitmentsystem.dto.*;
+import com.recruitmentsystem.dto.DistrictDto;
+import com.recruitmentsystem.dto.ProvinceDto;
+import com.recruitmentsystem.dto.WardDto;
 import com.recruitmentsystem.service.DistrictService;
 import com.recruitmentsystem.service.ProvinceService;
 import com.recruitmentsystem.service.WardService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 

@@ -1,6 +1,5 @@
 package com.recruitmentsystem.repository;
 
-import com.recruitmentsystem.dto.ProvinceDto;
 import com.recruitmentsystem.dto.WardDto;
 import com.recruitmentsystem.entity.Ward;
 import org.springframework.data.jpa.repository.JpaRepository;

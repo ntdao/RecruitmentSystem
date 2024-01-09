@@ -17,7 +17,7 @@ import java.util.UUID;
 public class FileService {
     // tạo thư mục nếu không tồn tại
     // lưu tệp đã tải lên từ đối tượng MultipartFile vào một tệp trong hệ thống tệp.
-    public String uploadImage(MultipartFile file, String fileDir, String root){
+    public String uploadImage(MultipartFile file, String fileDir, String root) {
         // 1. Check if image is not empty
         if (file.isEmpty()) {
             throw new IllegalStateException("Cannot upload empty file [" + file.getSize() + "]");
@@ -44,8 +44,9 @@ public class FileService {
 
         return fileDir + fileName;
     }
+
     private String saveFile(String uploadDir, String fileName,
-                                  MultipartFile multipartFile) throws IOException {
+                            MultipartFile multipartFile) throws IOException {
         Path uploadPath = Paths.get(uploadDir);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);

@@ -1,8 +1,8 @@
 package com.recruitmentsystem.security.config;
 
 import com.recruitmentsystem.entity.Account;
-import com.recruitmentsystem.service.AccountService;
 import com.recruitmentsystem.security.jwt.JwtService;
+import com.recruitmentsystem.service.AccountService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class LogoutService implements LogoutHandler {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String email;
-        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return;
         }
         jwt = authHeader.substring(7);

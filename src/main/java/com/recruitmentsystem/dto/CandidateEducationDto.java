@@ -3,7 +3,7 @@ package com.recruitmentsystem.dto;
 import lombok.Builder;
 
 @Builder
-public record UserEducationDto(
+public record CandidateEducationDto(
         String schoolName,
         String major,
         String description,

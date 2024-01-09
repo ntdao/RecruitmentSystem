@@ -16,6 +16,7 @@ public interface ProvinceRepository extends JpaRepository<Province, String> {
             from provinces p
             """)
     List<ProvinceDto> findAllProvince();
+
     @Query("""
             select p from provinces p
             right join districts d on d.province.provinceCode = p.provinceCode

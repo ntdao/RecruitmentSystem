@@ -3,7 +3,7 @@ package com.recruitmentsystem.dto;
 import lombok.Builder;
 
 @Builder
-public record UserWorkingHistoryDto(
+public record CandidateWorkingHistoryDto(
         String id,
         String companyName,
         String jobName,

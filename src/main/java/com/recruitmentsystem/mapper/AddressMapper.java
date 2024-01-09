@@ -1,12 +1,12 @@
 package com.recruitmentsystem.mapper;
 
-import com.recruitmentsystem.service.DistrictService;
-import com.recruitmentsystem.service.ProvinceService;
 import com.recruitmentsystem.dto.AddressDto;
 import com.recruitmentsystem.entity.Address;
 import com.recruitmentsystem.entity.Ward;
-import com.recruitmentsystem.service.WardService;
 import com.recruitmentsystem.repository.AddressRepository;
+import com.recruitmentsystem.service.DistrictService;
+import com.recruitmentsystem.service.ProvinceService;
+import com.recruitmentsystem.service.WardService;
 import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class AddressMapper {
     private final ProvinceService provinceService;
     private final WardService wardService;
 
-    public AddressDto addressToResponseModel(Address address) {
+    public AddressDto entityToDto(Address address) {
         if (address == null) {
             return null;
         }
@@ -37,7 +37,7 @@ public class AddressMapper {
                 .build();
     }
 
-    public Address addressRequestModelToAddress(AddressDto request) {
+    public Address dtoToEntity(AddressDto request) {
         Ward ward = wardService.findWardByWardCode(request.wardCode());
         String fullAddress = request.address() + ", "
                 + ward.getFullName() + ", "

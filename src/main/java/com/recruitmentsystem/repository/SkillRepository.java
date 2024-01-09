@@ -19,6 +19,7 @@ public interface SkillRepository extends JpaRepository<Skill, Integer> {
     Optional<Skill> findBySkillNameVI(String name);
 
     Optional<Skill> findBySkillName(String name);
+
     @Query(value = """
             select * from skill s 
             right join  job_skill js on js.skill_id = s.skill_id 

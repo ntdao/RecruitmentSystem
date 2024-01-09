@@ -1,6 +1,5 @@
 package com.recruitmentsystem.repository;
 
-import com.recruitmentsystem.dto.RecruitmentDto;
 import com.recruitmentsystem.entity.Recruitment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -28,7 +27,7 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, Intege
     void changeStatus(Integer applicationId, Integer status);
 
     @Query("""
-            select distinct a.user.userId from candidate_apply_job a
+            select distinct a.candidate.candidateId from candidate_apply_job a
             join a.job j
             where j.company.companyId = :companyId
             """)
@@ -37,15 +36,15 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, Intege
     @Query("""
             select caj from candidate_apply_job caj
             join fetch caj.job
-            join fetch caj.user u
-            where caj.user.userId = :candidateId
+            join fetch caj.candidate u
+            where caj.candidate.candidateId = :candidateId
             """)
     List<Recruitment> findAllByCandidateId(Integer candidateId);
 
     @Query("""
             select exists (select a.applicationId 
             from candidate_apply_job a
-            where a.user.userId = :userId  
+            where a.candidate.candidateId = :userId  
             and a.job.jobId = :jobId)
             """)
     boolean isApplied(Integer userId, Integer jobId);
@@ -53,7 +52,7 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, Intege
     @Query("""
             select caj from candidate_apply_job caj
             join fetch caj.job
-            join fetch caj.user u
+            join fetch caj.candidate u
             where caj.applicationId = :applicationId
             """)
     Optional<Recruitment> findByApplicationId(Integer applicationId);
@@ -61,7 +60,7 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, Intege
     @Query("""
             select caj from candidate_apply_job caj
             join fetch caj.job
-            join fetch caj.user u
+            join fetch caj.candidate u
             where caj.applicationId in :ids
             """)
     List<Recruitment> findAllByIds(List<Integer> ids);

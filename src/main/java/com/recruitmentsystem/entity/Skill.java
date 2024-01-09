@@ -3,8 +3,6 @@ package com.recruitmentsystem.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Collection;
-
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

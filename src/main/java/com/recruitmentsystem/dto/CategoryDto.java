@@ -8,5 +8,5 @@ public record CategoryDto(
         String categoryName,
         String categoryIcon,
         Integer categoryTotal
-){
+) {
 }

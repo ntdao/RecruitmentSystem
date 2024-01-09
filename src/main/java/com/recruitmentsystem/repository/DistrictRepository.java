@@ -1,7 +1,6 @@
 package com.recruitmentsystem.repository;
 
 import com.recruitmentsystem.dto.DistrictDto;
-import com.recruitmentsystem.dto.ProvinceDto;
 import com.recruitmentsystem.entity.District;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

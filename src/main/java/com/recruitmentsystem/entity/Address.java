@@ -3,7 +3,7 @@ package com.recruitmentsystem.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity(name = "address")
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

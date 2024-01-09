@@ -1,7 +1,7 @@
 package com.recruitmentsystem.security.config;
 
-import com.recruitmentsystem.repository.AccountRepository;
 import com.recruitmentsystem.config.AuditAwareImpl;
+import com.recruitmentsystem.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,6 +40,7 @@ public class ApplicationConfiguration {
         // khong ma hoa mat khau
 //        return NoOpPasswordEncoder.getInstance();
     }
+
     @Bean
     public AuditorAware<Integer> auditorAware() {
         return new AuditAwareImpl();

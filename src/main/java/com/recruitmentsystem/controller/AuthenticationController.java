@@ -2,7 +2,7 @@ package com.recruitmentsystem.controller;
 
 import com.recruitmentsystem.dto.AuthenticationRequestModel;
 import com.recruitmentsystem.dto.AuthenticationResponseModel;
-import com.recruitmentsystem.dto.UserRequestModel;
+import com.recruitmentsystem.dto.CandidateRequestModel;
 import com.recruitmentsystem.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +20,7 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void register(@RequestBody UserRequestModel request) {
+    public void register(@RequestBody CandidateRequestModel request) {
         authenticationService.register(request);
     }
 

@@ -1,6 +1,5 @@
 package com.recruitmentsystem.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,33 +16,27 @@ import java.time.LocalDateTime;
 @ToString
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class UserEducation {
+public class CandidateWorkingHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(updatable = false)
-    private Integer userEducationId;
+    @Column(name = "candidate_working_history_id")
+    private Integer candidateWorkingHistoryId;
     @Column(nullable = false)
-    private String schoolName;
+    private String companyName;
     @Column(nullable = false)
-    private String major;
+    private String jobName;
     @Column(nullable = false)
     private String startDate;
     @Column(nullable = false)
     private String endDate;
     @Column(columnDefinition = "text")
     private String description;
-    @ManyToOne
-    @JoinColumn(name = "degree_id")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Degree degree;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "candidate_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @JsonIgnore
-    private User user;
+    private Candidate candidate;
     @LastModifiedDate
     private LocalDateTime lastModified;
 }

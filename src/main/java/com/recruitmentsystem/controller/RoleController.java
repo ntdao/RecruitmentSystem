@@ -4,7 +4,6 @@ import com.recruitmentsystem.dto.RoleDto;
 import com.recruitmentsystem.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,7 +33,7 @@ public class RoleController {
     @PostMapping("/update/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateRole(@PathVariable("id") Integer id,
-                                        @RequestBody RoleDto request) {
+                           @RequestBody RoleDto request) {
         roleService.updateRole(id, request);
     }
 

@@ -1,7 +1,6 @@
 package com.recruitmentsystem.entity;
 
 import com.recruitmentsystem.enums.Gender;
-//import com.recruitmentsystem.jobposition.JobPosition;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
@@ -85,6 +84,7 @@ public class Job {
     private Integer lastModifiedBy;
     private boolean deleteFlag = false;
     private Integer oldId;
+
     public Job(Integer id, Job job, boolean deleteFlag) {
         this.jobName = job.getJobName();
         this.jobDescription = job.getJobDescription();

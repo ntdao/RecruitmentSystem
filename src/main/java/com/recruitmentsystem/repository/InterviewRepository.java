@@ -10,10 +10,10 @@ import org.springframework.stereotype.Repository;
 public interface InterviewRepository extends JpaRepository<Interview, Integer> {
     @Modifying
     @Query("""
-                update Interview i 
-                set i.interviewStatus = :status
-                where i.interviewId = :interviewId
-           """
+                 update Interview i 
+                 set i.interviewStatus = :status
+                 where i.interviewId = :interviewId
+            """
     )
     void changeStatus(Integer interviewId, Integer status);
 }

@@ -1,9 +1,9 @@
 package com.recruitmentsystem.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.dto.NotificationDto;
 import com.recruitmentsystem.entity.Account;
 import com.recruitmentsystem.entity.Notifications;
+import com.recruitmentsystem.mapper.NotificationMapper;
 import com.recruitmentsystem.pagination.PageDto;
 import com.recruitmentsystem.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +19,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
+    private final NotificationMapper notificationMapper;
     private final NotificationRepository notificationRepository;
-    private final ObjectMapper objectMapper;
 
     public int countAllNotification(Integer id) {
         return notificationRepository.countByAccountId(id);
@@ -33,7 +33,7 @@ public class NotificationService {
     public List<NotificationDto> getAccountNotification(Integer id) {
         return notificationRepository.getAccountNotification(id)
                 .stream()
-                .map(n -> objectMapper.convertValue(n, NotificationDto.class))
+                .map(notificationMapper::entityToDto)
                 .toList();
     }
 
@@ -48,7 +48,7 @@ public class NotificationService {
         if (pagedResult.hasContent()) {
             return pagedResult.getContent()
                     .stream()
-                    .map(n -> objectMapper.convertValue(n, NotificationDto.class))
+                    .map(notificationMapper::entityToDto)
                     .toList();
         } else {
             return new ArrayList<>();

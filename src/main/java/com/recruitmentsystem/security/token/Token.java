@@ -1,7 +1,7 @@
 package com.recruitmentsystem.security.token;
 
-import com.recruitmentsystem.enums.TokenType;
 import com.recruitmentsystem.entity.Account;
+import com.recruitmentsystem.enums.TokenType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,7 +28,7 @@ public class Token {
 //    private Instant expiresAt = Instant.now().plus(15, ChronoUnit.MINUTES);
     private Instant confirmedAt;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable=false, name="account_id")
+    @JoinColumn(nullable = false, name = "account_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Account account;

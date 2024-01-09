@@ -18,26 +18,25 @@ public class AddressService {
     }
 
     public AddressDto getCompanyAddressResponseModel(Integer id) {
-        return addressMapper.addressToResponseModel(getCompanyAddress(id));
+        return addressMapper.entityToDto(getCompanyAddress(id));
     }
 
     public Address updateAddress(Integer addressId, AddressDto request) {
         Address address = addressRequestModelToEntity(request);
-        System.out.println(address);
         address.setAddressId(addressId);
         return addressRepository.save(address);
     }
 
-    private Address getUserAddress(Integer id) {
-        return addressRepository.findByUserId(id);
+    private Address getCandidateAddress(Integer id) {
+        return addressRepository.findByCandidateId(id);
     }
 
-    public AddressDto getUserAddressResponseModel(Integer id) {
-        return addressMapper.addressToResponseModel(getCompanyAddress(id));
+    public AddressDto getCandidateAddressResponseModel(Integer id) {
+        return addressMapper.entityToDto(getCompanyAddress(id));
     }
 
     public Address addressRequestModelToEntity(AddressDto request) {
-        return request == null ? null : addressMapper.addressRequestModelToAddress(request);
+        return request == null ? null : addressMapper.dtoToEntity(request);
     }
 
     public Address saveAddress(AddressDto request) {

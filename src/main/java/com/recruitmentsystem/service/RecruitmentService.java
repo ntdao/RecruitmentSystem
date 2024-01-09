@@ -1,13 +1,11 @@
 package com.recruitmentsystem.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.dto.InterviewDto;
 import com.recruitmentsystem.dto.RecruitmentDto;
-import com.recruitmentsystem.dto.UserResponseModel;
+import com.recruitmentsystem.entity.Candidate;
 import com.recruitmentsystem.entity.Interview;
 import com.recruitmentsystem.entity.Job;
 import com.recruitmentsystem.entity.Recruitment;
-import com.recruitmentsystem.entity.User;
 import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.mapper.RecruitmentMapper;
 import com.recruitmentsystem.repository.RecruitmentRepository;
@@ -16,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -28,19 +26,19 @@ public class RecruitmentService {
     private final NotificationService notificationService;
     private final RecruitmentMapper recruitmentMapper;
     private final RecruitmentRepository recruitmentRepository;
-    private final UserService userService;
+    private final CandidateService userService;
 
     public void candidateApplyJob(Principal principal, Integer jobId) {
-        User user = userService.getCurrentUser(principal);
+        Candidate candidate = userService.getCurrentCandidate(principal);
         Job job = jobService.findById(jobId);
         Recruitment recruitment = Recruitment.builder()
-                .user(user)
+                .candidate(candidate)
                 .job(job)
                 .applicationStatus(0)
                 .createDate(LocalDateTime.now())
                 .build();
         recruitmentRepository.save(recruitment);
-        String content = String.format("%s ứng tuyển công việc %s", user.getFullName(), job.getJobName());
+        String content = String.format("%s ứng tuyển công việc %s", candidate.getFullName(), job.getJobName());
         notificationService.addNotification(content, job.getCompany().getAccount());
     }
 
@@ -64,7 +62,7 @@ public class RecruitmentService {
         String jobName = findById(recruitmentId).getJob().getJobName();
         String content = String.format(message, jobName);
         System.out.println(content);
-        notificationService.addNotification(content, findById(recruitmentId).getUser().getAccount());
+        notificationService.addNotification(content, findById(recruitmentId).getCandidate().getAccount());
     }
 
     public Recruitment findById(Integer recruitmentId) {
@@ -81,16 +79,16 @@ public class RecruitmentService {
     }
 
     public List<RecruitmentDto> getAllByCandidateId(Principal principal) {
-        User user = userService.getCurrentUser(principal);
-        List<Recruitment> recruitments = recruitmentRepository.findAllByCandidateId(user.getUserId());
+        Candidate candidate = userService.getCurrentCandidate(principal);
+        List<Recruitment> recruitments = recruitmentRepository.findAllByCandidateId(candidate.getCandidateId());
         return recruitments.stream()
                 .map(recruitmentMapper::entityToDto)
                 .toList();
     }
 
     public boolean checkApplyJob(Principal principal, Integer jobId) {
-        User user = userService.getCurrentUser(principal);
-        return recruitmentRepository.isApplied(user.getUserId(), jobId);
+        Candidate candidate = userService.getCurrentCandidate(principal);
+        return recruitmentRepository.isApplied(candidate.getCandidateId(), jobId);
     }
 
     public Recruitment getByApplicationId(Integer applicationId) {
@@ -100,5 +98,9 @@ public class RecruitmentService {
 
     public RecruitmentDto getDtoByApplicationId(Integer applicationId) {
         return recruitmentMapper.entityToDto(getByApplicationId(applicationId));
+    }
+
+    public Integer getCandidateQuantityByJob(Integer jobId) {
+        return recruitmentRepository.findAllByStatus(jobId, Arrays.asList(0, 1, 2)).size();
     }
 }

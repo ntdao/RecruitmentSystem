@@ -1,7 +1,7 @@
 package com.recruitmentsystem.repository;
 
-import com.recruitmentsystem.entity.Company;
 import com.recruitmentsystem.dto.CompanyTopModel;
+import com.recruitmentsystem.entity.Company;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -42,10 +42,10 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
             where c.deleteFlag = false
             """,
             countQuery = """
-            select c from Company c 
-            left join fetch c.industry
-            where c.deleteFlag = false
-            """)
+                    select c from Company c 
+                    left join fetch c.industry
+                    where c.deleteFlag = false
+                    """)
     Page<Company> findAllCompany(Pageable pageable);
 
     @Query("""
@@ -73,10 +73,10 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
             where c.deleteFlag = false
             """,
             countQuery = """
-            select new com.recruitmentsystem.dto.CompanyTopModel(c.companyShortName, c.companyLogo, c.industry.industryNameVI) 
-            from Company c
-            where c.deleteFlag = false
-            """
+                    select new com.recruitmentsystem.dto.CompanyTopModel(c.companyShortName, c.companyLogo, c.industry.industryNameVI) 
+                    from Company c
+                    where c.deleteFlag = false
+                    """
     )
     Page<CompanyTopModel> findTopCompany(Pageable paging);
 }

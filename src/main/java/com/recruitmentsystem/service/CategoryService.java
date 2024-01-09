@@ -2,10 +2,9 @@ package com.recruitmentsystem.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.dto.CategoryDto;
-import com.recruitmentsystem.entity.Job;
+import com.recruitmentsystem.entity.Category;
 import com.recruitmentsystem.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.exception.ResourceNotFoundException;
-import com.recruitmentsystem.entity.Category;
 import com.recruitmentsystem.pagination.PageDto;
 import com.recruitmentsystem.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

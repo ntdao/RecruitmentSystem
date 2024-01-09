@@ -1,11 +1,11 @@
 package com.recruitmentsystem.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.recruitmentsystem.dto.RoleDto;
 import com.recruitmentsystem.entity.Role;
 import com.recruitmentsystem.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.repository.RoleRepository;
-import com.recruitmentsystem.dto.RoleDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

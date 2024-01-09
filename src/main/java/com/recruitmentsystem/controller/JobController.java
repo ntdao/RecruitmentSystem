@@ -1,17 +1,16 @@
 package com.recruitmentsystem.controller;
 
-import com.recruitmentsystem.enums.Gender;
-import com.recruitmentsystem.dto.JobTypeDto;
 import com.recruitmentsystem.dto.JobRequestModel;
 import com.recruitmentsystem.dto.JobResponseModel;
-import com.recruitmentsystem.service.JobService;
 import com.recruitmentsystem.dto.JobTopModel;
-import com.recruitmentsystem.service.JobTypeService;
+import com.recruitmentsystem.dto.JobTypeDto;
+import com.recruitmentsystem.enums.Gender;
 import com.recruitmentsystem.pagination.PageDto;
+import com.recruitmentsystem.service.JobService;
+import com.recruitmentsystem.service.JobTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -66,6 +65,7 @@ public class JobController {
     public List<JobResponseModel> getAllJob(@PathVariable("companyId") Integer id) {
         return jobService.findJobByCompanyId(id);
     }
+
     @GetMapping("/admin/manage/jobs/all")
     public List<JobResponseModel> adminGetAllJob() {
         return jobService.findAllJobsByAdmin();

@@ -22,6 +22,7 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
             where a.id = :id and (t.expired = false or t.revoked = false)\s
             """)
     List<Token> findAllValidTokenByAccount(Integer id);
+
     @Query(value = """
             select t.token from Token t inner join Account a\s
             on t.account.id = a.id\s
@@ -30,6 +31,7 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
             (t.expired = false or t.revoked = false)\s
             """)
     String findAccessToken(Integer id);
+
     @Query(value = """
             select t.token from Token t inner join Account a\s
             on t.account.id = a.id\s

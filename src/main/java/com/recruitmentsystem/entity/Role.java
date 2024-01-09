@@ -1,7 +1,6 @@
 package com.recruitmentsystem.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.recruitmentsystem.entity.Account;
 import jakarta.persistence.*;
 import lombok.*;
 

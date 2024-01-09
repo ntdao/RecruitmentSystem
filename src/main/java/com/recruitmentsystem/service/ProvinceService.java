@@ -9,19 +9,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ProvinceService {
-    private final ObjectMapper objectMapper;
     private final ProvinceRepository provinceRepository;
 
     public List<ProvinceDto> findAllProvinces() {
         return provinceRepository.findAllProvince();
-//                .stream()
-//                .map(p -> objectMapper.convertValue(p, ProvinceDto.class))
-//                .collect(Collectors.toList());
     }
 
     public Province findProvinceByWardCode(String code) {

@@ -23,10 +23,11 @@ import java.util.Set;
 @ToString
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+public class Candidate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer userId;
+    @Column(name = "candidate_id")
+    private Integer candidateId;
     @OneToOne(cascade = CascadeType.MERGE)
     private Account account;
     private String fullName;
@@ -44,19 +45,19 @@ public class User {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @JoinTable(
-            name = "user_skill",
-            joinColumns = @JoinColumn(name = "user_id"),
+            name = "candidate_skill",
+            joinColumns = @JoinColumn(name = "candidate_id"),
             inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
-    private List<Skill> userSkills;
-    @OneToMany(mappedBy = "user")
+    private List<Skill> candidateSkills;
+    @OneToMany(mappedBy = "candidate")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private Set<UserEducation> userEducations = new HashSet<>();
-    @OneToMany(mappedBy = "user")
+    private Set<CandidateEducation> candidateEducations = new HashSet<>();
+    @OneToMany(mappedBy = "candidate")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private Set<UserWorkingHistory> workingHistories = new HashSet<>();
+    private Set<CandidateWorkingHistory> workingHistories = new HashSet<>();
     @OneToOne
     @JoinColumn(name = "category_id")
     @EqualsAndHashCode.Exclude
@@ -80,26 +81,26 @@ public class User {
     private boolean deleteFlag = false;
     private Integer oldId;
 
-    public User(User user, boolean deleteFlag) {
-        this.fullName = user.getFullName();
-        this.phoneNumber = user.getPhoneNumber();
-        this.address = user.getAddress();
-        this.gender = user.getGender();
-        this.imgUrl = user.getImgUrl();
-        this.birthday = user.getBirthday();
-        this.account = user.getAccount();
-        this.userSkills = user.getUserSkills();
-        this.userEducations = user.getUserEducations();
-        this.workingHistories = user.getWorkingHistories();
-        this.category = user.getCategory();
-        this.desiredJob = user.getDesiredJob();
-        this.cvUrl = user.getCvUrl();
-        this.educationLevel = user.getEducationLevel();
-        this.createDate = user.getCreateDate();
-        this.lastModified = user.getLastModified();
-        this.createdBy = user.getCreatedBy();
-        this.lastModifiedBy = user.getLastModifiedBy();
+    public Candidate(Candidate candidate, boolean deleteFlag) {
+        this.fullName = candidate.getFullName();
+        this.phoneNumber = candidate.getPhoneNumber();
+        this.address = candidate.getAddress();
+        this.gender = candidate.getGender();
+        this.imgUrl = candidate.getImgUrl();
+        this.birthday = candidate.getBirthday();
+        this.account = candidate.getAccount();
+        this.candidateSkills = candidate.getCandidateSkills();
+        this.candidateEducations = candidate.getCandidateEducations();
+        this.workingHistories = candidate.getWorkingHistories();
+        this.category = candidate.getCategory();
+        this.desiredJob = candidate.getDesiredJob();
+        this.cvUrl = candidate.getCvUrl();
+        this.educationLevel = candidate.getEducationLevel();
+        this.createDate = candidate.getCreateDate();
+        this.lastModified = candidate.getLastModified();
+        this.createdBy = candidate.getCreatedBy();
+        this.lastModifiedBy = candidate.getLastModifiedBy();
         this.deleteFlag = deleteFlag;
-        this.oldId = user.getUserId();
+        this.oldId = candidate.getCandidateId();
     }
 }

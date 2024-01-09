@@ -12,6 +12,7 @@ import java.util.List;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notifications, Integer> {
     int countByAccountId(Integer id);
+
     @Query("""
             select count(*) from Notifications n
             where n.isRead = false 

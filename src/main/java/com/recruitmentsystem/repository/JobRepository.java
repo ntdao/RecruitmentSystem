@@ -1,7 +1,7 @@
 package com.recruitmentsystem.repository;
 
-import com.recruitmentsystem.entity.Job;
 import com.recruitmentsystem.dto.JobTopModel;
+import com.recruitmentsystem.entity.Job;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,12 +30,12 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
             and j.jobName like %?1%
             """,
             countQuery = """
-            select j from Job j
-            left join fetch j.jobSkills
-            left join fetch j.jobAddresses
-            where j.deleteFlag = false
-            and j.jobName like %?1%
-            """)
+                    select j from Job j
+                    left join fetch j.jobSkills
+                    left join fetch j.jobAddresses
+                    where j.deleteFlag = false
+                    and j.jobName like %?1%
+                    """)
     Page<Job> findJobByName(String name, Pageable paging);
 
     @Query("""
@@ -54,11 +54,11 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
             where j.deleteFlag = false and j.jobStatus = 0
             """,
             countQuery = """
-            select new com.recruitmentsystem.dto.JobTopModel(
-            j.jobName, j.company.companyShortName, j.company.companyLogo, j.salary)
-            from Job j 
-            where j.deleteFlag = false and j.jobStatus = 0
-            """)
+                    select new com.recruitmentsystem.dto.JobTopModel(
+                    j.jobName, j.company.companyShortName, j.company.companyLogo, j.salary)
+                    from Job j 
+                    where j.deleteFlag = false and j.jobStatus = 0
+                    """)
     Page<JobTopModel> findTopJob(Pageable paging);
 
     @Query("""
@@ -78,13 +78,13 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
             and j.category.categoryId in ?2
             """,
             countQuery = """
-            select j from Job j
-            left join fetch j.jobSkills
-            left join fetch j.jobAddresses
-            where j.deleteFlag = false
-            and j.jobName like %?1%
-            and j.category.categoryId in ?2
-            """)
+                    select j from Job j
+                    left join fetch j.jobSkills
+                    left join fetch j.jobAddresses
+                    where j.deleteFlag = false
+                    and j.jobName like %?1%
+                    and j.category.categoryId in ?2
+                    """)
     Page<Job> findJobByNameAndCategory(String name, List<Integer> categories, Pageable paging);
 
     @Query("""

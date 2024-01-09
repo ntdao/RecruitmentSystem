@@ -14,6 +14,11 @@ import java.util.List;
 @ToString
 @Builder
 public class Degree {
+    @OneToMany(mappedBy = "degree", cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
+    List<CandidateEducation> candidateEducations;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
@@ -22,9 +27,4 @@ public class Degree {
     private String degreeName;
     @Column(name = "degree_name_VI")
     private String degreeNameVI;
-    @OneToMany(mappedBy = "degree", cascade = CascadeType.ALL)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    @JsonIgnore
-    List<UserEducation> userEducations;
 }

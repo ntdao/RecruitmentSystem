@@ -1,10 +1,10 @@
 package com.recruitmentsystem.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.recruitmentsystem.dto.IndustryDto;
 import com.recruitmentsystem.entity.Industry;
 import com.recruitmentsystem.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.exception.ResourceNotFoundException;
-import com.recruitmentsystem.dto.IndustryDto;
 import com.recruitmentsystem.repository.IndustryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

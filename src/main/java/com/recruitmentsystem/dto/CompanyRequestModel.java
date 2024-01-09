@@ -1,6 +1,6 @@
 package com.recruitmentsystem.dto;
 
-public record CompanyRequestModel (
+public record CompanyRequestModel(
         String password,
         String roleName,
         String companyShortName,

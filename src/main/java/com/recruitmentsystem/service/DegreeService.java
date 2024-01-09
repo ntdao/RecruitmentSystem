@@ -1,7 +1,7 @@
 package com.recruitmentsystem.service;
 
-import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.entity.Degree;
+import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.repository.DegreeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

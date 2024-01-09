@@ -1,7 +1,7 @@
 package com.recruitmentsystem.controller;
 
-import com.recruitmentsystem.pagination.PageDto;
 import com.recruitmentsystem.dto.SkillDto;
+import com.recruitmentsystem.pagination.PageDto;
 import com.recruitmentsystem.service.SkillService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

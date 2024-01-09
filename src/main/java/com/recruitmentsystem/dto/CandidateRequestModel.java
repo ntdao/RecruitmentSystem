@@ -5,7 +5,7 @@ import lombok.Builder;
 import java.time.LocalDate;
 
 @Builder
-public record UserRequestModel(
+public record CandidateRequestModel(
         String password,
         String email,
         String fullName,

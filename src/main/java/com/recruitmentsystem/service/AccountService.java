@@ -1,8 +1,8 @@
 package com.recruitmentsystem.service;
 
+import com.recruitmentsystem.entity.Account;
 import com.recruitmentsystem.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.exception.ResourceNotFoundException;
-import com.recruitmentsystem.entity.Account;
 import com.recruitmentsystem.repository.AccountRepository;
 import com.recruitmentsystem.security.jwt.JwtService;
 import com.recruitmentsystem.security.token.Token;
@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.List;
-
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Service
 @RequiredArgsConstructor

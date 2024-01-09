@@ -3,14 +3,14 @@ package com.recruitmentsystem.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.dto.AuthenticationRequestModel;
 import com.recruitmentsystem.dto.AuthenticationResponseModel;
-import com.recruitmentsystem.exception.ResourceNotFoundException;
-import com.recruitmentsystem.enums.TokenType;
+import com.recruitmentsystem.dto.CandidateRequestModel;
 import com.recruitmentsystem.entity.Account;
+import com.recruitmentsystem.entity.Candidate;
+import com.recruitmentsystem.enums.TokenType;
+import com.recruitmentsystem.exception.ResourceNotFoundException;
+import com.recruitmentsystem.mapper.CandidateMapper;
 import com.recruitmentsystem.repository.AccountRepository;
-import com.recruitmentsystem.entity.User;
-import com.recruitmentsystem.mapper.UserMapper;
-import com.recruitmentsystem.dto.UserRequestModel;
-import com.recruitmentsystem.repository.UserRepository;
+import com.recruitmentsystem.repository.CandidateRepository;
 import com.recruitmentsystem.security.jwt.JwtService;
 import com.recruitmentsystem.security.token.Token;
 import com.recruitmentsystem.security.token.TokenService;
@@ -39,10 +39,10 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
     private final TokenService tokenService;
-    private final UserMapper userMapper;
-    private final UserRepository userRepository;
+    private final CandidateMapper candidateMapper;
+    private final CandidateRepository candidateRepository;
 
-    public void register(UserRequestModel request) {
+    public void register(CandidateRequestModel request) {
         accountService.checkDuplicateEmail(request.email());
 
         Account account = Account.builder()
@@ -52,10 +52,10 @@ public class AuthenticationService {
                 .build();
         accountRepository.save(account);
 
-        User user = userMapper.userRequestModelToUser(request);
-        user.setCreatedBy(account.getId());
+        Candidate candidate = candidateMapper.dtoToEntity(request);
+        candidate.setCreatedBy(account.getId());
 
-        userRepository.save(user);
+        candidateRepository.save(candidate);
 
         String token = jwtService.generateEmailToken(account);
         saveAccountToken(account, token, TokenType.EMAIL);

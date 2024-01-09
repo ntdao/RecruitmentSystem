@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
-public record UserResponseModel(
+public record CandidateResponseModel(
         Integer id,
         String email,
         String fullName,
@@ -19,8 +19,8 @@ public record UserResponseModel(
         LocalDateTime createDate,
         LocalDateTime lastModified,
         String roleName,
-        List<UserEducationDto> education,
-        List<UserWorkingHistoryDto> workingHistory,
+        List<CandidateEducationDto> education,
+        List<CandidateWorkingHistoryDto> workingHistory,
         List<SkillDto> skill,
         String desiredJob,
         String educationLevel,
