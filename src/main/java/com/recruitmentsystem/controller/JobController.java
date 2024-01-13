@@ -1,9 +1,6 @@
 package com.recruitmentsystem.controller;
 
-import com.recruitmentsystem.dto.JobRequestModel;
-import com.recruitmentsystem.dto.JobResponseModel;
-import com.recruitmentsystem.dto.JobTopModel;
-import com.recruitmentsystem.dto.JobTypeDto;
+import com.recruitmentsystem.dto.*;
 import com.recruitmentsystem.enums.Gender;
 import com.recruitmentsystem.pagination.PageDto;
 import com.recruitmentsystem.service.JobService;
@@ -97,5 +94,10 @@ public class JobController {
     public void updateJob(@PathVariable("jobId") Integer jobId,
                           @RequestBody JobRequestModel jobRequestModel) {
         jobService.updateJob(jobId, jobRequestModel);
+    }
+
+    @GetMapping("/company/manage/jobs")
+    public List<JobDto> findJobByStatus(@RequestParam("jobStatus") String jobStatus, Principal principal) {
+        return jobService.findJobByStatus(jobStatus, principal);
     }
 }

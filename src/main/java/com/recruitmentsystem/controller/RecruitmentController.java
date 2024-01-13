@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -37,49 +36,21 @@ public class RecruitmentController {
         return recruitmentService.getDtoByApplicationId(applicationId);
     }
 
-    @GetMapping("/manage/job/{jobId}/all-candidate")
-    public List<RecruitmentDto> getAllByJob(@PathVariable("jobId") Integer jobId) {
-        return recruitmentService.getAllByJob(jobId, Arrays.asList(0, 1, 2));
+    @GetMapping("/manage/candidate")
+    public List<RecruitmentDto> getAllCandidateByJob(@RequestParam String jobId,
+                                            @RequestParam String statusId) {
+        return recruitmentService.getAllCandidateByJob(jobId, statusId);
     }
 
-    @GetMapping("/manage/job/{jobId}/candidate-quantity")
-    public Integer getCandidateQuantityByJob(@PathVariable("jobId") Integer jobId) {
+    @GetMapping("/manage/interviewee")
+    public List<RecruitmentDto> getAllIntervieweeByJob(@RequestParam String jobId,
+                                            @RequestParam String statusId) {
+        return recruitmentService.getAllIntervieweeByJob(jobId, statusId);
+    }
+
+    @GetMapping("/manage/candidate-quantity")
+    public Integer getCandidateQuantityByJob(@RequestParam Integer jobId) {
         return recruitmentService.getCandidateQuantityByJob(jobId);
-    }
-
-    @GetMapping("/manage/job/{jobId}/all-consider-cv")
-    public List<RecruitmentDto> getAllConsiderCVByJob(@PathVariable("jobId") Integer jobId) {
-        return recruitmentService.getAllByJob(jobId, List.of(0));
-    }
-
-    @GetMapping("/manage/job/{jobId}/all-pass-cv")
-    public List<RecruitmentDto> getAllPassCVByJob(@PathVariable("jobId") Integer jobId) {
-        return recruitmentService.getAllByJob(jobId, List.of(1));
-    }
-
-    @GetMapping("/manage/job/{jobId}/all-fail-cv")
-    public List<RecruitmentDto> getAllFailCVByJob(@PathVariable("jobId") Integer jobId) {
-        return recruitmentService.getAllByJob(jobId, List.of(2));
-    }
-
-    @GetMapping("/manage/job/{jobId}/all-interview")
-    public List<RecruitmentDto> getAllInterviewByJob(@PathVariable("jobId") Integer jobId) {
-        return recruitmentService.getAllByJob(jobId, Arrays.asList(3, 4, 5));
-    }
-
-    @GetMapping("/manage/job/{jobId}/all-consider-interview")
-    public List<RecruitmentDto> getAllConsiderInterviewByJob(@PathVariable("jobId") Integer jobId) {
-        return recruitmentService.getAllByJob(jobId, List.of(3));
-    }
-
-    @GetMapping("/manage/job/{jobId}/all-pass-interview")
-    public List<RecruitmentDto> getAllPassInterviewByJob(@PathVariable("jobId") Integer jobId) {
-        return recruitmentService.getAllByJob(jobId, List.of(4));
-    }
-
-    @GetMapping("/manage/job/{jobId}/all-fail-interview")
-    public List<RecruitmentDto> getAllFailInterviewByJob(@PathVariable("jobId") Integer jobId) {
-        return recruitmentService.getAllByJob(jobId, List.of(5));
     }
 
     @PostMapping("/manage/change-status/{applicationId}")

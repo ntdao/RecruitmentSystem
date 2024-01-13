@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -42,8 +40,30 @@ public class RecruitmentService {
         notificationService.addNotification(content, job.getCompany().getAccount());
     }
 
-    public List<RecruitmentDto> getAllByJob(Integer jobId, List<Integer> status) {
-        List<Integer> ids = recruitmentRepository.findAllByStatus(jobId, status);
+    public List<RecruitmentDto> getAllCandidateByJob(String jobId, String statusId) {
+        List<Integer> status;
+        if (jobId.equals("")) return null;
+        if (Objects.equals(statusId, "")) {
+            status = Arrays.asList(0,1,2);
+        } else {
+            status = Collections.singletonList(Integer.parseInt(statusId));
+        }
+        return getAllByJob(Integer.parseInt(jobId), status);
+    }
+
+    public List<RecruitmentDto> getAllIntervieweeByJob(String jobId, String statusId) {
+        List<Integer> status;
+        if (jobId.equals("")) return null;
+        if (Objects.equals(statusId, "")) {
+            status = Arrays.asList(3,4,5);
+        } else {
+            status = Collections.singletonList(Integer.parseInt(statusId));
+        }
+        return getAllByJob(Integer.parseInt(jobId), status);
+    }
+
+    private List<RecruitmentDto> getAllByJob(Integer jobId, List<Integer> statusId) {
+        List<Integer> ids = recruitmentRepository.findAllByStatus(jobId, statusId);
         return recruitmentRepository.findAllByIds(ids)
                 .stream()
                 .map(recruitmentMapper::entityToDto)

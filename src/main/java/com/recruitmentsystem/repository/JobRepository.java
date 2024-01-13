@@ -1,5 +1,6 @@
 package com.recruitmentsystem.repository;
 
+import com.recruitmentsystem.dto.JobDto;
 import com.recruitmentsystem.dto.JobTopModel;
 import com.recruitmentsystem.entity.Job;
 import org.springframework.data.domain.Page;
@@ -95,4 +96,12 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
             and j.jobName like %?1%
             """)
     List<Job> findByName(String name);
+
+    @Query("""
+            select new com.recruitmentsystem.dto.JobDto(j.jobId, j.jobName)
+            from Job j
+            where j.jobStatus in :jobStatus
+            and j.company.companyId = :companyId
+            """)
+    List<JobDto> findJobByStatus(List<Integer> jobStatus, Integer companyId);
 }

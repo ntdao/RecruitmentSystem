@@ -18,73 +18,73 @@ import java.util.List;
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class CandidateController {
-    private final CandidateService userService;
+    private final CandidateService candidateService;
 
-    @GetMapping("/admin/manage/users/all")
+    @GetMapping("/admin/manage/candidates/all")
     public List<CandidateResponseModel> getAllCandidates() {
-        return userService.findAllCandidates();
+        return candidateService.findAllCandidates();
     }
 
-    @PostMapping("/admin/manage/users/search")
+    @PostMapping("/admin/manage/candidates/search")
     public Page<CandidateResponseModel> searchCandidate(@RequestBody PageDto pageDto) {
-        return userService.searchCandidate(pageDto);
+        return candidateService.searchCandidate(pageDto);
     }
 
-    @GetMapping("/admin/manage/users/find/{id}")
+    @GetMapping("/admin/manage/candidates/find/{id}")
     public CandidateResponseModel getCandidateById(@PathVariable("id") Integer id) {
-        return userService.findCandidateResponseModelById(id);
+        return candidateService.findCandidateResponseModelById(id);
     }
 
-    @GetMapping("/admin/manage/users/find")
+    @GetMapping("/admin/manage/candidates/find")
     public List<CandidateResponseModel> getCandidateByName(@RequestParam("name") String name) {
-        return userService.findAllCandidateByName(name);
+        return candidateService.findAllCandidateByName(name);
     }
 
-    @PostMapping("/admin/manage/users/add")
+    @PostMapping("/admin/manage/candidates/add")
     @ResponseStatus(HttpStatus.CREATED)
-    public CandidateResponseModel addCandidate(@RequestBody CandidateRequestModel userRequest) {
-        return userService.addCandidate(userRequest);
+    public CandidateResponseModel addCandidate(@RequestBody CandidateRequestModel candidateRequest) {
+        return candidateService.addCandidate(candidateRequest);
     }
 
-    @DeleteMapping("/admin/manage/users/delete/{id}")
+    @DeleteMapping("/admin/manage/candidates/delete/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCandidate(@PathVariable("id") Integer id) {
-        userService.deleteCandidate(id);
+        candidateService.deleteCandidate(id);
     }
 
-    @DeleteMapping("/admin/manage/users/delete")
+    @DeleteMapping("/admin/manage/candidates/delete")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCandidate(@RequestBody Integer[] ids) {
         for (Integer id : ids) {
-            userService.deleteCandidate(id);
+            candidateService.deleteCandidate(id);
         }
     }
 
-    @GetMapping("/user/get-info-no-token")
+    @GetMapping("/candidate/get-info-no-token")
     public CandidateResponseModel getCandidateProfile(Principal connectedCandidate) {
-        return userService.getCurrentCandidateDisplay(connectedCandidate);
+        return candidateService.getCurrentCandidateDisplay(connectedCandidate);
     }
 
-    @PostMapping("/user/add-user-education")
+    @PostMapping("/candidate/add-candidate-education")
     public void addCandidateEducation(@RequestBody CandidateEducationDto candidateEducationDto,
                                  Principal connectedCandidate) {
-        userService.addCandidateEducation(candidateEducationDto, connectedCandidate);
+        candidateService.addCandidateEducation(candidateEducationDto, connectedCandidate);
     }
 
-    @PutMapping("/user/update-no-token")
+    @PutMapping("/candidate/update-no-token")
     public ResponseEntity<?> updateCandidate(@RequestBody CandidateRequestModel candidateRequestModel,
                                         Principal connectedCandidate) {
-        AuthenticationResponseModel response = userService.updateCandidateByCandidate(candidateRequestModel, connectedCandidate);
+        AuthenticationResponseModel response = candidateService.updateCandidateByCandidate(candidateRequestModel, connectedCandidate);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping(
-            value = "/user/image/upload-no-token",
+            value = "/candidate/image/upload-no-token",
             consumes = {"multipart/form-data"}
     )
     @ResponseStatus(HttpStatus.CREATED)
     public void uploadImageUrl(@RequestParam("image") MultipartFile multipartFile, Principal connectedCandidate) {
-        userService.uploadCandidateProfileImageNoToken(connectedCandidate, multipartFile);
+        candidateService.uploadCandidateProfileImageNoToken(connectedCandidate, multipartFile);
     }
 
     /**
@@ -92,43 +92,43 @@ public class CandidateController {
      * @param connectedCandidate upload image to AWS S3 Bucket
      */
     @PostMapping(
-            value = "/user/profile-image",
+            value = "/candidate/profile-image",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public String uploadCandidateProfileImage(@RequestParam("file") MultipartFile file,
                                          Principal connectedCandidate) {
-        return userService.uploadCandidateProfileImage(connectedCandidate, file);
+        return candidateService.uploadCandidateProfileImage(connectedCandidate, file);
     }
 
     @PostMapping(
-            value = "/user/cv",
+            value = "/candidate/cv",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public void uploadCandidateCV(@RequestParam("file") MultipartFile file,
                              Principal connectedCandidate) {
-        userService.uploadCandidateCV(connectedCandidate, file);
+        candidateService.uploadCandidateCV(connectedCandidate, file);
     }
 
     @GetMapping(
-            value = "/user/{userId}/cv",
+            value = "/candidate/{candidateId}/cv",
             produces = MediaType.APPLICATION_PDF_VALUE
     )
     public byte[] getCandidateCV(
-            @PathVariable("userId") Integer userId) {
-        return userService.getCandidateCV(userId);
+            @PathVariable("candidateId") Integer candidateId) {
+        return candidateService.getCandidateCV(candidateId);
     }
 
     @GetMapping(
-            value = "/user/{userId}/profile-image",
+            value = "/candidate/{candidateId}/profile-image",
             produces = MediaType.IMAGE_JPEG_VALUE
     )
-    public byte[] getCandidateProfileImage(@PathVariable("userId") Integer userId) {
-        return userService.getCandidateProfileImage(userId);
+    public byte[] getCandidateProfileImage(@PathVariable("candidateId") Integer candidateId) {
+        return candidateService.getCandidateProfileImage(candidateId);
     }
 
-    @PatchMapping("/user/change-password-no-token")
+    @PatchMapping("/candidate/change-password-no-token")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changePassword(@RequestBody ChangePasswordDto passwordRequest, Principal connectedCandidate) {
-        userService.changePassword(passwordRequest, connectedCandidate);
+        candidateService.changePassword(passwordRequest, connectedCandidate);
     }
 }

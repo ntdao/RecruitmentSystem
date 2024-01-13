@@ -1,5 +1,6 @@
 package com.recruitmentsystem.service;
 
+import com.recruitmentsystem.dto.JobDto;
 import com.recruitmentsystem.dto.JobRequestModel;
 import com.recruitmentsystem.dto.JobResponseModel;
 import com.recruitmentsystem.dto.JobTopModel;
@@ -19,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -139,5 +142,16 @@ public class JobService {
         } else {
             return new ArrayList<>();
         }
+    }
+
+    public List<JobDto> findJobByStatus(String jobStatus, Principal principal) {
+        Company company = companyService.getCurrentCompany(principal);
+        List<Integer> jobStatusList;
+        if (jobStatus.equals("")) {
+            jobStatusList = Arrays.asList(0,1,2);
+        } else {
+            jobStatusList = Collections.singletonList(Integer.parseInt(jobStatus));
+        }
+        return jobRepository.findJobByStatus(jobStatusList, company.getCompanyId());
     }
 }
