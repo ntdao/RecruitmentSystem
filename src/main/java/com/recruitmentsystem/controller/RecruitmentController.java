@@ -48,15 +48,10 @@ public class RecruitmentController {
         return recruitmentService.getAllIntervieweeByJob(jobId, statusId);
     }
 
-    @GetMapping("/manage/candidate-quantity")
-    public Integer getCandidateQuantityByJob(@RequestParam Integer jobId) {
-        return recruitmentService.getCandidateQuantityByJob(jobId);
-    }
-
-    @PostMapping("/manage/change-status/{applicationId}")
-    public void changeStatus(@PathVariable("applicationId") Integer applicationId,
-                             @RequestBody Map<String, Integer> request) {
-        recruitmentService.changeStatus(applicationId, request.get("status"));
+    @PostMapping("/manage/change-status")
+    public void changeStatus(@RequestParam("applicationId") Integer applicationId,
+                             @RequestParam("status") Integer status) {
+        recruitmentService.changeStatus(applicationId, status);
     }
 
     @PostMapping("/manage/add-interview/{applicationId}")
