@@ -1,15 +1,13 @@
 package com.recruitmentsystem.service;
 
-import com.recruitmentsystem.dto.JobDto;
-import com.recruitmentsystem.dto.JobRequestModel;
-import com.recruitmentsystem.dto.JobResponseModel;
-import com.recruitmentsystem.dto.JobTopModel;
+import com.recruitmentsystem.dto.*;
 import com.recruitmentsystem.entity.Company;
 import com.recruitmentsystem.entity.Job;
 import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.mapper.JobMapper;
 import com.recruitmentsystem.pagination.PageDto;
 import com.recruitmentsystem.repository.JobRepository;
+import com.recruitmentsystem.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -153,5 +148,10 @@ public class JobService {
             jobStatusList = Collections.singletonList(Integer.parseInt(jobStatus));
         }
         return jobRepository.findJobByStatus(jobStatusList, company.getCompanyId());
+    }
+
+    public StatisticDto getQuantity() {
+        List<Map<String, Object>> map = jobRepository.getQuantity();
+        return Utils.getStatistic(map);
     }
 }

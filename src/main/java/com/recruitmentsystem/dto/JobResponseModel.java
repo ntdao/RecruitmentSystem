@@ -13,6 +13,8 @@ public record JobResponseModel(
         String jobExperience,
         String jobGender,
         Integer jobQuantity,
+        Integer jobCandidate,
+        Integer jobPass,
         String salary,
         String jobDescription,
         String jobRequirement,

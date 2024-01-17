@@ -14,6 +14,7 @@ import com.recruitmentsystem.repository.CandidateRepository;
 import com.recruitmentsystem.security.jwt.JwtService;
 import com.recruitmentsystem.security.token.Token;
 import com.recruitmentsystem.security.token.TokenService;
+import com.recruitmentsystem.utils.Utils;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -332,5 +334,10 @@ public class CandidateService {
     public void deleteCandidateEducation(Integer id, Principal connectedCandidate) {
         Candidate candidate = getCurrentCandidate(connectedCandidate);
         Set<CandidateEducation> list = candidateEducationService.deleteCandidateEducation(id, candidate.getCandidateEducations());
+    }
+
+    public StatisticDto getQuantity() {
+        List<Map<String, Object>> map = candidateRepository.getQuantity();
+        return Utils.getStatistic(map);
     }
 }

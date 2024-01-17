@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -104,4 +105,11 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
             and j.company.companyId = :companyId
             """)
     List<JobDto> findJobByStatus(List<Integer> jobStatus, Integer companyId);
+
+    @Query("""
+            select month(j.createDate) as month, year(j.createDate) as year, count(*) as quantity
+            from Job j where j.deleteFlag = false 
+            group by month(j.createDate), year(j.createDate)
+            """)
+    List<Map<String, Object>> getQuantity();
 }

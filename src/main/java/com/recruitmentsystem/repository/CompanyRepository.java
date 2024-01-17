@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -79,4 +80,11 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
                     """
     )
     Page<CompanyTopModel> findTopCompany(Pageable paging);
+
+    @Query("""
+            select month(c.createDate) as month, year(c.createDate) as year, count(*) as quantity
+            from Company c where c.deleteFlag = false 
+            group by month(c.createDate), year(c.createDate)
+            """)
+    List<Map<String, Object>> getQuantity();
 }

@@ -1,9 +1,6 @@
 package com.recruitmentsystem.service;
 
-import com.recruitmentsystem.dto.AddressDto;
-import com.recruitmentsystem.dto.CompanyRequestModel;
-import com.recruitmentsystem.dto.CompanyResponseModel;
-import com.recruitmentsystem.dto.CompanyTopModel;
+import com.recruitmentsystem.dto.*;
 import com.recruitmentsystem.entity.Account;
 import com.recruitmentsystem.entity.Address;
 import com.recruitmentsystem.entity.Company;
@@ -12,6 +9,7 @@ import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.mapper.CompanyMapper;
 import com.recruitmentsystem.repository.AccountRepository;
 import com.recruitmentsystem.repository.CompanyRepository;
+import com.recruitmentsystem.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -28,6 +26,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -316,5 +315,10 @@ public class CompanyService {
         String image = prefix + s3Service.uploadFile("%s/%s/".formatted(field, company.getCompanyId()), file);
         System.out.println("Company image url: " + image);
         return image;
+    }
+
+    public StatisticDto getQuantity() {
+        List<Map<String, Object>> map = companyRepository.getQuantity();
+        return Utils.getStatistic(map);
     }
 }

@@ -5,10 +5,8 @@ import com.recruitmentsystem.dto.*;
 import com.recruitmentsystem.entity.Address;
 import com.recruitmentsystem.entity.Job;
 import com.recruitmentsystem.entity.Skill;
-import com.recruitmentsystem.service.AddressService;
-import com.recruitmentsystem.service.CategoryService;
-import com.recruitmentsystem.service.JobTypeService;
-import com.recruitmentsystem.service.SkillService;
+import com.recruitmentsystem.repository.RecruitmentRepository;
+import com.recruitmentsystem.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +25,7 @@ public class JobMapper {
     private final CategoryService categoryService;
     private final JobTypeService jobTypeService;
     private final SkillService skillService;
+    private final RecruitmentRepository recruitmentRepository;
 
     public JobResponseModel entityToDto(Job job) {
         List<AddressDto> addressList = job.getJobAddresses()
@@ -39,6 +38,8 @@ public class JobMapper {
                 .map(s -> objectMapper.convertValue(s, SkillDto.class))
                 .toList();
 
+        Integer jobCandidate = recruitmentRepository.findAllByStatus(job.getJobId(), List.of(0,1,2)).size();
+        Integer jobPass = recruitmentRepository.findAllByStatus(job.getJobId(), List.of(5)).size();
         return JobResponseModel
                 .builder()
                 .jobId(job.getJobId())
@@ -47,6 +48,8 @@ public class JobMapper {
                 .jobExperience(job.getJobExperience())
                 .jobGender(job.getJobGender().toString())
                 .jobQuantity(job.getJobQuantity())
+                .jobCandidate(jobCandidate)
+                .jobPass(jobPass)
                 .salary(job.getSalary())
                 .jobDescription(job.getJobDescription())
                 .jobRequirement(job.getJobRequirement())

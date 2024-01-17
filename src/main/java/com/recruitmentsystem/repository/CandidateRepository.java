@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -86,4 +87,16 @@ public interface CandidateRepository extends JpaRepository<Candidate, Integer> {
             and u.candidateId in :ids
             """)
     List<Candidate> findListCandidateByIds(List<Integer> ids);
+
+    //    @Query("""
+//            select new com.recruitmentsystem.dto.StatisticDetailDto(month(c.createDate), year(c.createDate), count(*))
+//            from Candidate c where c.deleteFlag = false
+//            group by month(c.createDate), year(c.createDate)
+//            """)
+    @Query("""
+            select month(c.createDate) as month, year(c.createDate) as year, count(*) as quantity
+            from Candidate c where c.deleteFlag = false 
+            group by month(c.createDate), year(c.createDate)
+            """)
+    List<Map<String, Object>> getQuantity();
 }
