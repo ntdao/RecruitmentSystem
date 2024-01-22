@@ -11,6 +11,7 @@ import com.recruitmentsystem.mapper.RecruitmentMapper;
 import com.recruitmentsystem.repository.RecruitmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -70,6 +71,7 @@ public class RecruitmentService {
                 .toList();
     }
 
+    @Transactional
     public void changeStatus(Integer recruitmentId, Integer status) {
         recruitmentRepository.changeStatus(recruitmentId, status);
         String message = switch (status) {

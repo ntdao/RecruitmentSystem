@@ -1,6 +1,5 @@
 package com.recruitmentsystem.controller;
 
-import com.recruitmentsystem.dto.StatisticDetailDto;
 import com.recruitmentsystem.dto.StatisticDto;
 import com.recruitmentsystem.service.CandidateService;
 import com.recruitmentsystem.service.CompanyService;

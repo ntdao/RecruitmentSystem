@@ -21,7 +21,7 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, Intege
     @Modifying
     @Query("""
             update candidate_apply_job a 
-            set a.applicationId = :status
+            set a.applicationStatus = :status
             where a.applicationId = :applicationId
             """)
     void changeStatus(Integer applicationId, Integer status);

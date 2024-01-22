@@ -15,6 +15,7 @@ public class InterviewService {
 
     public Interview addInterview(InterviewDto dto) {
         Interview interview = objectMapper.convertValue(dto, Interview.class);
+        interview.setInterviewStatus(0);
         return interviewRepository.save(interview);
     }
 
