@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 public class NotificationMapper {
     public NotificationDto entityToDto(Notifications notification) {
         return NotificationDto.builder()
+                .notificationId(notification.getNotificationId())
                 .content(notification.getContent())
                 .timeAgo(Utils.calculateTimeAgo(notification.getCreateDate()))
                 .build();

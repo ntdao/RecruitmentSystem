@@ -1,5 +1,6 @@
 package com.recruitmentsystem.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.dto.InterviewDto;
 import com.recruitmentsystem.dto.RecruitmentDto;
 import com.recruitmentsystem.entity.Candidate;
@@ -8,6 +9,7 @@ import com.recruitmentsystem.entity.Job;
 import com.recruitmentsystem.entity.Recruitment;
 import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.mapper.RecruitmentMapper;
+import com.recruitmentsystem.repository.InterviewRepository;
 import com.recruitmentsystem.repository.RecruitmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +22,8 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class RecruitmentService {
-    private final InterviewService interviewService;
+    private final ObjectMapper objectMapper;
+    private final InterviewRepository interviewRepository;
     private final JobService jobService;
     private final NotificationService notificationService;
     private final RecruitmentMapper recruitmentMapper;
@@ -45,7 +48,7 @@ public class RecruitmentService {
         List<Integer> status;
         if (jobId.equals("")) return null;
         if (Objects.equals(statusId, "")) {
-            status = Arrays.asList(0,1,2);
+            status = Arrays.asList(0, 1, 2);
         } else {
             status = Collections.singletonList(Integer.parseInt(statusId));
         }
@@ -56,7 +59,7 @@ public class RecruitmentService {
         List<Integer> status;
         if (jobId.equals("")) return null;
         if (Objects.equals(statusId, "")) {
-            status = Arrays.asList(3,4,5);
+            status = Arrays.asList(3, 4, 5);
         } else {
             status = Collections.singletonList(Integer.parseInt(statusId));
         }
@@ -75,29 +78,33 @@ public class RecruitmentService {
     public void changeStatus(Integer recruitmentId, Integer status) {
         recruitmentRepository.changeStatus(recruitmentId, status);
         String message = switch (status) {
-            case 1 -> "Kết quả vòng hồ sơ công việc %s";
-            case 2 -> "Kết quả vòng hồ sơ công việc %s";
-            case 4 -> "Kết quả vòng phỏng vấn công việc %s";
-            case 5 -> "Kết quả vòng phỏng vấn công việc %s";
+            case 1, 2 -> "Kết quả vòng hồ sơ công việc %s";
+            case 4, 5 -> "Kết quả vòng phỏng vấn công việc %s";
             default -> "";
         };
-        String jobName = findById(recruitmentId).getJob().getJobName();
+        Recruitment recruitment = findById(recruitmentId);
+        String jobName = recruitment.getJob().getJobName();
         String content = String.format(message, jobName);
-        System.out.println(content);
-        notificationService.addNotification(content, findById(recruitmentId).getCandidate().getAccount());
+        notificationService.addNotification(content, recruitment.getCandidate().getAccount());
     }
 
     public Recruitment findById(Integer recruitmentId) {
         return recruitmentRepository.findById(recruitmentId)
-                .orElseThrow(() -> new ResourceNotFoundException(""));
+                .orElseThrow(() -> new ResourceNotFoundException("Application not found"));
     }
 
+    @Transactional
     public void addInterview(Integer recruitmentId, InterviewDto dto) {
         Recruitment recruitment = findById(recruitmentId);
-        Set<Interview> interviews = recruitment.getInterviews();
-        interviews.add(interviewService.addInterview(dto));
-        recruitment.setInterviews(interviews);
-        recruitmentRepository.save(recruitment);
+        Interview interview = objectMapper.convertValue(dto, Interview.class);
+        interview.setInterviewStatus(0);
+        interview.setRecruitment(recruitment);
+        interviewRepository.save(interview);
+
+        String message = "Doanh nghiệp đã cập nhật lịch phỏng vấn công việc %s";
+        String jobName = recruitment.getJob().getJobName();
+        String content = String.format(message, jobName);
+        notificationService.addNotification(content, recruitment.getCandidate().getAccount());
     }
 
     public List<RecruitmentDto> getAllByCandidateId(Principal principal) {

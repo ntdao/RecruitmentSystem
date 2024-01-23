@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record NotificationDto(
-        Integer id,
+        Integer notificationId,
         String content,
         boolean isRead,
         String timeAgo
