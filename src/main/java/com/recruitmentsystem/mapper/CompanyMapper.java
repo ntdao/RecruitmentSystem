@@ -20,6 +20,7 @@ public class CompanyMapper {
         return CompanyResponseModel
                 .builder()
                 .companyId(company.getCompanyId())
+                .accountId(company.getAccount().getId())
                 .companyShortName(company.getCompanyShortName())
                 .companyFullName(company.getCompanyFullName())
                 .companyLogo(company.getCompanyLogo())

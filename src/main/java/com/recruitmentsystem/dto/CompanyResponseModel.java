@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 @Builder
 public record CompanyResponseModel(
         Integer companyId,
+        Integer accountId,
         String companyShortName,
         String companyFullName,
         AddressDto companyAddress,

@@ -9,6 +9,7 @@ import java.util.List;
 @Builder
 public record CandidateResponseModel(
         Integer id,
+        Integer accountId,
         String email,
         String fullName,
         String phoneNumber,

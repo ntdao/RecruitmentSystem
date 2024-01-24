@@ -78,8 +78,10 @@ public class RecruitmentService {
     public void changeStatus(Integer recruitmentId, Integer status) {
         recruitmentRepository.changeStatus(recruitmentId, status);
         String message = switch (status) {
-            case 1, 2 -> "Kết quả vòng hồ sơ công việc %s";
-            case 4, 5 -> "Kết quả vòng phỏng vấn công việc %s";
+            case 1 -> "Bạn đã qua vòng hồ sơ công việc %s";
+            case 2 -> "Bạn đã trượt vòng hồ sơ công việc %s";
+            case 4 -> "Bạn đã qua vòng phỏng vấn công việc %s";
+            case 5 -> "Bạn đã trượt vòng phỏng vấn công việc %s";
             default -> "";
         };
         Recruitment recruitment = findById(recruitmentId);
@@ -96,12 +98,14 @@ public class RecruitmentService {
     @Transactional
     public void addInterview(Integer recruitmentId, InterviewDto dto) {
         Recruitment recruitment = findById(recruitmentId);
+        recruitment.setApplicationStatus(3);
+
         Interview interview = objectMapper.convertValue(dto, Interview.class);
         interview.setInterviewStatus(0);
         interview.setRecruitment(recruitment);
         interviewRepository.save(interview);
 
-        String message = "Doanh nghiệp đã cập nhật lịch phỏng vấn công việc %s";
+        String message = "Lịch phỏng vấn công việc %s đã được cập nhật";
         String jobName = recruitment.getJob().getJobName();
         String content = String.format(message, jobName);
         notificationService.addNotification(content, recruitment.getCandidate().getAccount());
@@ -130,6 +134,6 @@ public class RecruitmentService {
     }
 
     public Integer getCandidateQuantityByJob(Integer jobId) {
-        return recruitmentRepository.findAllByStatus(jobId, Arrays.asList(0, 1, 2)).size();
+        return recruitmentRepository.countByJob(jobId);
     }
 }

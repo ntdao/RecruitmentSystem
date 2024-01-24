@@ -35,6 +35,7 @@ public class CandidateMapper {
         return CandidateResponseModel
                 .builder()
                 .id(candidate.getCandidateId())
+                .accountId(candidate.getAccount().getId())
                 .email(candidate.getAccount().getUsername())
                 .fullName(candidate.getFullName())
                 .phoneNumber(candidate.getPhoneNumber())

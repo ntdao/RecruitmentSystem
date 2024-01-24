@@ -1,37 +1,44 @@
 package com.recruitmentsystem.controller;
 
 import com.recruitmentsystem.dto.StatisticDto;
-import com.recruitmentsystem.service.CandidateService;
-import com.recruitmentsystem.service.CompanyService;
-import com.recruitmentsystem.service.JobService;
-import com.recruitmentsystem.service.RecruitmentService;
+import com.recruitmentsystem.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/statistic")
 @RequiredArgsConstructor
 public class StatisticController {
-    private final CandidateService candidateService;
-    private final CompanyService companyService;
-    private final JobService jobService;
-    private final RecruitmentService recruitmentService;
+    private final StatisticService service;
 
     @GetMapping("/candidate")
     public StatisticDto candidateQuantity() {
-        return candidateService.getQuantity();
+        return service.getCandidate();
     }
 
     @GetMapping("/company")
     public StatisticDto companyQuantity() {
-        return companyService.getQuantity();
+        return service.getCompany();
     }
 
     @GetMapping("/job")
     public StatisticDto jobQuantity() {
-        return jobService.getQuantity();
+        return service.getJob();
+    }
+
+    @GetMapping("/system")
+    public Map<String, Object> jobQuantityByCompany() {
+        return service.getAll();
+    }
+
+    @GetMapping("/{companyId}")
+    public Map<String, Object> jobQuantityByCompany(@PathVariable("companyId") Integer companyId) {
+        return service.getByCompany(companyId);
     }
 
     @GetMapping("/recruitment")

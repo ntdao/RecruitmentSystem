@@ -50,7 +50,7 @@ public class JobService {
                 .collect(Collectors.toList());
     }
 
-    private List<Job> findByCompanyId(Integer companyId) {
+    public List<Job> findByCompanyId(Integer companyId) {
         companyService.existsById(companyId);
         return jobRepository.findAllJobByCompany(companyId);
     }
