@@ -10,11 +10,10 @@ import java.util.Optional;
 
 public interface DegreeRepository extends JpaRepository<Degree, Integer> {
     @Query("""
-                    select r from Degree r where 1 = 1
-                    and (:code is null or lower(r.code) like %:code%)
-                    and (:name is null or lower(r.name) like %:name%)
+            select r from Degree r where 1 = 1
+            and (:name is null or lower(r.code) like %:name% or lower(r.name) like %:name%)
             """)
-    Page<Degree> findAll(String code, String name, Pageable pageable);
+    Page<Degree> findAll(String name, Pageable pageable);
 
     @Query(value = "select count(*) from Degree r where 1 = 1 " +
             "and (:id is null or r.id != :id) " +

@@ -38,6 +38,10 @@ public record CandidateDto (
         @JsonInclude(JsonInclude.Include.NON_NULL)
         String currentPass,
         @JsonInclude(JsonInclude.Include.NON_NULL)
-        String newPass
+        String newPass,
+
+        String key,
+        Integer page,
+        Integer size
 ) {
 }

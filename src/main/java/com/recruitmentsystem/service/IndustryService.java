@@ -61,7 +61,7 @@ public class IndustryService {
 
     public Page<IndustryDTO> findAll(IndustryDTO industry) {
         Pageable pageable = PageRequest.of(industry.getPage() - 1, industry.getSize());
-        return industryRepository.findAll(DataFormat.lower(industry.getCode()), DataFormat.lower(industry.getName()), pageable)
+        return industryRepository.findAll(DataFormat.lower(industry.getName()), pageable)
                 .map(r -> objectMapper.convertValue(r, IndustryDTO.class));
     }
 

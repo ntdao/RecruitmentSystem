@@ -61,7 +61,7 @@ public class SkillService {
 
     public Page<SkillDTO> findAll(SkillDTO skill) {
         Pageable pageable = PageRequest.of(skill.getPage() - 1, skill.getSize());
-        return skillRepository.findAll(DataFormat.lower(skill.getCode()), DataFormat.lower(skill.getName()), pageable)
+        return skillRepository.findAll(DataFormat.lower(skill.getName()), pageable)
                 .map(r -> objectMapper.convertValue(r, SkillDTO.class));
     }
 

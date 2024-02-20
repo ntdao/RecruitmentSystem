@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -25,10 +26,10 @@ public class CandidateController {
         return candidateService.findAllCandidates();
     }
 
-    @PostMapping("/admin/manage/candidates/paging")
-    public Page<CandidateResponseModel> searchCandidate(@RequestBody PageDto pageDto) {
-        return candidateService.searchCandidate(pageDto);
-    }
+//    @PostMapping("/admin/manage/candidates/paging")
+//    public Page<CandidateResponseModel> searchCandidate(@RequestBody CandidateDto dto) {
+//        return candidateService.searchCandidate(dto);
+//    }
 
     @GetMapping("/admin/manage/candidates/find/{id}")
     public CandidateResponseModel getCandidateById(@PathVariable("id") Integer id) {
@@ -36,8 +37,8 @@ public class CandidateController {
     }
 
     @GetMapping("/admin/manage/candidates/find")
-    public List<CandidateResponseModel> getCandidateByName(@RequestParam("name") String name) {
-        return candidateService.findAllCandidateByName(name);
+    public List<CandidateResponseModel> getCandidateByName(@RequestParam("key") String key) {
+        return candidateService.findAllCandidateByKey(key);
     }
 
     @PostMapping("/admin/manage/candidates/add")
@@ -61,20 +62,29 @@ public class CandidateController {
     }
 
     @GetMapping("/candidate/get-info-no-token")
-    public CandidateResponseModel getCandidateProfile(Principal connectedCandidate) {
-        return candidateService.getCurrentCandidateDisplay(connectedCandidate);
+    public CandidateResponseModel getCandidateProfile(Principal principal) {
+        return candidateService.getCurrentCandidateDisplay(principal);
     }
 
-    @PostMapping("/candidate/add-candidate-education")
-    public void addCandidateEducation(@RequestBody CandidateEducationDto candidateEducationDto,
-                                 Principal connectedCandidate) {
-        candidateService.addCandidateEducation(candidateEducationDto, connectedCandidate);
+    @PostMapping("/candidate/get-education")
+    public Set<CandidateEducationDto> getEducation(@RequestBody CandidateDto dto, Principal principal) {
+        return candidateService.getCandidateEducation(dto.id());
+    }
+    
+    @PostMapping("/candidate/save-education")
+    public void addEducation(@RequestBody CandidateEducationDto dto, Principal principal) {
+        candidateService.addCandidateEducation(dto, principal);
+    }
+
+    @PostMapping("/candidate/delete-education")
+    public void deleteEducation(@RequestBody CandidateEducationDto dto, Principal principal) {
+        candidateService.deleteCandidateEducation(dto.id(), principal);
     }
 
     @PutMapping("/candidate/update-no-token")
     public ResponseEntity<?> updateCandidate(@RequestBody CandidateRequestModel candidateRequestModel,
-                                        Principal connectedCandidate) {
-        AuthenticationResponseModel response = candidateService.updateCandidateByCandidate(candidateRequestModel, connectedCandidate);
+                                        Principal principal) {
+        AuthenticationResponseModel response = candidateService.updateCandidateByCandidate(candidateRequestModel, principal);
         return ResponseEntity.ok(response);
     }
 
@@ -83,21 +93,21 @@ public class CandidateController {
             consumes = {"multipart/form-data"}
     )
     @ResponseStatus(HttpStatus.CREATED)
-    public void uploadImageUrl(@RequestParam("image") MultipartFile multipartFile, Principal connectedCandidate) {
-        candidateService.uploadCandidateProfileImageNoToken(connectedCandidate, multipartFile);
+    public void uploadImageUrl(@RequestParam("image") MultipartFile multipartFile, Principal principal) {
+        candidateService.uploadCandidateProfileImageNoToken(principal, multipartFile);
     }
 
     /**
      * @param file
-     * @param connectedCandidate upload image to AWS S3 Bucket
+     * @param principal upload image to AWS S3 Bucket
      */
     @PostMapping(
             value = "/candidate/profile-image",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public String uploadCandidateProfileImage(@RequestParam("file") MultipartFile file,
-                                         Principal connectedCandidate) {
-        return candidateService.uploadCandidateProfileImage(connectedCandidate, file);
+                                         Principal principal) {
+        return candidateService.uploadCandidateProfileImage(principal, file);
     }
 
     @PostMapping(
@@ -105,8 +115,8 @@ public class CandidateController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public void uploadCandidateCV(@RequestParam("file") MultipartFile file,
-                             Principal connectedCandidate) {
-        candidateService.uploadCandidateCV(connectedCandidate, file);
+                             Principal principal) {
+        candidateService.uploadCandidateCV(principal, file);
     }
 
     @GetMapping(
@@ -128,7 +138,7 @@ public class CandidateController {
 
     @PatchMapping("/candidate/change-password-no-token")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void changePassword(@RequestBody ChangePasswordDto passwordRequest, Principal connectedCandidate) {
-        candidateService.changePassword(passwordRequest, connectedCandidate);
+    public void changePassword(@RequestBody ChangePasswordDto passwordRequest, Principal principal) {
+        candidateService.changePassword(passwordRequest, principal);
     }
 }

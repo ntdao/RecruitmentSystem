@@ -10,11 +10,10 @@ import java.util.Optional;
 
 public interface RoleRepository extends JpaRepository<Role, Integer> {
     @Query("""
-                    select r from Role r where 1 = 1
-                    and (:code is null or lower(r.code) like %:code%)
-                    and (:name is null or lower(r.name) like %:name%)
+            select r from Role r where 1 = 1
+            and (:name is null or lower(r.code) like %:name% or lower(r.name) like %:name%)
             """)
-    Page<Role> findAll(String code, String name, Pageable pageable);
+    Page<Role> findAll(String name, Pageable pageable);
 
     @Query(value = "select count(*) from Role r where 1 = 1 " +
             "and (:id is null or r.id != :id) " +

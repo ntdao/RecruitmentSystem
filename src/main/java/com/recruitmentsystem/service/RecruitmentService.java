@@ -29,6 +29,7 @@ public class RecruitmentService {
     private final RecruitmentMapper recruitmentMapper;
     private final RecruitmentRepository recruitmentRepository;
     private final CandidateService userService;
+    private final EmailService emailService;
 
     public void candidateApplyJob(Principal principal, Integer jobId) {
         Candidate candidate = userService.getCurrentCandidate(principal);
@@ -85,9 +86,13 @@ public class RecruitmentService {
             default -> "";
         };
         Recruitment recruitment = findById(recruitmentId);
+        Candidate candidate = recruitment.getCandidate();
         String jobName = recruitment.getJob().getJobName();
         String content = String.format(message, jobName);
+        String body = "Đã có kết quả ứng tuyển công việc " + jobName;
+        String link = "http://localhost:3000/login";
         notificationService.addNotification(content, recruitment.getCandidate().getAccount());
+        emailService.sendNotification(candidate.getFullName(), candidate.getAccount().getEmail(), body, link);
     }
 
     public Recruitment findById(Integer recruitmentId) {
@@ -106,9 +111,12 @@ public class RecruitmentService {
         interviewRepository.save(interview);
 
         String message = "Lịch phỏng vấn công việc %s đã được cập nhật";
+        Candidate candidate = recruitment.getCandidate();
         String jobName = recruitment.getJob().getJobName();
         String content = String.format(message, jobName);
+        String link = "http://localhost:3000/login";
         notificationService.addNotification(content, recruitment.getCandidate().getAccount());
+        emailService.sendNotification(candidate.getFullName(), candidate.getAccount().getEmail(), message, link);
     }
 
     public List<RecruitmentDto> getAllByCandidateId(Principal principal) {

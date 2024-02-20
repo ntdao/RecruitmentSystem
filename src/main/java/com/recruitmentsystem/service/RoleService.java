@@ -61,7 +61,7 @@ public class RoleService {
 
     public Page<RoleDTO> findAll(RoleDTO role) {
         Pageable pageable = PageRequest.of(role.getPage() - 1, role.getSize());
-        return roleRepository.findAll(DataFormat.lower(role.getCode()), DataFormat.lower(role.getName()), pageable)
+        return roleRepository.findAll(DataFormat.lower(role.getName()), pageable)
                 .map(r -> objectMapper.convertValue(r, RoleDTO.class));
     }
 

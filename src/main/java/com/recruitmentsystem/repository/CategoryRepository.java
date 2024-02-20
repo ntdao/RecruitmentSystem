@@ -10,11 +10,10 @@ import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("""
-                    select r from Category r where 1 = 1
-                    and (:code is null or lower(r.code) like %:code%)
-                    and (:name is null or lower(r.name) like %:name%)
+            select r from Category r where 1 = 1
+            and (:name is null or lower(r.code) like %:name% or lower(r.name) like %:name%)
             """)
-    Page<Category> findAll(String code, String name, Pageable pageable);
+    Page<Category> findAll(String name, Pageable pageable);
 
     @Query(value = "select count(*) from Category r where 1 = 1 " +
             "and (:id is null or r.id != :id) " +

@@ -10,11 +10,10 @@ import java.util.Optional;
 
 public interface IndustryRepository extends JpaRepository<Industry, Integer> {
     @Query("""
-                    select r from Industry r where 1 = 1
-                    and (:code is null or lower(r.code) like %:code%)
-                    and (:name is null or lower(r.name) like %:name%)
+            select r from Industry r where 1 = 1
+            and (:name is null or lower(r.code) like %:name% or lower(r.name) like %:name%)
             """)
-    Page<Industry> findAll(String code, String name, Pageable pageable);
+    Page<Industry> findAll(String name, Pageable pageable);
 
     @Query(value = "select count(*) from Industry r where 1 = 1 " +
             "and (:id is null or r.id != :id) " +

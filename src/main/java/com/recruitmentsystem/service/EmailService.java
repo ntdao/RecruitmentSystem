@@ -123,7 +123,7 @@ public class EmailService {
             helper.setFrom("recruitmentsystemamj@gmail.com");
             helper.setTo(recipientEmail);
 
-            String subject = "Here's the link to reset your password";
+            String subject = "Link to reset your password";
             String content = "<p>Hello " + username + ",</p>"
                     + "<p>You have requested to reset your password.</p>"
                     + "<p>Click the link below to change your password:</p>"
@@ -132,6 +132,32 @@ public class EmailService {
                     + "<p>Link will expire in 15 minutes.</p>"
                     + "<p>Ignore this email if you do remember your password, "
                     + "or you have not made the request.</p>";
+            helper.setSubject(subject);
+            helper.setText(content, true);
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            LOGGER.error("failed to send email", e);
+            throw new IllegalStateException("failed to send email");
+        }
+    }
+
+    @Async
+    public void sendNotification(String username, String recipientEmail, String body, String link) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+
+            helper.setFrom("recruitmentsystemamj@gmail.com");
+            helper.setTo(recipientEmail);
+
+            String subject = "Result application";
+            String content = "<p>Hello " + username + ",</p>"
+                    + "<p>" + body + "</p>"
+                    + "<p>Nhấn <a href=\"" + link + "\">vào đây</a> để xem thông tin chi tiết</p>"
+                    + "<br>"
+                    + "<p>Nếu bạn có bất kỳ câu hỏi, vui lòng liên hệ recruitmentsystemamj@gmail.com để được hỗ trợ.</p>"
+                    + "<p>Trân trọng</p>"
+                    + "<p>Đội ngũ ANJ recruitment system/p></p>";
             helper.setSubject(subject);
             helper.setText(content, true);
             mailSender.send(message);

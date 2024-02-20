@@ -11,10 +11,9 @@ import java.util.Optional;
 public interface SkillRepository extends JpaRepository<Skill, Integer> {
     @Query("""
             select r from Skill r where 1 = 1
-            and (:code is null or lower(r.code) like %:code%)
-            and (:name is null or lower(r.name) like %:name%)
+            and (:name is null or lower(r.code) like %:name% or lower(r.name) like %:name%)
             """)
-    Page<Skill> findAll(String code, String name, Pageable pageable);
+    Page<Skill> findAll(String name, Pageable pageable);
 
     @Query(value = "select count(*) from Skill r where 1 = 1 " +
             "and (:id is null or r.id != :id) " +

@@ -61,7 +61,7 @@ public class JobTypeService {
 
     public Page<JobTypeDTO> findAll(JobTypeDTO jobType) {
         Pageable pageable = PageRequest.of(jobType.getPage() - 1, jobType.getSize());
-        return jobTypeRepository.findAll(DataFormat.lower(jobType.getCode()), DataFormat.lower(jobType.getName()), pageable)
+        return jobTypeRepository.findAll(DataFormat.lower(jobType.getName()), pageable)
                 .map(r -> objectMapper.convertValue(r, JobTypeDTO.class));
     }
 

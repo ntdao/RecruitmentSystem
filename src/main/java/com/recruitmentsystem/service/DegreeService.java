@@ -61,7 +61,7 @@ public class DegreeService {
 
     public Page<DegreeDTO> findAll(DegreeDTO degree) {
         Pageable pageable = PageRequest.of(degree.getPage() - 1, degree.getSize());
-        return degreeRepository.findAll(DataFormat.lower(degree.getCode()), DataFormat.lower(degree.getName()), pageable)
+        return degreeRepository.findAll(DataFormat.lower(degree.getName()), pageable)
                 .map(r -> objectMapper.convertValue(r, DegreeDTO.class));
     }
 

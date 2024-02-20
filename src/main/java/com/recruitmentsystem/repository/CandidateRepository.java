@@ -31,15 +31,20 @@ public interface CandidateRepository extends JpaRepository<Candidate, Integer> {
             left join fetch u.candidateSkills
             join fetch u.account
             where u.account.deleteFlag = false
+            and (:key is null or lower(u.fullName) like %:key%
+             or lower(u.account.email) like %:key%)
             """,
-            countQuery = """
-                    select u from Candidate u 
-                    left join fetch u.candidateEducations 
-                    left join fetch u.workingHistories
-                    left join fetch u.candidateSkills
-                    where u.account.deleteFlag = false
-                    """)
-    Page<Candidate> findAllCandidate(Pageable paging);
+        countQuery = """
+                select u from Candidate u 
+                left join fetch u.candidateEducations 
+                left join fetch u.workingHistories
+                left join fetch u.candidateSkills
+                join fetch u.account
+                where u.account.deleteFlag = false
+                and (:key is null or lower(u.fullName) like %:key%
+                 or lower(u.account.email) like %:key%)
+                """)
+    Page<Candidate> findAllCandidate(String key, Pageable paging);
 
     @Query("""
             select u from Candidate u
@@ -59,10 +64,11 @@ public interface CandidateRepository extends JpaRepository<Candidate, Integer> {
             left join fetch u.workingHistories 
             left join fetch u.candidateSkills
             join fetch u.account
-            where u.fullName like %:name%
+            where (:key is null or lower(u.fullName) like %:key%
+             or lower(u.account.email) like %:key%)
             and u.deleteFlag = false
             """)
-    List<Candidate> findAllCandidateByName(String name);
+    List<Candidate> findAllCandidateByKey(String key);
 
     @Query("""
             select u from Candidate u

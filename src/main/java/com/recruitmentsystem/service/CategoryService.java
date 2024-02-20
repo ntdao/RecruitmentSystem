@@ -65,7 +65,7 @@ public class CategoryService {
 
     public Page<CategoryDTO> findAll(CategoryDTO category) {
         Pageable pageable = PageRequest.of(category.getPage() - 1, category.getSize());
-        return categoryRepository.findAll(DataFormat.lower(category.getCode()), DataFormat.lower(category.getName()), pageable)
+        return categoryRepository.findAll(DataFormat.lower(category.getName()), pageable)
                 .map(r -> objectMapper.convertValue(r, CategoryDTO.class));
     }
 

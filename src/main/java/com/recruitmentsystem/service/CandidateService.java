@@ -81,15 +81,11 @@ public class CandidateService {
                 .map(candidateMapper::entityToDto).collect(Collectors.toList());
     }
 
-    public Page<CandidateResponseModel> searchCandidate(PageDto pageDto) {
-        Pageable paging = PageRequest.of(
-                pageDto.getPageNo(),
-                pageDto.getPageSize(),
-                Sort.Direction.fromString(pageDto.getSortDir()),
-                pageDto.getSortBy());
-        Page<Candidate> pagedResult = candidateRepository.findAllCandidate(paging);
-        return pagedResult.map(candidateMapper::entityToDto);
-    }
+//    public Page<CandidateResponseModel> searchCandidate(CandidateDto dto) {
+//        Pageable paging = PageRequest.of(dto.page() - 1, dto.size());
+//        Page<Candidate> pagedResult = candidateRepository.findAllCandidate(dto.key(), paging);
+//        return pagedResult.map(candidateMapper::entityToDto);
+//    }
 
     public CandidateResponseModel findCandidateResponseModelById(Integer id) {
         return candidateMapper.entityToDto(findCandidateById(id));
@@ -111,8 +107,8 @@ public class CandidateService {
                 .toList();
     }
 
-    public List<CandidateResponseModel> findAllCandidateByName(String name) {
-        return candidateRepository.findAllCandidateByName(name)
+    public List<CandidateResponseModel> findAllCandidateByKey(String key) {
+        return candidateRepository.findAllCandidateByKey(key)
                 .stream()
                 .map(candidateMapper::entityToDto)
                 .collect(Collectors.toList());
