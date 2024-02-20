@@ -1,25 +1,20 @@
 package com.recruitmentsystem.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.recruitmentsystem.dto.DistrictDto;
 import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.repository.DistrictRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class DistrictService {
     private final DistrictRepository districtRepository;
-    private final ObjectMapper objectMapper;
 
-    public List<DistrictDto> findAllDistrictsByProvince(String code) {
+    public List<Map<String, Object>> findAllDistrictsByProvince(String code) {
         return districtRepository.findDistrictByProvinceCode(code);
-//                .stream()
-//                .map(d -> objectMapper.convertValue(d, DistrictDto.class))
-//                .collect(Collectors.toList());
     }
 
     public String findDistrictByWardCode(String code) {

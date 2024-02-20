@@ -21,12 +21,12 @@ public record JobResponseModel(
         String jobBenefit,
         String companyName,
         String companyLogo,
-        JobTypeDto jobType,
+        JobTypeDTO jobType,
         Integer jobStatus,
         LocalDateTime createdAt,
         LocalDateTime jobExpiredDate,
-        CategoryDto category,
-        List<SkillDto> jobSkill,
+        CategoryDTO category,
+        List<SkillDTO> jobSkill,
         List<AddressDto> jobAddress
 ) {
 }

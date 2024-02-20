@@ -5,21 +5,22 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Builder
-public record CompanyResponseModel(
+public record CompanyDto (
         Integer companyId,
         Integer accountId,
+        String password,
         String companyShortName,
         String companyFullName,
         AddressDto companyAddress,
         String companyLogo,
         String companyIntroduction,
+        Integer companyIndustryId,
         IndustryDTO companyIndustry,
         String companyImage,
         Integer companyFoundedYear,
         String companyMST,
         String companyLicense,
         String companySize,
-        String companyTag,
         String email,
         String phoneNumber,
         String website,

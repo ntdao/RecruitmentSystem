@@ -52,7 +52,7 @@ public class Account implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(this.role.getRoleName());
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(this.role.getName());
         return Collections.singletonList(authority);
     }
 

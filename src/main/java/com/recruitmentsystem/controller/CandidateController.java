@@ -25,7 +25,7 @@ public class CandidateController {
         return candidateService.findAllCandidates();
     }
 
-    @PostMapping("/admin/manage/candidates/search")
+    @PostMapping("/admin/manage/candidates/paging")
     public Page<CandidateResponseModel> searchCandidate(@RequestBody PageDto pageDto) {
         return candidateService.searchCandidate(pageDto);
     }

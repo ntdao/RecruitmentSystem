@@ -1,78 +1,96 @@
 package com.recruitmentsystem.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.recruitmentsystem.dto.JobTypeDto;
+import com.recruitmentsystem.dto.JobTypeDTO;
 import com.recruitmentsystem.entity.JobType;
 import com.recruitmentsystem.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.repository.JobTypeRepository;
-import lombok.RequiredArgsConstructor;
+import com.recruitmentsystem.utils.DataFormat;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class JobTypeService {
-    private final ObjectMapper objectMapper;
-    private final JobTypeRepository jobTypeRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private JobTypeRepository jobTypeRepository;
 
-    public void addJobType(JobTypeDto request) {
-        checkDuplicatedJobTypeName(request.jobTypeName(), request.jobTypeNameVI());
-        JobType jobType = objectMapper.convertValue(request, JobType.class);
-        jobTypeRepository.save(jobType);
-    }
-
-    private void checkDuplicatedJobTypeName(String nameEN, String nameVI) {
-        if (jobTypeRepository.existsJobTypeByJobTypeName(nameEN)) {
-            throw new ResourceAlreadyExistsException("JobType EN name already taken");
-        }
-        if (jobTypeRepository.existsJobTypeByJobTypeNameVI(nameVI)) {
-            throw new ResourceAlreadyExistsException("JobType VI name already taken");
+    public void save(JobTypeDTO jobType) {
+        if (Objects.isNull(jobType.getId())) {
+            create(jobType);
+        } else {
+            update(jobType);
         }
     }
 
-    public void deleteJobType(Integer id) {
-        JobType jobType = findById(id);
-        jobTypeRepository.delete(jobType);
+    public void create(JobTypeDTO jobType) {
+        jobTypeRepository.save(checkValid(jobType));
     }
 
-    public List<JobType> findAll() {
-        return jobTypeRepository.findAll();
+    private JobType checkValid(JobTypeDTO dto) {
+        if (jobTypeRepository.countByNameAndCode(
+                dto.getId(),
+                DataFormat.lower(dto.getName()),
+                DataFormat.lower(dto.getCode())) > 0) {
+            throw new ResourceAlreadyExistsException("Tên loại hình công việc/mã loại hình công việc đã tồn tại");
+        }
+        return objectMapper.convertValue(dto, JobType.class);
     }
 
-    public List<JobTypeDto> findAllJobTypeResponseModel() {
-        return jobTypeRepository.findAll()
-                .stream()
-                .map(j -> objectMapper.convertValue(j, JobTypeDto.class))
-                .collect(Collectors.toList());
+    public void update(JobTypeDTO _jobType) {
+        Optional<JobType> op = jobTypeRepository.findById(_jobType.getId());
+        JobType jobType = checkValid(_jobType);
+        if (op.isPresent()) {
+            JobType r = op.get();
+            r.setName(jobType.getName());
+            r.setCode(jobType.getCode());
+            jobTypeRepository.save(r);
+        } else {
+            throw new ResourceNotFoundException("Không tìm thấy loại hình công việc!");
+        }
+    }
+
+    public Page<JobTypeDTO> findAll(JobTypeDTO jobType) {
+        Pageable pageable = PageRequest.of(jobType.getPage() - 1, jobType.getSize());
+        return jobTypeRepository.findAll(DataFormat.lower(jobType.getCode()), DataFormat.lower(jobType.getName()), pageable)
+                .map(r -> objectMapper.convertValue(r, JobTypeDTO.class));
+    }
+
+    public JobTypeDTO findDTOById(Integer id) {
+        Optional<JobType> op = jobTypeRepository.findById(id);
+        if (op.isPresent()) {
+            return objectMapper.convertValue(op.get(), JobTypeDTO.class);
+        } else {
+            throw new ResourceNotFoundException("Không tìm thấy loại hình công việc!");
+        }
     }
 
     public JobType findById(Integer id) {
-        return jobTypeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("JobType with id " + id + " does not exist"));
-    }
-
-    public JobType findByName(String name) {
-        return jobTypeRepository.findByJobTypeNameVI(name)
-                .orElseThrow(() -> new ResourceNotFoundException("JobType with name " + name + " does not exist"));
-    }
-
-    public JobTypeDto findJobTypeResponseModelById(Integer id) {
-        return objectMapper.convertValue(findById(id), JobTypeDto.class);
-    }
-
-    public JobTypeDto findJobTypeResponseModelByName(String name) {
-        return objectMapper.convertValue(findByName(name), JobTypeDto.class);
+        Optional<JobType> op = jobTypeRepository.findById(id);
+        if (op.isPresent()) {
+            return op.get();
+        } else {
+            throw new ResourceNotFoundException("Không tìm thấy loại hình công việc!");
+        }
     }
 
     @Transactional
-    public void updateJobType(Integer id, JobTypeDto request) {
-        JobType updateJobType = findById(id);
-        JobType jobTypeRequest = objectMapper.convertValue(request, JobType.class);
-        jobTypeRequest.setJobTypeId(id);
-        jobTypeRepository.save(updateJobType);
+    public void delete(Integer id) {
+        JobType jobType = jobTypeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy loại hình công việc!"));
+        jobTypeRepository.delete(jobType);
+    }
+
+    public JobType findByName(String name) {
+        return jobTypeRepository.findByName(name).get();
     }
 }
+

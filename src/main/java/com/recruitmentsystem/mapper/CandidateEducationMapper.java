@@ -20,7 +20,7 @@ public class CandidateEducationMapper {
                 .major(candidateEducation.getMajor())
                 .startDate(candidateEducation.getStartDate())
                 .endDate(candidateEducation.getEndDate())
-                .degreeName(candidateEducation.getDegree().getDegreeNameVI())
+                .degreeName(candidateEducation.getDegree().getName())
                 .description(candidateEducation.getDescription())
                 .build();
     }
@@ -37,7 +37,7 @@ public class CandidateEducationMapper {
                 .major(candidateEducationDto.major())
                 .startDate(candidateEducationDto.startDate())
                 .endDate(candidateEducationDto.endDate())
-                .degree(degreeService.findDegreeByName(candidateEducationDto.degreeName()))
+                .degree(degreeService.findByName(candidateEducationDto.degreeName()))
                 .build();
     }
 }

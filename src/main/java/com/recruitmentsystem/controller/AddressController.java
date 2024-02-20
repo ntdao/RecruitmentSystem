@@ -1,8 +1,5 @@
 package com.recruitmentsystem.controller;
 
-import com.recruitmentsystem.dto.DistrictDto;
-import com.recruitmentsystem.dto.ProvinceDto;
-import com.recruitmentsystem.dto.WardDto;
 import com.recruitmentsystem.service.DistrictService;
 import com.recruitmentsystem.service.ProvinceService;
 import com.recruitmentsystem.service.WardService;
@@ -13,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/address")
@@ -23,17 +21,17 @@ public class AddressController {
     private final WardService wardService;
 
     @GetMapping("/provinces")
-    public List<ProvinceDto> getAllProvinces() {
+    public List<Map<String, Object>> getAllProvinces() {
         return provinceService.findAllProvinces();
     }
 
     @GetMapping("/districts/province")
-    public List<DistrictDto> getAllDistrictsByProvince(@RequestParam("code") String code) {
+    public List<Map<String, Object>> getAllDistrictsByProvince(@RequestParam("code") String code) {
         return districtService.findAllDistrictsByProvince(code);
     }
 
     @GetMapping("/wards/district")
-    public List<WardDto> getAllWardsByDistrict(@RequestParam("code") String code) {
+    public List<Map<String, Object>> getAllWardsByDistrict(@RequestParam("code") String code) {
         return wardService.getAllWardsByDistrict(code);
     }
 }

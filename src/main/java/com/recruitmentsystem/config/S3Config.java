@@ -11,15 +11,10 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class S3Config {
-
     @Value("${aws.region}")
     private String region;
-
-    //    @Value("${aws.s3.mock}")
-    //    private boolean mock;
     @Value("${aws.credentials.access-key}")
     private String accessKey;
-
     @Value("${aws.credentials.secret-key}")
     private String accessSecret;
 
@@ -30,15 +25,4 @@ public class S3Config {
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
                 .withRegion(region).build();
     }
-
-//    @Bean
-//    public S3Client s3Client() {
-//        if (mock) {
-//            return new FakeS3();
-//        }
-//        return S3Client.builder()
-//                .region(Region.of(awsRegion))
-//                .build();
-//    }
-
 }

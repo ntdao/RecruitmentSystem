@@ -1,45 +1,54 @@
 package com.recruitmentsystem.controller;
 
-import com.recruitmentsystem.dto.RoleDto;
+import com.recruitmentsystem.dto.RoleDTO;
+import com.recruitmentsystem.response.BaseResponse;
 import com.recruitmentsystem.service.RoleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/admin/manage/roles")
+@RequestMapping("/api/v1/role")
 @RequiredArgsConstructor
 public class RoleController {
     private final RoleService roleService;
 
-    @GetMapping("/all")
-    public List<RoleDto> getAllRoles() {
-        return roleService.findAllRoles();
+    @PostMapping("/save")
+    public ResponseEntity<BaseResponse> save(@RequestBody RoleDTO role) {
+        BaseResponse baseResponse = new BaseResponse();
+        roleService.save(role);
+
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/find/{id}")
-    public RoleDto getRoleById(@PathVariable("id") Integer id) {
-        return roleService.findRoleResponseModelById(id);
+    @PostMapping("/get-by-id")
+    public ResponseEntity<BaseResponse> findById(@RequestBody RoleDTO dto) {
+        BaseResponse baseResponse = new BaseResponse();
+        baseResponse.setAdditionalProperty("data", roleService.findDTOById(dto.getId()));
+
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void addRole(@RequestBody RoleDto request) {
-        roleService.addRole(request);
+    @PostMapping("/get-all")
+    public ResponseEntity<BaseResponse> getAll(@RequestBody RoleDTO role) {
+        BaseResponse baseResponse = new BaseResponse();
+        Page<RoleDTO> page = roleService.findAll(role);
+        baseResponse.setAdditionalProperty("data", page.getContent());
+        baseResponse.setAdditionalProperty("total", page.getTotalElements());
+
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
-    @PostMapping("/update/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateRole(@PathVariable("id") Integer id,
-                           @RequestBody RoleDto request) {
-        roleService.updateRole(id, request);
-    }
+    @PostMapping("/delete")
+    public ResponseEntity<BaseResponse> delete(@RequestBody RoleDTO dto) {
+        BaseResponse baseResponse = new BaseResponse();
+        roleService.delete(dto.getId());
 
-    @DeleteMapping("/delete/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteRole(@PathVariable("id") Integer id) {
-        roleService.deleteRole(id);
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 }

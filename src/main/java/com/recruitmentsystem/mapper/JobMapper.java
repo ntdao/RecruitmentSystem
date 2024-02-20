@@ -33,9 +33,9 @@ public class JobMapper {
                 .map(addressMapper::entityToDto)
                 .toList();
 
-        List<SkillDto> skillList = job.getJobSkills()
+        List<SkillDTO> skillList = job.getJobSkills()
                 .stream()
-                .map(s -> objectMapper.convertValue(s, SkillDto.class))
+                .map(s -> objectMapper.convertValue(s, SkillDTO.class))
                 .toList();
 
         Integer jobCandidate = recruitmentRepository.findAllByStatus(job.getJobId(), List.of(0,1,2)).size();
@@ -56,11 +56,11 @@ public class JobMapper {
                 .jobBenefit(job.getJobBenefit())
                 .companyName(job.getCompany().getCompanyShortName())
                 .companyLogo(job.getCompany().getCompanyLogo())
-                .jobType(objectMapper.convertValue(job.getJobType(), JobTypeDto.class))
+                .jobType(objectMapper.convertValue(job.getJobType(), JobTypeDTO.class))
                 .jobStatus(job.getJobStatus())
                 .createdAt(job.getCreateDate())
                 .jobExpiredDate(job.getJobExpiredDate())
-                .category(objectMapper.convertValue(job.getCategory(), CategoryDto.class))
+                .category(objectMapper.convertValue(job.getCategory(), CategoryDTO.class))
                 .jobSkill(skillList)
                 .jobAddress(addressList)
                 .build();

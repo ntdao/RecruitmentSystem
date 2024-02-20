@@ -1,7 +1,7 @@
 package com.recruitmentsystem.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.recruitmentsystem.dto.InterviewDto;
+import com.recruitmentsystem.dto.InterviewDTO;
 import com.recruitmentsystem.dto.RecruitmentDto;
 import com.recruitmentsystem.entity.Candidate;
 import com.recruitmentsystem.entity.Interview;
@@ -48,7 +48,7 @@ public class RecruitmentService {
         List<Integer> status;
         if (jobId.equals("")) return null;
         if (Objects.equals(statusId, "")) {
-            status = Arrays.asList(0, 1, 2);
+            status = Arrays.asList(0, 1, 2, 3, 4, 5);
         } else {
             status = Collections.singletonList(Integer.parseInt(statusId));
         }
@@ -96,7 +96,7 @@ public class RecruitmentService {
     }
 
     @Transactional
-    public void addInterview(Integer recruitmentId, InterviewDto dto) {
+    public void addInterview(Integer recruitmentId, InterviewDTO dto) {
         Recruitment recruitment = findById(recruitmentId);
         recruitment.setApplicationStatus(3);
 

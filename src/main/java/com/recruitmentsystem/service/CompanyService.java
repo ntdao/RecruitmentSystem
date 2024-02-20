@@ -48,24 +48,21 @@ public class CompanyService {
         return findCompanyByEmail(accountService.getCurrentAccount(connectedAccount).getEmail());
     }
 
-    private void checkDuplicateCompanyName(String shortName, String fullName) {
-        if (companyRepository.existsCompanyByCompanyShortName(shortName)) {
-            throw new ResourceAlreadyExistsException("Company short name already taken");
-        }
-        if (companyRepository.existsCompanyByCompanyFullName(fullName)) {
-            throw new ResourceAlreadyExistsException("Company full name already taken");
+    private void checkDuplicateCompanyName(Integer id, String shortName, String fullName) {
+        if (companyRepository.countByName(id, shortName, fullName) > 0) {
+            throw new ResourceAlreadyExistsException("Tên công ty đã tồn tại");
         }
     }
 
     @Transactional
-    public CompanyResponseModel addCompanyByAdmin(CompanyRequestModel request) {
+    public CompanyResponseModel addCompanyByAdmin(CompanyDto request) {
         accountService.checkDuplicateEmail(request.email());
-        checkDuplicateCompanyName(request.companyShortName(), request.companyFullName());
+        checkDuplicateCompanyName(request.companyId(), request.companyShortName(), request.companyFullName());
 
         Account account = Account.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .role(roleService.findRoleByName(request.roleName()))
+                .role(roleService.findByName("COMPANY"))
                 .enabled(true)
                 .build();
 
@@ -118,7 +115,6 @@ public class CompanyService {
     }
 
     public List<CompanyResponseModel> findCompanyByCompanyName(String name) {
-        System.out.println(name);
         return companyRepository.findByName(name)
                 .stream()
                 .map(companyMapper::entityToDto)
@@ -126,18 +122,18 @@ public class CompanyService {
     }
 
 //    @Transactional
-//    public void updateCompanyByAdmin(Integer id, CompanyRequestModel requestModel) {
+//    public void updateCompanyByAdmin(Integer id, CompanyDto requestModel) {
 //        Company updateCompany = findCompanyById(id);
 //        updateCompany(updateCompany, requestModel);
 //    }
 
-    public void updateCompanyByCompany(CompanyRequestModel request, Principal connectedAccount) {
+    public void updateCompanyByCompany(CompanyDto request, Principal connectedAccount) {
         Company company = getCurrentCompany(connectedAccount);
         updateCompanyInfo(company, request);
     }
 
     @Transactional
-    public void updateCompanyInfo(Company updateCompany, CompanyRequestModel request) {
+    public void updateCompanyInfo(Company updateCompany, CompanyDto request) {
         int id = updateCompany.getCompanyId();
         Account updateAccount = updateCompany.getAccount();
 
@@ -157,11 +153,7 @@ public class CompanyService {
             accountRepository.save(updateAccount);
         }
 
-        boolean isNameChange = !updateCompany.getCompanyFullName().equals(request.companyFullName()) &&
-                updateCompany.getCompanyShortName().equals(request.companyShortName());
-        if (isNameChange) {
-            checkDuplicateCompanyName(request.companyFullName(), request.companyShortName());
-        }
+        checkDuplicateCompanyName(request.companyId(), request.companyFullName(), request.companyShortName());
 
         // tao ban ghi luu thong tin cu cua company
         Company oldCompany = new Company(updateCompany, true);
@@ -187,13 +179,13 @@ public class CompanyService {
     }
 
     @Transactional
-    public void updateBasicInfoByCompany(CompanyRequestModel request, Principal principal) {
+    public void updateBasicInfoByCompany(CompanyDto request, Principal principal) {
         Company updateCompany = getCurrentCompany(principal);
 
         boolean isNameChange = !updateCompany.getCompanyFullName().equals(request.companyFullName()) &&
                 updateCompany.getCompanyShortName().equals(request.companyShortName());
         if (isNameChange) {
-            checkDuplicateCompanyName(request.companyFullName(), request.companyShortName());
+            checkDuplicateCompanyName(request.companyId(), request.companyFullName(), request.companyShortName());
         }
 
         // tao ban ghi luu thong tin cu cua company
@@ -204,10 +196,10 @@ public class CompanyService {
         // update company
         updateCompany.setCompanyFullName(request.companyFullName());
         updateCompany.setCompanyShortName(request.companyShortName());
-        updateCompany.setIndustry(industryService.findById(Integer.parseInt(request.companyIndustry())));
+        updateCompany.setIndustry(industryService.findById(request.companyIndustryId()));
         updateCompany.setCompanyLogo(request.companyLogo());
         updateCompany.setCompanySize(request.companySize());
-        updateCompany.setCompanyFoundedYear(Integer.parseInt(request.companyFoundedYear()));
+        updateCompany.setCompanyFoundedYear(request.companyFoundedYear());
         updateCompany.setCompanyMst(request.companyMST());
         updateCompany.setCompanyLicense(request.companyLicense());
 
@@ -225,7 +217,7 @@ public class CompanyService {
     }
 
     @Transactional
-    public void updateContactByCompany(CompanyRequestModel request, Principal connectedUser) {
+    public void updateContactByCompany(CompanyDto request, Principal connectedUser) {
         Company company = getCurrentCompany(connectedUser);
         Account updateAccount = company.getAccount();
 
@@ -256,7 +248,7 @@ public class CompanyService {
     }
 
     @Transactional
-    public void updateDescByCompany(CompanyRequestModel request, Principal connectedUser) {
+    public void updateDescByCompany(CompanyDto request, Principal connectedUser) {
         Company company = getCurrentCompany(connectedUser);
         System.out.println("Company - Old info: " + company);
 
@@ -293,10 +285,10 @@ public class CompanyService {
         }
     }
 
-    public List<CompanyTopModel> getTopCompaniesModel(Integer pageNo, Integer pageSize, String sortBy) {
+    public List<Map<String, Object>> getTopCompaniesModel(Integer pageNo, Integer pageSize, String sortBy) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
 
-        Page<CompanyTopModel> pagedResult = companyRepository.findTopCompany(paging);
+        Page<Map<String, Object>> pagedResult = companyRepository.findTopCompany(paging);
 
         if (pagedResult.hasContent()) {
             return pagedResult.getContent();

@@ -1,52 +1,54 @@
 package com.recruitmentsystem.controller;
 
-import com.recruitmentsystem.dto.CategoryDto;
-import com.recruitmentsystem.pagination.PageDto;
+import com.recruitmentsystem.dto.CategoryDTO;
+import com.recruitmentsystem.response.BaseResponse;
 import com.recruitmentsystem.service.CategoryService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1")
-@RequiredArgsConstructor
+@RequestMapping("/api/v1/category")
 public class CategoryController {
+    @Autowired
+    private CategoryService categoryService;
 
-    private final CategoryService categoryService;
+    @PostMapping("/save")
+    public ResponseEntity<BaseResponse> save(@RequestBody CategoryDTO category) {
+        BaseResponse baseResponse = new BaseResponse();
+        categoryService.save(category);
 
-    @GetMapping("/categories/all")
-    public List<CategoryDto> getAllCategories() {
-        return categoryService.findAllCategories();
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
-    @PostMapping("/categories/hot")
-    public List<CategoryDto> getHotCategories(@RequestBody PageDto pageDto) {
-        return categoryService.findCategoriesPagingAndSorting(pageDto);
+    @PostMapping("/get-by-id")
+    public ResponseEntity<BaseResponse> findById(@RequestBody CategoryDTO dto) {
+        BaseResponse baseResponse = new BaseResponse();
+        baseResponse.setAdditionalProperty("data", categoryService.findDTOById(dto.getId()));
+
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/admin/manage/categories/find/{categoryId}")
-    public CategoryDto getCategoryById(@PathVariable("categoryId") Integer id) {
-        return categoryService.findCategoryResponseModelById(id);
+    @PostMapping("/get-all")
+    public ResponseEntity<BaseResponse> getAll(@RequestBody CategoryDTO category) {
+        BaseResponse baseResponse = new BaseResponse();
+        Page<CategoryDTO> page = categoryService.findAll(category);
+        baseResponse.setAdditionalProperty("data", page.getContent());
+        baseResponse.setAdditionalProperty("total", page.getTotalElements());
+
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
-    @PostMapping("/admin/manage/categories/add")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void addCategory(@RequestBody CategoryDto request) {
-        categoryService.addCategory(request);
-    }
+    @PostMapping("/delete")
+    public ResponseEntity<BaseResponse> delete(@RequestBody CategoryDTO dto) {
+        BaseResponse baseResponse = new BaseResponse();
+        categoryService.delete(dto.getId());
 
-    @PutMapping("/admin/manage/categories/update/{categoryId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateCategory(@PathVariable("categoryId") Integer id,
-                               @RequestBody CategoryDto request) {
-        categoryService.updateCategory(id, request);
-    }
-
-    @DeleteMapping("/admin/manage/categories/delete/{categoryId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCategory(@PathVariable("categoryId") Integer id) {
-        categoryService.deleteCategory(id);
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 }

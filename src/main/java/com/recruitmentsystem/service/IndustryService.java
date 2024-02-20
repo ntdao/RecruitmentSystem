@@ -1,85 +1,96 @@
 package com.recruitmentsystem.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.recruitmentsystem.dto.IndustryDto;
+import com.recruitmentsystem.dto.IndustryDTO;
 import com.recruitmentsystem.entity.Industry;
 import com.recruitmentsystem.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.repository.IndustryRepository;
-import lombok.RequiredArgsConstructor;
+import com.recruitmentsystem.utils.DataFormat;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class IndustryService {
-    private final ObjectMapper objectMapper;
-    private final IndustryRepository industryRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private IndustryRepository industryRepository;
 
-    @Transactional
-    public void addIndustry(IndustryDto request) {
-        checkDuplicatedIndustryName(request.industryName(), request.industryNameVI());
-        Industry industry = objectMapper.convertValue(request, Industry.class);
-        industryRepository.save(industry);
-    }
-
-    private void checkDuplicatedIndustryName(String nameEN, String nameVI) {
-        if (industryRepository.existsIndustryByIndustryName(nameEN)) {
-            throw new ResourceAlreadyExistsException("Industry EN name already taken");
-        }
-        if (industryRepository.existsIndustryByIndustryNameVI(nameVI)) {
-            throw new ResourceAlreadyExistsException("Industry VI name already taken");
+    public void save(IndustryDTO industry) {
+        if (Objects.isNull(industry.getId())) {
+            create(industry);
+        } else {
+            update(industry);
         }
     }
 
-    public void deleteIndustry(Integer id) {
-        Industry industry = findById(id);
-        industryRepository.delete(industry);
+    public void create(IndustryDTO industry) {
+        industryRepository.save(checkValid(industry));
     }
 
-    public List<Industry> findAll() {
-        return industryRepository.findAll();
+    private Industry checkValid(IndustryDTO dto) {
+        if (industryRepository.countByNameAndCode(
+                dto.getId(),
+                DataFormat.lower(dto.getName()),
+                DataFormat.lower(dto.getCode())) > 0) {
+            throw new ResourceAlreadyExistsException("Tên lĩnh vực hoạt động/mã lĩnh vực hoạt động đã tồn tại");
+        }
+        return objectMapper.convertValue(dto, Industry.class);
     }
 
-    public List<IndustryDto> findAllIndustryResponseModel() {
-        return industryRepository.findAll()
-                .stream()
-                .map(i -> objectMapper.convertValue(i, IndustryDto.class))
-                .collect(Collectors.toList());
+    public void update(IndustryDTO _industry) {
+        Optional<Industry> op = industryRepository.findById(_industry.getId());
+        Industry industry = checkValid(_industry);
+        if (op.isPresent()) {
+            Industry r = op.get();
+            r.setName(industry.getName());
+            r.setCode(industry.getCode());
+            industryRepository.save(r);
+        } else {
+            throw new ResourceNotFoundException("Không tìm thấy lĩnh vực hoạt động!");
+        }
+    }
+
+    public Page<IndustryDTO> findAll(IndustryDTO industry) {
+        Pageable pageable = PageRequest.of(industry.getPage() - 1, industry.getSize());
+        return industryRepository.findAll(DataFormat.lower(industry.getCode()), DataFormat.lower(industry.getName()), pageable)
+                .map(r -> objectMapper.convertValue(r, IndustryDTO.class));
+    }
+
+    public IndustryDTO findDTOById(Integer id) {
+        Optional<Industry> op = industryRepository.findById(id);
+        if (op.isPresent()) {
+            return objectMapper.convertValue(op.get(), IndustryDTO.class);
+        } else {
+            throw new ResourceNotFoundException("Không tìm thấy lĩnh vực hoạt động!");
+        }
     }
 
     public Industry findById(Integer id) {
-        return industryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Industry with id " + id + " does not exist"));
-    }
-
-    public Industry findIndustryByName(String name) {
-        return industryRepository.findByIndustryNameVI(name)
-                .orElseThrow(() -> new ResourceNotFoundException("Industry with name " + name + " does not exist"));
-    }
-
-    public List<Industry> findByName(String name) {
-        return industryRepository.findByIndustryNameVIContains(name);
-    }
-
-    public IndustryDto findIndustryResponseModelById(Integer id) {
-        return objectMapper.convertValue(findById(id), IndustryDto.class);
-    }
-
-    public IndustryDto findIndustryResponseModelByName(String name) {
-        return objectMapper.convertValue(findIndustryByName(name), IndustryDto.class);
+        Optional<Industry> op = industryRepository.findById(id);
+        if (op.isPresent()) {
+            return op.get();
+        } else {
+            throw new ResourceNotFoundException("Không tìm thấy lĩnh vực hoạt động!");
+        }
     }
 
     @Transactional
-    public void updateIndustry(Integer id, IndustryDto request) {
-        Industry updateIndustry = findById(id);
-        Industry industryRequest = objectMapper.convertValue(request, Industry.class);
-        industryRequest.setIndustryId(id);
-        industryRepository.save(updateIndustry);
+    public void delete(Integer id) {
+        Industry industry = industryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy lĩnh vực hoạt động!"));
+        industryRepository.delete(industry);
+    }
+
+    public Industry findByName(String name) {
+        return industryRepository.findByName(name).get();
     }
 }
-
 

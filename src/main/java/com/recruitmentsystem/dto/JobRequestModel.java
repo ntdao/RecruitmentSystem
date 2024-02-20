@@ -20,6 +20,8 @@ public record JobRequestModel(
         String jobRequirement,
         String jobBenefit,
         List<String> jobSkills,
-        List<AddressDto> jobAddresses
+        List<AddressDto> jobAddresses,
+        Integer size,
+        Integer page
 ) {
 }

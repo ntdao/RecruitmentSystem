@@ -5,33 +5,23 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface SkillRepository extends JpaRepository<Skill, Integer> {
-    boolean existsSkillBySkillName(String nameEN);
-
-    boolean existsSkillBySkillNameVI(String nameVI);
-
-    Optional<Skill> findBySkillNameVI(String name);
-
-    Optional<Skill> findBySkillName(String name);
-
-    @Query(value = """
-            select * from skill s 
-            right join  job_skill js on js.skill_id = s.skill_id 
-            right join job j on j.job_id = js.job_id 
-            where j.job_id = :id
-            """, nativeQuery = true)
-    List<Skill> findByJobId(Integer id);
-
-    @Query(value = """
-            select s from Skill s 
-            where (s.skillName like %:key% 
-            or s.skillNameVI like %:key%)
+    @Query("""
+            select r from Skill r where 1 = 1
+            and (:code is null or lower(r.code) like %:code%)
+            and (:name is null or lower(r.name) like %:name%)
             """)
-    Page<Skill> findSkillsByName(String key, Pageable paging);
+    Page<Skill> findAll(String code, String name, Pageable pageable);
+
+    @Query(value = "select count(*) from Skill r where 1 = 1 " +
+            "and (:id is null or r.id != :id) " +
+            "and ((:name is null or lower(r.name) like :name) " +
+            "or (:code is null or lower(r.code) like :code))")
+    Integer countByNameAndCode(Integer id, String name, String code);
+
+    Optional<Skill> findByName(String name);
 }
+

@@ -17,11 +17,9 @@ public class JobType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
-    private Integer jobTypeId;
-    @Column(nullable = false)
-    private String jobTypeName;
-    @Column(name = "job_type_name_vi")
-    private String jobTypeNameVI;
+    private Integer id;
+    private String code;
+    private String name;
     @OneToMany(mappedBy = "jobType", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

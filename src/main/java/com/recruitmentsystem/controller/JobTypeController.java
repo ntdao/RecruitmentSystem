@@ -1,9 +1,9 @@
 package com.recruitmentsystem.controller;
 
-import com.recruitmentsystem.dto.IndustryDTO;
+import com.recruitmentsystem.dto.JobTypeDTO;
 import com.recruitmentsystem.response.BaseResponse;
-import com.recruitmentsystem.service.IndustryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.recruitmentsystem.service.JobTypeService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,31 +13,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/industry")
-public class IndustryController {
-    @Autowired
-    private IndustryService industryService;
+@RequestMapping("/api/v1/job-type")
+@RequiredArgsConstructor
+public class JobTypeController {
+    private final JobTypeService jobTypeService;
 
     @PostMapping("/save")
-    public ResponseEntity<BaseResponse> save(@RequestBody IndustryDTO industry) {
+    public ResponseEntity<BaseResponse> save(@RequestBody JobTypeDTO jobType) {
         BaseResponse baseResponse = new BaseResponse();
-        industryService.save(industry);
+        jobTypeService.save(jobType);
 
         return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
     @PostMapping("/get-by-id")
-    public ResponseEntity<BaseResponse> findById(@RequestBody IndustryDTO dto) {
+    public ResponseEntity<BaseResponse> findById(@RequestBody JobTypeDTO dto) {
         BaseResponse baseResponse = new BaseResponse();
-        baseResponse.setAdditionalProperty("data", industryService.findDTOById(dto.getId()));
+        baseResponse.setAdditionalProperty("data", jobTypeService.findDTOById(dto.getId()));
 
         return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
     @PostMapping("/get-all")
-    public ResponseEntity<BaseResponse> getAll(@RequestBody IndustryDTO industry) {
+    public ResponseEntity<BaseResponse> getAll(@RequestBody JobTypeDTO jobType) {
         BaseResponse baseResponse = new BaseResponse();
-        Page<IndustryDTO> page = industryService.findAll(industry);
+        Page<JobTypeDTO> page = jobTypeService.findAll(jobType);
         baseResponse.setAdditionalProperty("data", page.getContent());
         baseResponse.setAdditionalProperty("total", page.getTotalElements());
 
@@ -45,10 +45,11 @@ public class IndustryController {
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<BaseResponse> delete(@RequestBody IndustryDTO dto) {
+    public ResponseEntity<BaseResponse> delete(@RequestBody JobTypeDTO dto) {
         BaseResponse baseResponse = new BaseResponse();
-        industryService.delete(dto.getId());
+        jobTypeService.delete(dto.getId());
 
         return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 }
+

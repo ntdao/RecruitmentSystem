@@ -1,19 +1,20 @@
 package com.recruitmentsystem.controller;
 
-import com.recruitmentsystem.dto.InterviewDto;
+import com.recruitmentsystem.dto.InterviewDTO;
 import com.recruitmentsystem.dto.RecruitmentDto;
+import com.recruitmentsystem.service.InterviewService;
 import com.recruitmentsystem.service.RecruitmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/recruitment")
 @RequiredArgsConstructor
 public class RecruitmentController {
+    private final InterviewService interviewService;
     private final RecruitmentService recruitmentService;
 
     @PostMapping("/apply-job/{jobId}")
@@ -56,7 +57,18 @@ public class RecruitmentController {
 
     @PostMapping("/manage/add-interview/{applicationId}")
     public void addInterview(@PathVariable("applicationId") Integer applicationId,
-                             @RequestBody InterviewDto dto) {
+                             @RequestBody InterviewDTO dto) {
         recruitmentService.addInterview(applicationId, dto);
+    }
+
+    @PostMapping("/get-interview/{applicationId}")
+    public InterviewDTO getInterview(@PathVariable("applicationId") Integer applicationId) {
+        return interviewService.getInterview(applicationId);
+    }
+
+    @PostMapping("/change-interview-status")
+    public void changeInterviewStatus(@RequestParam("interviewId") Integer interviewId,
+                             @RequestParam("status") Integer status) {
+        interviewService.changeStatus(interviewId, status);
     }
 }

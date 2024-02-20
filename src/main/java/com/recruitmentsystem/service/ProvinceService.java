@@ -1,7 +1,5 @@
 package com.recruitmentsystem.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.recruitmentsystem.dto.ProvinceDto;
 import com.recruitmentsystem.entity.Province;
 import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.repository.ProvinceRepository;
@@ -9,13 +7,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class ProvinceService {
     private final ProvinceRepository provinceRepository;
 
-    public List<ProvinceDto> findAllProvinces() {
+    public List<Map<String, Object>> findAllProvinces() {
         return provinceRepository.findAllProvince();
     }
 

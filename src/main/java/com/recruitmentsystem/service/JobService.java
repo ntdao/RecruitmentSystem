@@ -26,6 +26,7 @@ public class JobService {
     private final JobRepository jobRepository;
     private final JobMapper jobMapper;
     private final CompanyService companyService;
+    private final CandidateService candidateService;
 
     @Transactional
     public void addJob(JobRequestModel request, Principal principal) {
@@ -36,11 +37,21 @@ public class JobService {
     }
 
     public List<JobResponseModel> findAllJob() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        Object object = authentication.getPrincipal();
+//        if (authentication.getPrincipal().equals("anonymousUser")) {
         return jobRepository.findAllJob()
                 .stream()
                 .filter(j -> j.getJobStatus() == 0)
                 .map(jobMapper::entityToDto)
                 .collect(Collectors.toList());
+//        }
+//        Candidate candidate = candidateService.findCandidateByEmail(authentication.getName());
+//        return jobRepository.findAllJobByCategory(candidate.getCategory().getCategoryName())
+//                .stream()
+//                .filter(j -> j.getJobStatus() == 0)
+//                .map(jobMapper::entityToDto)
+//                .collect(Collectors.toList());
     }
 
     public List<JobResponseModel> findAllJobsByAdmin() {
@@ -143,7 +154,7 @@ public class JobService {
         Company company = companyService.getCurrentCompany(principal);
         List<Integer> jobStatusList;
         if (jobStatus.equals("")) {
-            jobStatusList = Arrays.asList(0,1,2);
+            jobStatusList = Arrays.asList(0, 1, 2);
         } else {
             jobStatusList = Collections.singletonList(Integer.parseInt(jobStatus));
         }
@@ -153,5 +164,9 @@ public class JobService {
     public StatisticDto getQuantity() {
         List<Map<String, Object>> map = jobRepository.getQuantity();
         return Utils.getStatistic(map);
+    }
+
+    public List<JobResponseModel> getJobPaging(JobRequestModel request) {
+        return null;
     }
 }

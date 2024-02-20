@@ -1,15 +1,27 @@
 package com.recruitmentsystem.repository;
 
 import com.recruitmentsystem.entity.Degree;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface DegreeRepository extends JpaRepository<Degree, Integer> {
-    List<Degree> findByDegreeNameVIContains(String name);
+    @Query("""
+                    select r from Degree r where 1 = 1
+                    and (:code is null or lower(r.code) like %:code%)
+                    and (:name is null or lower(r.name) like %:name%)
+            """)
+    Page<Degree> findAll(String code, String name, Pageable pageable);
 
-    Optional<Degree> findByDegreeName(String name);
+    @Query(value = "select count(*) from Degree r where 1 = 1 " +
+            "and (:id is null or r.id != :id) " +
+            "and ((:name is null or lower(r.name) like :name) " +
+            "or (:code is null or lower(r.code) like :code))")
+    Integer countByNameAndCode(Integer id, String name, String code);
+
+    Optional<Degree> findByName(String name);
 }
+

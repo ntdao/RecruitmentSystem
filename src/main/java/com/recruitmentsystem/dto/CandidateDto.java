@@ -1,5 +1,7 @@
 package com.recruitmentsystem.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -7,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
-public record CandidateResponseModel(
+public record CandidateDto (
         Integer id,
         Integer accountId,
         String email,
@@ -20,12 +22,22 @@ public record CandidateResponseModel(
         LocalDateTime createDate,
         LocalDateTime lastModified,
         String roleName,
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
         List<CandidateEducationDto> education,
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
         List<CandidateWorkingHistoryDto> workingHistory,
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
         List<SkillDTO> skill,
         String desiredJob,
         String educationLevel,
         CategoryDTO category,
-        String cvUrl
+        String cvUrl,
+        @JsonIgnore
+        String password,
+
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        String currentPass,
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        String newPass
 ) {
 }

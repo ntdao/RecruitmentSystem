@@ -71,13 +71,21 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
             """)
     List<Job> findAllJob();
 
+    @Query("""
+            select j from Job j
+            left join fetch j.jobSkills
+            left join fetch j.jobAddresses
+            where j.deleteFlag = false and j.category.name = :categoryName
+            """)
+    List<Job> findAllJobByCategory(String categoryName);
+
     @Query(value = """
             select j from Job j
             left join fetch j.jobSkills
             left join fetch j.jobAddresses
             where j.deleteFlag = false
             and j.jobName like %?1%
-            and j.category.categoryId in ?2
+            and j.category.id in ?2
             """,
             countQuery = """
                     select j from Job j
@@ -85,7 +93,7 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
                     left join fetch j.jobAddresses
                     where j.deleteFlag = false
                     and j.jobName like %?1%
-                    and j.category.categoryId in ?2
+                    and j.category.id in ?2
                     """)
     Page<Job> findJobByNameAndCategory(String name, List<Integer> categories, Pageable paging);
 

@@ -21,10 +21,7 @@ public class Degree {
     List<CandidateEducation> candidateEducations;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(updatable = false)
-    private Integer degreeId;
-    @Column(nullable = false)
-    private String degreeName;
-    @Column(name = "degree_name_VI")
-    private String degreeNameVI;
+    private Integer id;
+    private String code;
+    private String name;
 }

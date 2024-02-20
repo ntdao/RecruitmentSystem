@@ -1,10 +1,11 @@
 package com.recruitmentsystem.controller;
 
-import com.recruitmentsystem.dto.*;
+import com.recruitmentsystem.dto.JobDto;
+import com.recruitmentsystem.dto.JobRequestModel;
+import com.recruitmentsystem.dto.JobResponseModel;
+import com.recruitmentsystem.dto.JobTopModel;
 import com.recruitmentsystem.enums.Gender;
-import com.recruitmentsystem.pagination.PageDto;
 import com.recruitmentsystem.service.JobService;
-import com.recruitmentsystem.service.JobTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JobController {
     private final JobService jobService;
-    private final JobTypeService jobTypeService;
 
     @GetMapping("/jobs/all")
     public List<JobResponseModel> getAllJobs() {
@@ -34,8 +34,8 @@ public class JobController {
     }
 
     @PostMapping("/jobs/find")
-    public List<JobResponseModel> getTopJobs(@RequestBody PageDto pageDto) {
-        return jobService.getJobByPaging(pageDto);
+    public List<JobResponseModel> getJobPaging(@RequestBody JobRequestModel request) {
+        return jobService.getJobPaging(request);
     }
 
     @GetMapping("/jobs/find")
@@ -46,11 +46,6 @@ public class JobController {
     @GetMapping("/job/{jobId}")
     public JobResponseModel getJobById(@PathVariable("jobId") Integer jobId) {
         return jobService.findJobById(jobId);
-    }
-
-    @GetMapping("/jobs/job-type")
-    public List<JobTypeDto> getAllJobType() {
-        return jobTypeService.findAllJobTypeResponseModel();
     }
 
     @GetMapping("/jobs/job-gender")

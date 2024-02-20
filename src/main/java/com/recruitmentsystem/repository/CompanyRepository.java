@@ -1,6 +1,5 @@
 package com.recruitmentsystem.repository;
 
-import com.recruitmentsystem.dto.CompanyTopModel;
 import com.recruitmentsystem.entity.Company;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,11 +13,6 @@ import java.util.Optional;
 
 @Repository
 public interface CompanyRepository extends JpaRepository<Company, Integer> {
-
-    boolean existsCompanyByCompanyShortName(String name);
-
-    boolean existsCompanyByCompanyFullName(String name);
-
     @Query("""
             select c from Company c 
             left join fetch c.industry
@@ -69,17 +63,17 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
     List<Company> findByName(String name);
 
     @Query(value = """
-            select new com.recruitmentsystem.dto.CompanyTopModel(c.companyShortName, c.companyLogo, c.industry.industryNameVI) 
+            select c.companyShortName as companyShortName, c.companyLogo as companyLogo, c.industry.name as industry
             from Company c
             where c.deleteFlag = false
             """,
             countQuery = """
-                    select new com.recruitmentsystem.dto.CompanyTopModel(c.companyShortName, c.companyLogo, c.industry.industryNameVI) 
-                    from Company c
-                    where c.deleteFlag = false
-                    """
+            select c.companyShortName as companyShortName, c.companyLogo as companyLogo, c.industry.name as industry
+            from Company c
+            where c.deleteFlag = false
+            """
     )
-    Page<CompanyTopModel> findTopCompany(Pageable paging);
+    Page<Map<String, Object>> findTopCompany(Pageable paging);
 
     @Query("""
             select month(c.createDate) as month, year(c.createDate) as year, count(*) as quantity
@@ -87,4 +81,9 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
             group by month(c.createDate), year(c.createDate)
             """)
     List<Map<String, Object>> getQuantity();
+
+    @Query(value = "select count(*) from Company c where 1 = 1 " +
+            "and :id is null or c.companyId <> :id " +
+            "and (c.companyShortName = :shortName or c.companyFullName = :fullName)")
+    Integer countByName(Integer id, String shortName, String fullName);
 }

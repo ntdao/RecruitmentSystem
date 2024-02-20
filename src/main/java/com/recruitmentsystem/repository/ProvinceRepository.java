@@ -1,21 +1,20 @@
 package com.recruitmentsystem.repository;
 
-import com.recruitmentsystem.dto.ProvinceDto;
 import com.recruitmentsystem.entity.Province;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
 public interface ProvinceRepository extends JpaRepository<Province, String> {
     @Query("""
-            select new com.recruitmentsystem.dto.ProvinceDto(p.provinceCode, p.fullName)
-            from provinces p
+            select p.provinceCode as code, p.fullName as name from provinces p
             """)
-    List<ProvinceDto> findAllProvince();
+    List<Map<String, Object>> findAllProvince();
 
     @Query("""
             select p from provinces p

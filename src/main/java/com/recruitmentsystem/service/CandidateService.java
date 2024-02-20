@@ -61,7 +61,7 @@ public class CandidateService {
         Account account = Account.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .role(roleService.findRoleByName(request.roleName()))
+                .role(roleService.findByName("CANDIDATE"))
                 .enabled(true)
                 .build();
         accountRepository.save(account);

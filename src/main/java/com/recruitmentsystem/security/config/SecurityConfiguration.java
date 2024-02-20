@@ -57,7 +57,7 @@ public class SecurityConfiguration {
                 .permitAll()
 
                 // Tất cả các request khác đều cần phải xác thực mới được truy cập
-                .anyRequest().authenticated()
+//                .anyRequest().authenticated()
                 .and()
                 // disable session
                 .sessionManagement()

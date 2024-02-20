@@ -48,7 +48,7 @@ public class AuthenticationService {
         Account account = Account.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .role(roleService.findRoleByName(request.roleName()))
+                .role(roleService.findByName(request.roleName()))
                 .build();
         accountRepository.save(account);
 
@@ -108,7 +108,6 @@ public class AuthenticationService {
 
     public AuthenticationResponseModel forgotPassword(String email) {
         Account account = accountService.findAccountByEmail(email);
-//        User user = userService.findUserByEmail(email);
         String token = jwtService.generateEmailToken(account);
         saveAccountToken(account, token, TokenType.EMAIL);
 
@@ -122,20 +121,9 @@ public class AuthenticationService {
 
     public void updatePassword(String token, String newPassword) {
         confirmEmail(token);
-
         Account account = accountService.findAccountByToken(token);
         revokeAllAccountTokens(account);
-
-        // tao ban ghi luu thong tin cu cua account
-        Account oldAccount = new Account(account, true);
-        accountRepository.save(oldAccount);
-
-        // update account
         account.setPassword(passwordEncoder.encode(newPassword));
-//        user.setUpdatedAt(Instant.now());
-//        user.setUpdatedBy(user.getId());
-
-        // luu thong tin vao database
         accountRepository.save(account);
     }
 

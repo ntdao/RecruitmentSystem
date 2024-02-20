@@ -13,9 +13,7 @@ import lombok.*;
 public class Skill {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(updatable = false)
-    private Integer skillId;
-    private String skillName;
-    @Column(name = "skill_name_VI")
-    private String skillNameVI;
+    private Integer id;
+    private String code;
+    private String name;
 }

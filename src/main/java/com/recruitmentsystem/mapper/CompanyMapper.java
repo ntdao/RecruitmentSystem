@@ -1,9 +1,9 @@
 package com.recruitmentsystem.mapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.recruitmentsystem.dto.CompanyRequestModel;
+import com.recruitmentsystem.dto.CompanyDto;
 import com.recruitmentsystem.dto.CompanyResponseModel;
-import com.recruitmentsystem.dto.IndustryDto;
+import com.recruitmentsystem.dto.IndustryDTO;
 import com.recruitmentsystem.entity.Company;
 import com.recruitmentsystem.service.IndustryService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class CompanyMapper {
                 .companyLogo(company.getCompanyLogo())
                 .companyImage(company.getCompanyImage())
                 .companyIntroduction(company.getCompanyIntroduction())
-                .companyIndustry(objectMapper.convertValue(company.getIndustry(), IndustryDto.class))
+                .companyIndustry(objectMapper.convertValue(company.getIndustry(), IndustryDTO.class))
                 .companyAddress(addressMapper.entityToDto(company.getCompanyAddress()))
                 .companyMST(company.getCompanyMst())
                 .companyLicense(company.getCompanyLicense())
@@ -44,16 +44,16 @@ public class CompanyMapper {
                 .build();
     }
 
-    public Company dtoToEntity(CompanyRequestModel request) {
+    public Company dtoToEntity(CompanyDto request) {
         return Company
                 .builder()
                 .companyShortName(request.companyShortName())
                 .companyFullName(request.companyFullName())
                 .companyIntroduction(request.companyIntroduction())
-                .industry(industryService.findById(Integer.parseInt(request.companyIndustry())))
+                .industry(industryService.findById(request.companyIndustryId()))
                 .companyMst(request.companyMST())
                 .companySize(request.companySize())
-                .companyFoundedYear(Integer.parseInt(request.companyFoundedYear()))
+                .companyFoundedYear(request.companyFoundedYear())
                 .companyBranch(request.companyBranch())
                 .phoneNumber(request.phoneNumber())
                 .website(request.website())

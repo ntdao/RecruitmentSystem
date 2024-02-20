@@ -14,9 +14,9 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
-    private Integer categoryId;
-    @Column(nullable = false)
-    private String categoryName;
-    private String categoryIcon;
-    private Integer categoryTotal;
+    private Integer id;
+    private String code;
+    private String name;
+    private String icon;
+    private Integer total;
 }

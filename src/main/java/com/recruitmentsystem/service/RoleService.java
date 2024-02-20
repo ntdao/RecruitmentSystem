@@ -1,71 +1,100 @@
 package com.recruitmentsystem.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.recruitmentsystem.dto.RoleDto;
+import com.recruitmentsystem.dto.RoleDTO;
 import com.recruitmentsystem.entity.Role;
 import com.recruitmentsystem.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.repository.RoleRepository;
-import lombok.RequiredArgsConstructor;
+import com.recruitmentsystem.utils.DataFormat;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class RoleService {
-    private final ObjectMapper objectMapper;
-    private final RoleRepository roleRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private RoleRepository roleRepository;
 
-    public void addRole(RoleDto request) {
-        // check role_name
-        if (roleRepository.existsRoleByRoleName(request.roleName())) {
-            throw new ResourceAlreadyExistsException("Role name already taken");
+    public void save(RoleDTO role) {
+        if (Objects.isNull(role.getId())) {
+            create(role);
+        } else {
+            update(role);
         }
-
-        // add role to db
-        Role role = new Role(request.roleName());
-        roleRepository.save(role);
     }
 
-    public List<RoleDto> findAllRoles() {
-        return roleRepository.findAll()
-                .stream()
-                .map(r -> objectMapper.convertValue(r, RoleDto.class))
-                .collect(Collectors.toList());
+    public void create(RoleDTO role) {
+        roleRepository.save(checkValid(role));
     }
 
-    public Role findRoleById(Integer id) {
-        return roleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Role with id " + id + " does not exist"));
+    private Role checkValid(RoleDTO dto) {
+        if (roleRepository.countByNameAndCode(
+                dto.getId(),
+                DataFormat.lower(dto.getName()),
+                DataFormat.lower(dto.getCode())) > 0) {
+            throw new ResourceAlreadyExistsException("Tên quyền/mã quyền đã tồn tại");
+        }
+        return objectMapper.convertValue(dto, Role.class);
     }
 
-    public RoleDto findRoleResponseModelById(Integer id) {
-        return objectMapper.convertValue(findRoleById(id), RoleDto.class);
+    public void update(RoleDTO _role) {
+        Optional<Role> op = roleRepository.findById(_role.getId());
+        Role role = checkValid(_role);
+        if (op.isPresent()) {
+            Role r = op.get();
+            r.setName(role.getName());
+            r.setCode(role.getCode());
+            roleRepository.save(r);
+        } else {
+            throw new ResourceNotFoundException("Không tìm thấy quyền!");
+        }
     }
 
-    public Role findRoleByName(String name) {
-        return roleRepository.findByRoleName(name)
-                .orElseThrow(() -> new ResourceNotFoundException("Role with name " + name + " does not exist"));
+    public Page<RoleDTO> findAll(RoleDTO role) {
+        Pageable pageable = PageRequest.of(role.getPage() - 1, role.getSize());
+        return roleRepository.findAll(DataFormat.lower(role.getCode()), DataFormat.lower(role.getName()), pageable)
+                .map(r -> objectMapper.convertValue(r, RoleDTO.class));
     }
 
-    public RoleDto findRoleResponseModelByName(String name) {
-        return objectMapper.convertValue(findRoleByName(name), RoleDto.class);
+    public RoleDTO findDTOById(Integer id) {
+        Optional<Role> op = roleRepository.findById(id);
+        if (op.isPresent()) {
+            return objectMapper.convertValue(op.get(), RoleDTO.class);
+        } else {
+            throw new ResourceNotFoundException("Không tìm thấy quyền!");
+        }
     }
 
-    public void updateRole(Integer id, RoleDto request) {
-        // tim role theo id
-        Role updateRole = findRoleById(id);
-
-        // update role
-        updateRole.setRoleName(request.roleName());
-        updateRole.setRoleId(id);
-        roleRepository.save(updateRole);
+    public Role findById(Integer id) {
+        Optional<Role> op = roleRepository.findById(id);
+        if (op.isPresent()) {
+            return op.get();
+        } else {
+            throw new ResourceNotFoundException("Không tìm thấy quyền!");
+        }
     }
 
-    public void deleteRole(Integer id) {
-        Role role = findRoleById(id);
-        roleRepository.deleteById(id);
+    @Transactional
+    public void delete(Integer id) {
+        Role role = roleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy quyền!"));
+        roleRepository.delete(role);
+    }
+
+    public Role findByCode(String code) {
+        return roleRepository.findByCode(code).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy quyền!"));
+    }
+
+    public Role findByName(String name) {
+        return (Role) roleRepository.findByName(name).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy quyền!"));
     }
 }
+

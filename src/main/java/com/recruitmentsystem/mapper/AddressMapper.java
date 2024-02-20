@@ -20,7 +20,7 @@ public class AddressMapper {
     private final WardService wardService;
 
     public AddressDto entityToDto(Address address) {
-        if (address == null) {
+        if (address == null || address.getWard() == null) {
             return null;
         }
         String wardCode = address.getWard().getWardCode();

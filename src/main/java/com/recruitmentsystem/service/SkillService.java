@@ -1,110 +1,96 @@
 package com.recruitmentsystem.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.recruitmentsystem.dto.SkillDto;
+import com.recruitmentsystem.dto.SkillDTO;
 import com.recruitmentsystem.entity.Skill;
 import com.recruitmentsystem.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.exception.ResourceNotFoundException;
-import com.recruitmentsystem.pagination.PageDto;
 import com.recruitmentsystem.repository.SkillRepository;
-import lombok.RequiredArgsConstructor;
+import com.recruitmentsystem.utils.DataFormat;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class SkillService {
-    private final ObjectMapper objectMapper;
-    private final SkillRepository skillRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private SkillRepository skillRepository;
 
-    public void addSkill(SkillDto request) {
-        checkDuplicatedSkillName(request.skillName(), request.skillNameVI());
-        Skill skill = objectMapper.convertValue(request, Skill.class);
-        skillRepository.save(skill);
-    }
-
-    private void checkDuplicatedSkillName(String nameEN, String nameVI) {
-        if (skillRepository.existsSkillBySkillName(nameEN)) {
-            throw new ResourceAlreadyExistsException("Skill EN name already taken");
-        }
-        if (skillRepository.existsSkillBySkillNameVI(nameVI)) {
-            throw new ResourceAlreadyExistsException("Skill VI name already taken");
+    public void save(SkillDTO skill) {
+        if (Objects.isNull(skill.getId())) {
+            create(skill);
+        } else {
+            update(skill);
         }
     }
 
-    public void deleteSkill(Integer id) {
-        Skill skill = findById(id);
-        skillRepository.delete(skill);
+    public void create(SkillDTO skill) {
+        skillRepository.save(checkValid(skill));
     }
 
-    public List<Skill> findAll() {
-        return skillRepository.findAll();
+    private Skill checkValid(SkillDTO dto) {
+        if (skillRepository.countByNameAndCode(
+                dto.getId(),
+                DataFormat.lower(dto.getName()),
+                DataFormat.lower(dto.getCode())) > 0) {
+            throw new ResourceAlreadyExistsException("Tên kỹ năng/mã kỹ năng đã tồn tại");
+        }
+        return objectMapper.convertValue(dto, Skill.class);
     }
 
-    public List<SkillDto> findAllSkillDto() {
-        return skillRepository.findAll()
-                .stream()
-                .map(s -> objectMapper.convertValue(s, SkillDto.class))
-                .collect(Collectors.toList());
+    public void update(SkillDTO _skill) {
+        Optional<Skill> op = skillRepository.findById(_skill.getId());
+        Skill skill = checkValid(_skill);
+        if (op.isPresent()) {
+            Skill r = op.get();
+            r.setName(skill.getName());
+            r.setCode(skill.getCode());
+            skillRepository.save(r);
+        } else {
+            throw new ResourceNotFoundException("Không tìm thấy kỹ năng!");
+        }
+    }
+
+    public Page<SkillDTO> findAll(SkillDTO skill) {
+        Pageable pageable = PageRequest.of(skill.getPage() - 1, skill.getSize());
+        return skillRepository.findAll(DataFormat.lower(skill.getCode()), DataFormat.lower(skill.getName()), pageable)
+                .map(r -> objectMapper.convertValue(r, SkillDTO.class));
+    }
+
+    public SkillDTO findDTOById(Integer id) {
+        Optional<Skill> op = skillRepository.findById(id);
+        if (op.isPresent()) {
+            return objectMapper.convertValue(op.get(), SkillDTO.class);
+        } else {
+            throw new ResourceNotFoundException("Không tìm thấy kỹ năng!");
+        }
     }
 
     public Skill findById(Integer id) {
-        return skillRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Skill with id " + id + " does not exist"));
-    }
-
-    public Skill findByName(String name) {
-        return skillRepository.findBySkillName(name)
-                .orElseThrow(() -> new ResourceNotFoundException("Skill with name " + name + " does not exist"));
-    }
-
-    public SkillDto findSkillDtoById(Integer id) {
-        return objectMapper.convertValue(findById(id), SkillDto.class);
-    }
-
-    public SkillDto findSkillDtoByName(String name) {
-        return objectMapper.convertValue(findByName(name), SkillDto.class);
-    }
-
-    public List<SkillDto> findSkillsByName(PageDto pageDto) {
-        Pageable paging = PageRequest.of(
-                pageDto.getPageNo(),
-                pageDto.getPageSize(),
-                Sort.Direction.fromString(pageDto.getSortDir()),
-                pageDto.getSortBy());
-        Page<Skill> pagedResult = skillRepository.findSkillsByName(pageDto.getKey(), paging);
-        if (pagedResult.hasContent()) {
-            return pagedResult.getContent()
-                    .stream()
-                    .map(s -> objectMapper.convertValue(s, SkillDto.class))
-                    .toList();
+        Optional<Skill> op = skillRepository.findById(id);
+        if (op.isPresent()) {
+            return op.get();
         } else {
-            return null;
+            throw new ResourceNotFoundException("Không tìm thấy kỹ năng!");
         }
     }
 
-    private List<Skill> findSkillByJob(Integer id) {
-        return skillRepository.findByJobId(id);
-    }
-
-    public List<SkillDto> findSkillDtoByJob(Integer id) {
-        return findSkillByJob(id).stream()
-                .map(s -> objectMapper.convertValue(s, SkillDto.class))
-                .collect(Collectors.toList());
-    }
-
     @Transactional
-    public void updateSkill(Integer id, SkillDto skillDto) {
-        Skill updateSkill = findById(id);
-        Skill skill = objectMapper.convertValue(skillDto, Skill.class);
-        skill.setSkillId(id);
-        skillRepository.save(skill);
+    public void delete(Integer id) {
+        Skill skill = skillRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy kỹ năng!"));
+        skillRepository.delete(skill);
+    }
+
+    public Skill findByName(String name) {
+        return skillRepository.findByName(name).get();
     }
 }
+

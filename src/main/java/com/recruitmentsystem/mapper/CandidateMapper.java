@@ -26,11 +26,11 @@ public class CandidateMapper {
                 .stream()
                 .map(h -> objectMapper.convertValue(h, CandidateWorkingHistoryDto.class))
                 .toList();
-        List<SkillDto> skills = candidate.getCandidateSkills()
+        List<SkillDTO> skills = candidate.getCandidateSkills()
                 .stream()
-                .map(s -> objectMapper.convertValue(s, SkillDto.class))
+                .map(s -> objectMapper.convertValue(s, SkillDTO.class))
                 .toList();
-        CategoryDto category = objectMapper.convertValue(candidate.getCategory(), CategoryDto.class);
+        CategoryDTO category = objectMapper.convertValue(candidate.getCategory(), CategoryDTO.class);
 
         return CandidateResponseModel
                 .builder()

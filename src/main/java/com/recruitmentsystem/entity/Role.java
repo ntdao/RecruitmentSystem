@@ -16,17 +16,12 @@ import java.util.List;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(updatable = false)
-    private Integer roleId;
-    @Column(nullable = false)
-    private String roleName;
+    private Integer id;
+    private String code;
+    private String name;
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @JsonIgnore
     private List<Account> accounts;
-
-    public Role(String roleName) {
-        this.roleName = roleName;
-    }
 }

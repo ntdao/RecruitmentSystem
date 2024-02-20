@@ -1,9 +1,8 @@
 package com.recruitmentsystem.controller;
 
 import com.recruitmentsystem.dto.AddressDto;
-import com.recruitmentsystem.dto.CompanyRequestModel;
+import com.recruitmentsystem.dto.CompanyDto;
 import com.recruitmentsystem.dto.CompanyResponseModel;
-import com.recruitmentsystem.dto.CompanyTopModel;
 import com.recruitmentsystem.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -26,9 +26,9 @@ public class CompanyController {
     }
 
     @GetMapping("/companies/top")
-    public List<CompanyTopModel> getTopCompanies(@RequestParam(defaultValue = "0") Integer pageNo,
-                                                 @RequestParam(defaultValue = "6") Integer pageSize,
-                                                 @RequestParam(defaultValue = "companyId") String sortBy) {
+    public List<Map<String, Object>> getTopCompanies(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                     @RequestParam(defaultValue = "6") Integer pageSize,
+                                                     @RequestParam(defaultValue = "companyId") String sortBy) {
         return companyService.getTopCompaniesModel(pageNo, pageSize, sortBy);
     }
 
@@ -54,7 +54,7 @@ public class CompanyController {
 
     @PostMapping("/admin/manage/companies/add")
     @ResponseStatus(HttpStatus.CREATED)
-    public CompanyResponseModel addCompany(@RequestBody CompanyRequestModel companyRequest) {
+    public CompanyResponseModel addCompany(@RequestBody CompanyDto companyRequest) {
         return companyService.addCompanyByAdmin(companyRequest);
     }
 
@@ -62,7 +62,7 @@ public class CompanyController {
 //    @PreAuthorize("hasAuthority('ADMIN')")
 //    @ResponseStatus(HttpStatus.NO_CONTENT)
 //    public void updateCompany(@PathVariable("id") Integer id,
-//                              @RequestBody CompanyRequestModel companyRequest) {
+//                              @RequestBody CompanyDto companyRequest) {
 //        companyService.updateCompanyByAdmin(id, companyRequest);
 //    }
 
@@ -79,23 +79,23 @@ public class CompanyController {
 
     @PostMapping("/company/manage/update-basic-info")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@RequestBody CompanyRequestModel companyRequestModel,
+    public void update(@RequestBody CompanyDto dto,
                        Principal connectedUser) {
-        companyService.updateBasicInfoByCompany(companyRequestModel, connectedUser);
+        companyService.updateBasicInfoByCompany(dto, connectedUser);
     }
 
     @PostMapping("/company/manage/update-desc")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateDesc(@RequestBody CompanyRequestModel companyRequestModel,
+    public void updateDesc(@RequestBody CompanyDto dto,
                            Principal connectedUser) {
-        companyService.updateDescByCompany(companyRequestModel, connectedUser);
+        companyService.updateDescByCompany(dto, connectedUser);
     }
 
     @PostMapping("/company/manage/update-media")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateContact(@RequestBody CompanyRequestModel companyRequestModel,
+    public void updateContact(@RequestBody CompanyDto dto,
                               Principal connectedUser) {
-        companyService.updateContactByCompany(companyRequestModel, connectedUser);
+        companyService.updateContactByCompany(dto, connectedUser);
     }
 
     @PostMapping("/company/manage/update-address")
