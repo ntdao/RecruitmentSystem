@@ -1,10 +1,8 @@
 package com.recruitmentsystem.controller;
 
 import com.recruitmentsystem.dto.*;
-import com.recruitmentsystem.pagination.PageDto;
 import com.recruitmentsystem.service.CandidateService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +25,7 @@ public class CandidateController {
     }
 
 //    @PostMapping("/admin/manage/candidates/paging")
-//    public Page<CandidateResponseModel> searchCandidate(@RequestBody CandidateDto dto) {
+//    public List<CandidateResponseModel> searchCandidate(@RequestBody CandidateDto dto) {
 //        return candidateService.searchCandidate(dto);
 //    }
 
@@ -37,7 +35,7 @@ public class CandidateController {
     }
 
     @GetMapping("/admin/manage/candidates/find")
-    public List<CandidateResponseModel> getCandidateByName(@RequestParam("key") String key) {
+    public List<CandidateResponseModel> getCandidateByName(@RequestParam("name") String key) {
         return candidateService.findAllCandidateByKey(key);
     }
 
@@ -67,18 +65,33 @@ public class CandidateController {
     }
 
     @PostMapping("/candidate/get-education")
-    public Set<CandidateEducationDto> getEducation(@RequestBody CandidateDto dto, Principal principal) {
-        return candidateService.getCandidateEducation(dto.id());
+    public Set<CandidateEducationDto> getEducation(@RequestBody CandidateDto dto) {
+        return candidateService.getEducation(dto.id());
     }
     
     @PostMapping("/candidate/save-education")
-    public void addEducation(@RequestBody CandidateEducationDto dto, Principal principal) {
-        candidateService.addCandidateEducation(dto, principal);
+    public void saveEducation(@RequestBody CandidateEducationDto dto, Principal principal) {
+        candidateService.saveEducation(dto, principal);
     }
 
     @PostMapping("/candidate/delete-education")
-    public void deleteEducation(@RequestBody CandidateEducationDto dto, Principal principal) {
-        candidateService.deleteCandidateEducation(dto.id(), principal);
+    public void deleteEducation(@RequestBody CandidateEducationDto dto) {
+        candidateService.deleteEducation(dto.id());
+    }
+
+    @PostMapping("/candidate/get-history")
+    public Set<CandidateWorkingHistoryDto> getHistory(@RequestBody CandidateWorkingHistoryDto dto) {
+        return candidateService.getHistory(dto.id());
+    }
+
+    @PostMapping("/candidate/save-history")
+    public void saveHistory(@RequestBody CandidateWorkingHistoryDto dto, Principal principal) {
+        candidateService.saveHistory(dto, principal);
+    }
+
+    @PostMapping("/candidate/delete-history")
+    public void deleteEducation(@RequestBody CandidateWorkingHistoryDto dto) {
+        candidateService.deleteHistory(dto.id());
     }
 
     @PutMapping("/candidate/update-no-token")

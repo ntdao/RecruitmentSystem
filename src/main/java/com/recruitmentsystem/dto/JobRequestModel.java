@@ -8,8 +8,10 @@ import java.util.List;
 @Builder
 public record JobRequestModel(
         String jobName,
+        Integer jobTypeId,
         String jobType,
-        String categoryId,
+        Integer categoryId,
+        String category,
         String minEducationLevel,
         String jobExperience,
         Gender jobGender,
@@ -20,7 +22,9 @@ public record JobRequestModel(
         String jobRequirement,
         String jobBenefit,
         List<String> jobSkills,
-        List<AddressDto> jobAddresses,
+        AddressDto jobAddress,
+
+        String provinceCode,
         Integer size,
         Integer page
 ) {

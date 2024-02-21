@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
     @Query("""
             select j from Job j
             left join fetch j.jobSkills
-            left join fetch j.jobAddresses
+            left join fetch j.jobAddress
             where j.company.companyId = :id
             and j.deleteFlag = false
             """)
@@ -27,14 +28,14 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
     @Query(value = """
             select j from Job j
             left join fetch j.jobSkills
-            left join fetch j.jobAddresses
+            left join fetch j.jobAddress
             where j.deleteFlag = false
             and j.jobName like %?1%
             """,
             countQuery = """
                     select j from Job j
                     left join fetch j.jobSkills
-                    left join fetch j.jobAddresses
+                    left join fetch j.jobAddress
                     where j.deleteFlag = false
                     and j.jobName like %?1%
                     """)
@@ -43,7 +44,7 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
     @Query("""
             select j from Job j
             left join fetch j.jobSkills
-            left join fetch j.jobAddresses
+            left join fetch j.jobAddress
             where j.deleteFlag = false
             and j.jobId = :id
             """)
@@ -66,7 +67,7 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
     @Query("""
             select j from Job j
             left join fetch j.jobSkills
-            left join fetch j.jobAddresses
+            left join fetch j.jobAddress
             where j.deleteFlag = false
             """)
     List<Job> findAllJob();
@@ -74,7 +75,7 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
     @Query("""
             select j from Job j
             left join fetch j.jobSkills
-            left join fetch j.jobAddresses
+            left join fetch j.jobAddress
             where j.deleteFlag = false and j.category.name = :categoryName
             """)
     List<Job> findAllJobByCategory(String categoryName);
@@ -82,7 +83,7 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
     @Query(value = """
             select j from Job j
             left join fetch j.jobSkills
-            left join fetch j.jobAddresses
+            left join fetch j.jobAddress
             where j.deleteFlag = false
             and j.jobName like %?1%
             and j.category.id in ?2
@@ -90,7 +91,7 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
             countQuery = """
                     select j from Job j
                     left join fetch j.jobSkills
-                    left join fetch j.jobAddresses
+                    left join fetch j.jobAddress
                     where j.deleteFlag = false
                     and j.jobName like %?1%
                     and j.category.id in ?2
@@ -100,7 +101,7 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
     @Query("""
             select j from Job j
             left join fetch j.jobSkills
-            left join fetch j.jobAddresses
+            left join fetch j.jobAddress
             where j.deleteFlag = false
             and j.jobName like %?1%
             """)
@@ -120,4 +121,19 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
             group by month(j.createDate), year(j.createDate)
             """)
     List<Map<String, Object>> getQuantity();
+
+    @Query("""
+            select j from Job j
+            left join fetch j.jobSkills
+            left join fetch j.jobAddress
+            left join fetch j.jobAddress.ward
+            left join fetch j.jobAddress.ward.district
+            left join fetch j.jobAddress.ward.district.province
+            where 1 = 1 and j.deleteFlag = false
+            and (:name is null or j.jobName like %:name%)
+            and (:categoryId is null or j.category.id = :categoryId)
+            and (:jobTypeId is null or j.jobType.id = :jobTypeId)
+            and (:provinceCode is null or j.jobAddress.ward.district.province.provinceCode = :provinceCode)
+            """)
+    List<Job> findAll(String name, Integer categoryId, Integer jobTypeId, String provinceCode);
 }

@@ -49,7 +49,7 @@ public class Candidate {
             joinColumns = @JoinColumn(name = "candidate_id"),
             inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
-    private List<Skill> candidateSkills;
+    private Set<Skill> candidateSkills;
     @OneToMany(mappedBy = "candidate")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

@@ -41,15 +41,20 @@ public class Job {
     @Column(columnDefinition = "text")
     private String jobExperience;
     private String minEducationLevel;
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @EqualsAndHashCode.Exclude
+//    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @EqualsAndHashCode.Exclude
+//    @ToString.Exclude
+//    @JoinTable(
+//            name = "job_address",
+//            joinColumns = @JoinColumn(name = "job_id"),
+//            inverseJoinColumns = @JoinColumn(name = "address_id")
+//    )
+//    private Set<Address> jobAddresses;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "address_id")
     @ToString.Exclude
-    @JoinTable(
-            name = "job_address",
-            joinColumns = @JoinColumn(name = "job_id"),
-            inverseJoinColumns = @JoinColumn(name = "address_id")
-    )
-    private Set<Address> jobAddresses;
+    @EqualsAndHashCode.Exclude
+    private Address jobAddress;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "company_id")
     private Company company;
@@ -95,7 +100,7 @@ public class Job {
         this.jobQuantity = job.getJobQuantity();
         this.jobGender = job.getJobGender();
         this.jobExperience = job.getJobExperience();
-        this.jobAddresses = job.getJobAddresses();
+        this.jobAddress = job.getJobAddress();
         this.company = job.getCompany();
         this.category = job.getCategory();
         this.jobType = job.getJobType();

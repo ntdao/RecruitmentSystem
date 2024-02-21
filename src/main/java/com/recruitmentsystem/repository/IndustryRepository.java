@@ -18,7 +18,7 @@ public interface IndustryRepository extends JpaRepository<Industry, Integer> {
     @Query(value = "select count(*) from Industry r where 1 = 1 " +
             "and (:id is null or r.id != :id) " +
             "and ((:name is null or lower(r.name) like :name) " +
-            "or (:code is null or lower(r.code) like :code))")
+            "or (lower(r.code) like :code))")
     Integer countByNameAndCode(Integer id, String name, String code);
 
     Optional<Industry> findByName(String name);

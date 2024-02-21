@@ -37,6 +37,11 @@ public class CompanyController {
         return companyService.findCompanyByCompanyName(name);
     }
 
+    @PostMapping("/companies/find")
+    public List<CompanyResponseModel> getCompany(@RequestBody CompanyDto dto) {
+        return companyService.getCompanyPaging(dto);
+    }
+
     @GetMapping("/company/{companyId}")
     public CompanyResponseModel getCompanyByCompanyId(@PathVariable("companyId") Integer companyId) {
         return companyService.findCompanyByCompanyId(companyId);
@@ -58,12 +63,9 @@ public class CompanyController {
         return companyService.addCompanyByAdmin(companyRequest);
     }
 
-//    @PutMapping("/admin/manage/companies/update/{id}")
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-//    public void updateCompany(@PathVariable("id") Integer id,
-//                              @RequestBody CompanyDto companyRequest) {
-//        companyService.updateCompanyByAdmin(id, companyRequest);
+//    @PutMapping("/admin/manage/companies/update")
+//    public void updateCompany(@RequestBody CompanyDto dto) {
+//        companyService.updateCompanyByAdmin(dto);
 //    }
 
     @DeleteMapping("/admin/manage/companies/delete/{id}")

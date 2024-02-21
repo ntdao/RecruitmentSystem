@@ -4,24 +4,21 @@ import com.recruitmentsystem.dto.*;
 import com.recruitmentsystem.entity.Account;
 import com.recruitmentsystem.entity.Candidate;
 import com.recruitmentsystem.entity.CandidateEducation;
+import com.recruitmentsystem.entity.CandidateWorkingHistory;
 import com.recruitmentsystem.enums.TokenType;
 import com.recruitmentsystem.exception.InputException;
 import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.mapper.CandidateMapper;
-import com.recruitmentsystem.pagination.PageDto;
 import com.recruitmentsystem.repository.AccountRepository;
 import com.recruitmentsystem.repository.CandidateRepository;
 import com.recruitmentsystem.security.jwt.JwtService;
 import com.recruitmentsystem.security.token.Token;
 import com.recruitmentsystem.security.token.TokenService;
+import com.recruitmentsystem.utils.DataFormat;
 import com.recruitmentsystem.utils.Utils;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +40,7 @@ public class CandidateService {
     private final CandidateRepository candidateRepository;
     private final CandidateMapper candidateMapper;
     private final CandidateEducationService candidateEducationService;
+    private final CandidateWorkingHistoryService candidateWorkingHistoryService;
     private final FileService fileService;
     private final JwtService jwtService;
     private final RoleService roleService;
@@ -108,7 +105,7 @@ public class CandidateService {
     }
 
     public List<CandidateResponseModel> findAllCandidateByKey(String key) {
-        return candidateRepository.findAllCandidateByKey(key)
+        return candidateRepository.findAllCandidateByKey(DataFormat.lower(key))
                 .stream()
                 .map(candidateMapper::entityToDto)
                 .collect(Collectors.toList());
@@ -120,8 +117,8 @@ public class CandidateService {
     }
 
     @Transactional
-    public AuthenticationResponseModel updateCandidateByCandidate(CandidateRequestModel request, Principal connectedCandidate) {
-        Candidate updateCandidate = getCurrentCandidate(connectedCandidate);
+    public AuthenticationResponseModel updateCandidateByCandidate(CandidateRequestModel request, Principal principal) {
+        Candidate updateCandidate = getCurrentCandidate(principal);
         return updateCandidate(updateCandidate, request);
     }
 
@@ -193,8 +190,8 @@ public class CandidateService {
                 .refreshToken(refreshToken).build();
     }
 
-    public void uploadCandidateProfileImageNoToken(Principal connectedCandidate, MultipartFile file) {
-        Candidate candidate = getCurrentCandidate(connectedCandidate);
+    public void uploadCandidateProfileImageNoToken(Principal principal, MultipartFile file) {
+        Candidate candidate = getCurrentCandidate(principal);
         uploadProfileImage(candidate, file);
     }
 
@@ -218,21 +215,19 @@ public class CandidateService {
     }
 
     @Transactional
-    public String uploadCandidateProfileImage(Principal connectedCandidate, MultipartFile file) {
-        Candidate candidate = getCurrentCandidate(connectedCandidate);
+    public String uploadCandidateProfileImage(Principal principal, MultipartFile file) {
+        Candidate candidate = getCurrentCandidate(principal);
         return prefix + s3Service.uploadFile("profile-images/%s/".formatted(candidate.getCandidateId()), file);
     }
 
-    public String uploadCandidateCV(Principal connectedCandidate, MultipartFile file) {
-        Candidate candidate = getCurrentCandidate(connectedCandidate);
-        String cvUrl = prefix + s3Service.uploadFile("cv/%s/".formatted(candidate.getCandidateId()), file);
-        return cvUrl;
+    public String uploadCandidateCV(Principal principal, MultipartFile file) {
+        Candidate candidate = getCurrentCandidate(principal);
+        return prefix + s3Service.uploadFile("cv/%s/".formatted(candidate.getCandidateId()), file);
     }
 
     public byte[] getCandidateCV(Integer id) {
         Candidate candidate = findCandidateById(id);
-        byte[] cv = s3Service.downloadFile("cv/10/1700818252791-2.png");
-        return cv;
+        return s3Service.downloadFile("cv/10/1700818252791-2.png");
     }
 
     public byte[] getCandidateProfileImage(Integer id) {
@@ -242,18 +237,18 @@ public class CandidateService {
             throw new ResourceNotFoundException("Candidate with id [%s] profile image not found".formatted(id));
         }
 
-        byte[] profileImage = s3Service.downloadFile(candidate.getImgUrl());
-        return profileImage;
+        return s3Service.downloadFile(candidate.getImgUrl());
     }
 
-    public Candidate getCurrentCandidate(Principal connectedCandidate) {
-        return findCandidateByEmail(accountService.getCurrentAccount(connectedCandidate).getEmail());
+    public Candidate getCurrentCandidate(Principal principal) {
+        return findCandidateByEmail(accountService.getCurrentAccount(principal).getEmail());
     }
 
-    public CandidateResponseModel getCurrentCandidateDisplay(Principal connectedCandidate) {
-        return candidateMapper.entityToDto(getCurrentCandidate(connectedCandidate));
+    public CandidateResponseModel getCurrentCandidateDisplay(Principal principal) {
+        return candidateMapper.entityToDto(getCurrentCandidate(principal));
     }
 
+    @Transactional
     public void deleteCandidate(Integer id) {
         Candidate candidate = findCandidateById(id);
         candidate.setDeleteFlag(true);
@@ -267,9 +262,9 @@ public class CandidateService {
         accountService.revokeAllAccountTokens(account.getId());
     }
 
-    public void changePassword(ChangePasswordDto request,
-                               Principal connectedCandidate) {
-        Candidate candidate = getCurrentCandidate(connectedCandidate);
+    @Transactional
+    public void changePassword(ChangePasswordDto request, Principal principal) {
+        Candidate candidate = getCurrentCandidate(principal);
         Account account = candidate.getAccount();
         int accountId = candidate.getAccount().getId();
 
@@ -277,59 +272,37 @@ public class CandidateService {
         if (!passwordEncoder.matches(request.currentPassword(), account.getPassword())) {
             throw new InputException("Wrong password");
         }
-        // check if the two new passwords are the same
-        if (!request.newPassword().equals(request.confirmationPassword())) {
-            throw new InputException("Password are not the same");
-        }
 
-        Account oldAccount = new Account(account, true);
-        accountRepository.save(oldAccount);
-        System.out.println("Account - before change password: " + oldAccount);
-
-        Account newAccount = Account.builder()
-                .id(accountId)
-                .email(oldAccount.getEmail())
-                .password(passwordEncoder.encode(request.newPassword()))
-                .enabled(true)
-                .role(oldAccount.getRole())
-                .deleteFlag(false)
-                .oldId(null)
-                .build();
-        accountRepository.save(newAccount);
-        System.out.println("Account - after change password: " + newAccount);
-
-        System.out.println("Candidate - before change password: " + candidate);
-        // kiem tra xem co can thiet hay khong
-        candidate.setLastModified(LocalDateTime.now());
-        candidate.setLastModifiedBy(accountId);
-        candidateRepository.save(candidate);
-        System.out.println("Candidate - before change password: " + candidate);
+        account.setPassword(passwordEncoder.encode(request.newPassword()));
+        accountRepository.save(account);
 
         accountService.revokeAllAccountTokens(accountId);
     }
 
-    public Set<CandidateEducationDto> getCandidateEducation(Integer id) {
+    public Set<CandidateEducationDto> getEducation(Integer id) {
         return candidateEducationService.findByCandidate(id);
     }
 
-    public void addCandidateEducation(CandidateEducationDto candidateEducationDto, Principal connectedCandidate) {
-        Candidate candidate = getCurrentCandidate(connectedCandidate);
-        System.out.println("Candidate before add education: " + candidate);
-        System.out.println("List candidate education before add: " + candidate.getCandidateEducations());
-        Set<CandidateEducation> list = candidateEducationService.addCandidateEducation(candidate.getCandidateEducations(), candidateEducationDto);
-        System.out.println("List candidate education after add: " + list);
-        candidate.setCandidateEducations(list);
-        candidateRepository.save(candidate);
+    public void saveEducation(CandidateEducationDto dto, Principal principal) {
+        Candidate candidate = getCurrentCandidate(principal);
+        candidateEducationService.save(candidate, dto);
     }
 
-    public void updateCandidateEducation(Integer id, CandidateEducationDto candidateEducationDto, Principal connectedCandidate) {
-        Candidate candidate = getCurrentCandidate(connectedCandidate);
-        Set<CandidateEducation> list = candidateEducationService.updateCandidateEducation(id, candidateEducationDto, candidate.getCandidateEducations());
+    public void deleteEducation(Integer id) {
+        candidateEducationService.delete(id);
     }
 
-    public void deleteCandidateEducation(Integer id, Principal connectedCandidate) {
-        Candidate candidate = getCurrentCandidate(connectedCandidate);
-        Set<CandidateEducation> list = candidateEducationService.deleteCandidateEducation(id, candidate.getCandidateEducations());
+    public Set<CandidateWorkingHistoryDto> getHistory(Integer id) {
+        return candidateWorkingHistoryService.findByCandidate(id);
+    }
+
+    public void saveHistory(CandidateWorkingHistoryDto dto, Principal principal) {
+        Candidate candidate = getCurrentCandidate(principal);
+        candidateWorkingHistoryService.save(candidate, dto);
+    }
+
+    public void deleteHistory(Integer id) {
+        candidateWorkingHistoryService.delete(id);
     }
 
     public StatisticDto getQuantity() {

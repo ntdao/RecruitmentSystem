@@ -2,11 +2,13 @@ package com.recruitmentsystem.mapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruitmentsystem.dto.*;
-import com.recruitmentsystem.entity.Address;
 import com.recruitmentsystem.entity.Job;
 import com.recruitmentsystem.entity.Skill;
 import com.recruitmentsystem.repository.RecruitmentRepository;
-import com.recruitmentsystem.service.*;
+import com.recruitmentsystem.service.AddressService;
+import com.recruitmentsystem.service.CategoryService;
+import com.recruitmentsystem.service.JobTypeService;
+import com.recruitmentsystem.service.SkillService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,18 +22,18 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class JobMapper {
     private final ObjectMapper objectMapper;
-    private final AddressMapper addressMapper;
-    private final AddressService addressService;
+//    private final AddressService addressService;
     private final CategoryService categoryService;
     private final JobTypeService jobTypeService;
     private final SkillService skillService;
     private final RecruitmentRepository recruitmentRepository;
+    private final AddressMapper addressMapper;
 
     public JobResponseModel entityToDto(Job job) {
-        List<AddressDto> addressList = job.getJobAddresses()
-                .stream()
-                .map(addressMapper::entityToDto)
-                .toList();
+//        List<AddressDto> addressList = job.getJobAddresses()
+//                .stream()
+//                .map(addressMapper::entityToDto)
+//                .toList();
 
         List<SkillDTO> skillList = job.getJobSkills()
                 .stream()
@@ -62,16 +64,16 @@ public class JobMapper {
                 .jobExpiredDate(job.getJobExpiredDate())
                 .category(objectMapper.convertValue(job.getCategory(), CategoryDTO.class))
                 .jobSkill(skillList)
-                .jobAddress(addressList)
+                .jobAddress(addressMapper.entityToDto(job.getJobAddress()))
                 .build();
     }
 
     public Job dtoToEntity(JobRequestModel request) {
 
-        Set<Address> address = new HashSet<>();
-        for (AddressDto a : request.jobAddresses()) {
-            address.add(addressService.addressRequestModelToEntity(a));
-        }
+//        Set<Address> address = new HashSet<>();
+//        for (AddressDto a : request.jobAddresses()) {
+//            address.add(addressService.addressRequestModelToEntity(a));
+//        }
 
         Set<Skill> skill = new HashSet<>();
         for (String s : request.jobSkills()) {
@@ -85,7 +87,7 @@ public class JobMapper {
         return Job
                 .builder()
                 .jobName(request.jobName())
-                .jobAddresses(address)
+                .jobAddress(addressMapper.dtoToEntity(request.jobAddress()))
                 .salary(request.jobSalary())
                 .jobRequirement(request.jobRequirement())
                 .jobDescription(request.jobDescription())
@@ -93,7 +95,7 @@ public class JobMapper {
                 .jobGender(request.jobGender())
                 .jobType(jobTypeService.findById(Integer.parseInt(request.jobType())))
                 .jobExperience(request.jobExperience())
-                .category(categoryService.findById(Integer.parseInt(request.categoryId())))
+                .category(categoryService.findById(request.categoryId()))
                 .jobExpiredDate(dateTime)
                 .minEducationLevel(request.minEducationLevel())
                 .jobSkills(skill)

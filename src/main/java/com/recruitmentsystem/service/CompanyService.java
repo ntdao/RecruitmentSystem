@@ -4,11 +4,13 @@ import com.recruitmentsystem.dto.*;
 import com.recruitmentsystem.entity.Account;
 import com.recruitmentsystem.entity.Address;
 import com.recruitmentsystem.entity.Company;
+import com.recruitmentsystem.entity.Job;
 import com.recruitmentsystem.exception.ResourceAlreadyExistsException;
 import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.mapper.CompanyMapper;
 import com.recruitmentsystem.repository.AccountRepository;
 import com.recruitmentsystem.repository.CompanyRepository;
+import com.recruitmentsystem.utils.DataFormat;
 import com.recruitmentsystem.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,7 +88,6 @@ public class CompanyService {
 
     public List<CompanyResponseModel> findAllCompanies() {
         List<Company> companies = companyRepository.findAllCompany();
-        System.out.println(companies);
         return companies.stream()
                 .map(companyMapper::entityToDto)
                 .collect(Collectors.toList());
@@ -122,9 +123,9 @@ public class CompanyService {
     }
 
 //    @Transactional
-//    public void updateCompanyByAdmin(Integer id, CompanyDto requestModel) {
-//        Company updateCompany = findCompanyById(id);
-//        updateCompany(updateCompany, requestModel);
+//    public void updateCompanyByAdmin(CompanyDto dto) {
+//        Company updateCompany = findCompanyById(dto.companyId());
+//        updateCompany(updateCompany, dto);
 //    }
 
     public void updateCompanyByCompany(CompanyDto request, Principal connectedAccount) {
@@ -259,6 +260,7 @@ public class CompanyService {
         System.out.println("Company - New info: " + company);
     }
 
+    @Transactional
     public void deleteCompany(Integer id) {
         Company company = findCompanyById(id);
         company.setDeleteFlag(true);
@@ -304,13 +306,20 @@ public class CompanyService {
 
     public String uploadCompanyImage(Principal connectedUser, MultipartFile file, String field) {
         Company company = getCurrentCompany(connectedUser);
-        String image = prefix + s3Service.uploadFile("%s/%s/".formatted(field, company.getCompanyId()), file);
-        System.out.println("Company image url: " + image);
-        return image;
+        return prefix + s3Service.uploadFile("%s/%s/".formatted(field, company.getCompanyId()), file);
     }
 
     public StatisticDto getQuantity() {
         List<Map<String, Object>> map = companyRepository.getQuantity();
         return Utils.getStatistic(map);
+    }
+
+    public List<CompanyResponseModel> getCompanyPaging(CompanyDto dto) {
+        List<Company> companies = companyRepository.findAll(
+                DataFormat.lower(dto.companyFullName()),
+                dto.companyIndustryId(),
+                dto.provinceCode()
+        );
+        return companies.stream().map(companyMapper::entityToDto).toList();
     }
 }

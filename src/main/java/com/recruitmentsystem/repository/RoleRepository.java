@@ -18,7 +18,7 @@ public interface RoleRepository extends JpaRepository<Role, Integer> {
     @Query(value = "select count(*) from Role r where 1 = 1 " +
             "and (:id is null or r.id != :id) " +
             "and ((:name is null or lower(r.name) like :name) " +
-            "or (:code is null or lower(r.code) like :code))")
+            "or (lower(r.code) like :code))")
     Integer countByNameAndCode(Integer id, String name, String code);
 
     Optional<Role> findByCode(String code);

@@ -27,6 +27,6 @@ public record JobResponseModel(
         LocalDateTime jobExpiredDate,
         CategoryDTO category,
         List<SkillDTO> jobSkill,
-        List<AddressDto> jobAddress
+        AddressDto jobAddress
 ) {
 }

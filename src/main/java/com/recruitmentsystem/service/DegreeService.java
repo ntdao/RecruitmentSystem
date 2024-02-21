@@ -90,7 +90,8 @@ public class DegreeService {
     }
 
     public Degree findByName(String name) {
-        return degreeRepository.findByName(name).get();
+        return degreeRepository.findByName(name)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy bằng cấp!"));
     }
 }
 

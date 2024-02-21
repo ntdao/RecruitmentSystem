@@ -29,6 +29,7 @@ public record CompanyDto (
         String linkedinUrl,
         String companyBranch,
         LocalDateTime createDate,
-        LocalDateTime lastModified
+        LocalDateTime lastModified,
+        String provinceCode
 ) {
 }

@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record CandidateWorkingHistoryDto(
-        String id,
+        Integer id,
         String companyName,
         String jobName,
         String description,

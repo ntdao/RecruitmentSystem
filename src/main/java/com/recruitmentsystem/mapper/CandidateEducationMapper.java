@@ -16,6 +16,7 @@ public class CandidateEducationMapper {
 
     public CandidateEducationDto entityToDto(CandidateEducation candidateEducation) {
         return CandidateEducationDto.builder()
+                .id(candidateEducation.getCandidateEducationId())
                 .schoolName(candidateEducation.getSchoolName())
                 .major(candidateEducation.getMajor())
                 .startDate(candidateEducation.getStartDate())

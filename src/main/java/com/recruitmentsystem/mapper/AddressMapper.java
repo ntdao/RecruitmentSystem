@@ -38,6 +38,7 @@ public class AddressMapper {
     }
 
     public Address dtoToEntity(AddressDto request) {
+        if (request == null) return null;
         Ward ward = wardService.findWardByWardCode(request.wardCode());
         String fullAddress = request.address() + ", "
                 + ward.getFullName() + ", "

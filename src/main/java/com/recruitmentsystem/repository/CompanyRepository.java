@@ -25,21 +25,22 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
             select c from Company c 
             left join fetch c.industry
             left join fetch c.companyAddress
-            join fetch c.account
-            where c.deleteFlag = false
+            join fetch c.account a
+            where c.deleteFlag = false and a.deleteFlag = false
             """)
     List<Company> findAllCompany();
 
     @Query(value = """
             select c from Company c 
             left join fetch c.industry
-            join fetch c.account
-            where c.deleteFlag = false
+            left join fetch c.account a
+            where c.deleteFlag = false and a.deleteFlag = false
             """,
             countQuery = """
                     select c from Company c 
                     left join fetch c.industry
-                    where c.deleteFlag = false
+                    left join fetch c.account a
+                    where c.deleteFlag = false and a.deleteFlag = false
                     """)
     Page<Company> findAllCompany(Pageable pageable);
 
@@ -68,10 +69,10 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
             where c.deleteFlag = false
             """,
             countQuery = """
-            select c.companyShortName as companyShortName, c.companyLogo as companyLogo, c.industry.name as industry
-            from Company c
-            where c.deleteFlag = false
-            """
+                    select c.companyShortName as companyShortName, c.companyLogo as companyLogo, c.industry.name as industry
+                    from Company c
+                    where c.deleteFlag = false
+                    """
     )
     Page<Map<String, Object>> findTopCompany(Pageable paging);
 
@@ -86,4 +87,17 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
             "and :id is null or c.companyId <> :id " +
             "and (c.companyShortName = :shortName or c.companyFullName = :fullName)")
     Integer countByName(Integer id, String shortName, String fullName);
+
+    @Query("""
+            select j from Company j
+            left join fetch j.companyAddress
+            left join fetch j.companyAddress.ward
+            left join fetch j.companyAddress.ward.district
+            left join fetch j.companyAddress.ward.district.province
+            where 1 = 1 and j.deleteFlag = false
+            and (:name is null or j.companyFullName like %:name% or j.companyShortName like %:name%)
+            and (:industryId is null or j.industry.id = :industryId)
+            and (:provinceCode is null or j.companyAddress.ward.district.province.provinceCode = :provinceCode)
+            """)
+    List<Company> findAll(String name, Integer industryId, String provinceCode);
 }

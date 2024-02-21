@@ -7,16 +7,19 @@ import com.recruitmentsystem.exception.ResourceNotFoundException;
 import com.recruitmentsystem.mapper.JobMapper;
 import com.recruitmentsystem.pagination.PageDto;
 import com.recruitmentsystem.repository.JobRepository;
+import com.recruitmentsystem.utils.DataFormat;
 import com.recruitmentsystem.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,7 +29,6 @@ public class JobService {
     private final JobRepository jobRepository;
     private final JobMapper jobMapper;
     private final CompanyService companyService;
-    private final CandidateService candidateService;
 
     @Transactional
     public void addJob(JobRequestModel request, Principal principal) {
@@ -166,7 +168,31 @@ public class JobService {
         return Utils.getStatistic(map);
     }
 
-    public List<JobResponseModel> getJobPaging(JobRequestModel request) {
-        return null;
+    public List<JobResponseModel> getJobPaging(JobRequestModel dto) {
+        List<Job> jobs = jobRepository.findAll(
+                DataFormat.lower(dto.jobName()),
+                dto.categoryId(),
+                dto.jobTypeId(),
+                dto.provinceCode()
+        );
+        return jobs.stream().map(jobMapper::entityToDto).toList();
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    public void changeJobStatus() {
+        System.out.println("Start Change Job Status at " + new Date());
+
+        List<Job> jobs = jobRepository.findAllJob().stream().filter(j -> j.getJobStatus() == 0).toList();
+
+        jobs.forEach(x -> {
+            LocalDate date = x.getJobExpiredDate().toLocalDate();
+            LocalDate now = LocalDate.now();
+            if (date.isBefore(now)) {
+                x.setJobStatus(2);
+                jobRepository.save(x);
+            }
+        });
+
+        System.out.println("End Change Job Status at " + new Date());
     }
 }
