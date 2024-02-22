@@ -1,14 +1,8 @@
 package hust.seee.recruitmentsystem.utils;
 
-import hust.seee.recruitmentsystem.dto.StatisticDTO;
-import hust.seee.recruitmentsystem.dto.StatisticDetailDTO;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class Utils {
     public static String calculateTimeAgo(LocalDateTime createDate) {
@@ -29,21 +23,21 @@ public class Utils {
         }
     }
 
-    public static StatisticDTO getStatistic(List<Map<String, Object>> map) {
-        List<StatisticDetailDTO> dto = new ArrayList<>();
-        final long[] total = {0};
-        map.forEach(m -> {
-                    dto.add(new StatisticDetailDTO(
-                            m.get("month").toString(),
-                            m.get("year").toString(),
-                            m.get("quantity").toString())
-                    );
-                    total[0] += (Long) m.get("quantity");
-                }
-        );
-        return StatisticDTO.builder()
-                .dto(dto)
-                .total(total[0])
-                .build();
-    }
+//    public static StatisticDTO getStatistic(List<Map<String, Object>> map) {
+//        List<StatisticDetailDTO> dto = new ArrayList<>();
+//        final long[] total = {0};
+//        map.forEach(m -> {
+//                    dto.add(new StatisticDetailDTO(
+//                            m.get("month").toString(),
+//                            m.get("year").toString(),
+//                            m.get("quantity").toString())
+//                    );
+//                    total[0] += (Long) m.get("quantity");
+//                }
+//        );
+//        return StatisticDTO.builder()
+//                .dto(dto)
+//                .total(total[0])
+//                .build();
+//    }
 }

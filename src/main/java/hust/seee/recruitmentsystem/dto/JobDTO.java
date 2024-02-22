@@ -37,7 +37,7 @@ public class JobDTO {
     private String companyLogo;
     private JobTypeDTO jobType;
     private Integer jobStatus;
-    private LocalDateTime createdAt;
+    private LocalDateTime createDate;
     //    LocalDateTime jobExpiredDate;
     private CategoryDTO category;
     private List<SkillDTO> jobSkill;

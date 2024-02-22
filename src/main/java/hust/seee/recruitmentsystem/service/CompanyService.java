@@ -2,7 +2,6 @@ package hust.seee.recruitmentsystem.service;
 
 import hust.seee.recruitmentsystem.dto.AddressDTO;
 import hust.seee.recruitmentsystem.dto.CompanyDTO;
-import hust.seee.recruitmentsystem.dto.StatisticDTO;
 import hust.seee.recruitmentsystem.entity.Account;
 import hust.seee.recruitmentsystem.entity.Address;
 import hust.seee.recruitmentsystem.entity.Company;
@@ -12,7 +11,6 @@ import hust.seee.recruitmentsystem.mapper.CompanyMapper;
 import hust.seee.recruitmentsystem.repository.AccountRepository;
 import hust.seee.recruitmentsystem.repository.CompanyRepository;
 import hust.seee.recruitmentsystem.utils.DataFormat;
-import hust.seee.recruitmentsystem.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -287,13 +285,13 @@ public class CompanyService {
         }
     }
 
-    public List<Map<String, Object>> getTopCompaniesModel(Integer pageNo, Integer pageSize, String sortBy) {
+    public List<CompanyDTO> getTopCompaniesModel(Integer pageNo, Integer pageSize, String sortBy) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
 
-        Page<Map<String, Object>> pagedResult = companyRepository.findTopCompany(paging);
+        Page<Company> pagedResult = companyRepository.findTopCompany(paging);
 
         if (pagedResult.hasContent()) {
-            return pagedResult.getContent();
+            return pagedResult.getContent().stream().map(companyMapper::entityToDto).toList();
         } else {
             return new ArrayList<>();
         }
@@ -309,10 +307,10 @@ public class CompanyService {
         return prefix + s3Service.uploadFile("%s/%s/".formatted(field, company.getCompanyId()), file);
     }
 
-    public StatisticDTO getQuantity() {
-        List<Map<String, Object>> map = companyRepository.getQuantity();
-        return Utils.getStatistic(map);
-    }
+//    public StatisticDTO getQuantity() {
+//        List<Map<String, Object>> map = companyRepository.getQuantity();
+//        return Utils.getStatistic(map);
+//    }
 
     public Page<CompanyDTO> getCompanyPaging(CompanyDTO dto) {
         Pageable pageable = PageRequest.of(dto.getPage() - 1, dto.getSize());

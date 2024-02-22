@@ -3,7 +3,6 @@ package hust.seee.recruitmentsystem.service;
 import hust.seee.recruitmentsystem.dto.CandidateDTO;
 import hust.seee.recruitmentsystem.dto.EducationDTO;
 import hust.seee.recruitmentsystem.dto.HistoryDTO;
-import hust.seee.recruitmentsystem.dto.StatisticDTO;
 import hust.seee.recruitmentsystem.entity.Account;
 import hust.seee.recruitmentsystem.entity.Candidate;
 import hust.seee.recruitmentsystem.enums.TokenType;
@@ -17,7 +16,6 @@ import hust.seee.recruitmentsystem.security.jwt.JwtService;
 import hust.seee.recruitmentsystem.security.token.Token;
 import hust.seee.recruitmentsystem.security.token.TokenService;
 import hust.seee.recruitmentsystem.utils.DataFormat;
-import hust.seee.recruitmentsystem.utils.Utils;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -94,7 +92,7 @@ public class CandidateService {
         return candidateRepository.findAll(
                         DataFormat.lower(dto.getFullName()),
                         dto.getCategoryId(),
-                        dto.getProvinceCode(),
+                        DataFormat.lower(dto.getProvinceCode()),
                         pageable)
                 .map(candidateMapper::entityToDto);
     }
@@ -319,8 +317,8 @@ public class CandidateService {
         candidateWorkingHistoryService.delete(id);
     }
 
-    public StatisticDTO getQuantity() {
-        List<Map<String, Object>> map = candidateRepository.getQuantity();
-        return Utils.getStatistic(map);
-    }
+//    public StatisticDTO getQuantity() {
+//        List<Map<String, Object>> map = candidateRepository.getQuantity();
+//        return Utils.getStatistic(map);
+//    }
 }

@@ -40,6 +40,7 @@ public class CompanyMapper {
                 .createDate(company.getCreateDate())
                 .lastModified(company.getLastModified())
                 .companyBranch(company.getCompanyBranch())
+                .createDate(company.getCreateDate())
                 .build();
     }
 

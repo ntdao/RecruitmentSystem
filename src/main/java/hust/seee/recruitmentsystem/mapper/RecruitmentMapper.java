@@ -32,6 +32,7 @@ public class RecruitmentMapper {
                 .jobCandidate(jobCandidateQuantity.toString())
                 .applicationTimeAgo(Utils.calculateTimeAgo(recruitment.getCreateDate()))
                 .applicationStatus(recruitment.getApplicationStatus())
+                .createDate(recruitment.getCreateDate())
                 .build();
     }
 }

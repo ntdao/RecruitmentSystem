@@ -56,7 +56,7 @@ public class JobMapper {
                 .companyLogo(job.getCompany().getCompanyLogo())
                 .jobType(objectMapper.convertValue(job.getJobType(), JobTypeDTO.class))
                 .jobStatus(job.getJobStatus())
-                .createdAt(job.getCreateDate())
+                .createDate(job.getCreateDate())
                 .jobExpiredDate(job.getJobExpiredDate().toString())
                 .category(objectMapper.convertValue(job.getCategory(), CategoryDTO.class))
                 .jobSkill(skillList)

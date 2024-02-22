@@ -1,5 +1,6 @@
 package hust.seee.recruitmentsystem.repository;
 
+import hust.seee.recruitmentsystem.dto.CompanyDTO;
 import hust.seee.recruitmentsystem.entity.Company;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -64,24 +65,19 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
     List<Company> findByName(String name);
 
     @Query(value = """
-            select c.companyShortName as companyShortName, c.companyLogo as companyLogo, c.industry.name as industry
-            from Company c
+            select c from Company c 
+            left join fetch c.industry
+            join fetch c.account
             where c.deleteFlag = false
             """,
             countQuery = """
-                    select c.companyShortName as companyShortName, c.companyLogo as companyLogo, c.industry.name as industry
-                    from Company c
-                    where c.deleteFlag = false
-                    """
+               select c from Company c 
+               left join fetch c.industry
+               join fetch c.account
+               where c.deleteFlag = false
+               """
     )
-    Page<Map<String, Object>> findTopCompany(Pageable paging);
-
-    @Query("""
-            select month(c.createDate) as month, year(c.createDate) as year, count(*) as quantity
-            from Company c where c.deleteFlag = false 
-            group by month(c.createDate), year(c.createDate)
-            """)
-    List<Map<String, Object>> getQuantity();
+    Page<Company> findTopCompany(Pageable paging);
 
     @Query(value = "select count(*) from Company c where 1 = 1 " +
             "and :id is null or c.companyId <> :id " +

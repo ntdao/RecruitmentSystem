@@ -1,7 +1,6 @@
 package hust.seee.recruitmentsystem.service;
 
 import hust.seee.recruitmentsystem.dto.JobDTO;
-import hust.seee.recruitmentsystem.dto.StatisticDTO;
 import hust.seee.recruitmentsystem.entity.Company;
 import hust.seee.recruitmentsystem.entity.Job;
 import hust.seee.recruitmentsystem.exception.ResourceNotFoundException;
@@ -9,7 +8,6 @@ import hust.seee.recruitmentsystem.mapper.JobMapper;
 import hust.seee.recruitmentsystem.pagination.PageDto;
 import hust.seee.recruitmentsystem.repository.JobRepository;
 import hust.seee.recruitmentsystem.utils.DataFormat;
-import hust.seee.recruitmentsystem.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -164,10 +162,10 @@ public class JobService {
         return jobRepository.findJobByStatus(jobStatusList, company.getCompanyId());
     }
 
-    public StatisticDTO getQuantity() {
-        List<Map<String, Object>> map = jobRepository.getQuantity();
-        return Utils.getStatistic(map);
-    }
+//    public StatisticDTO getQuantity() {
+//        List<Map<String, Object>> map = jobRepository.getQuantity();
+//        return Utils.getStatistic(map);
+//    }
 
     public Page<JobDTO> getJobPaging(JobDTO dto) {
         Pageable pageable = PageRequest.of(dto.getPage() - 1, dto.getSize());

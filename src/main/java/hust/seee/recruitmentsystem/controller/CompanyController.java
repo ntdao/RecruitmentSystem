@@ -28,7 +28,7 @@ public class CompanyController {
     }
 
     @GetMapping("/companies/top")
-    public List<Map<String, Object>> getTopCompanies(@RequestParam(defaultValue = "0") Integer pageNo,
+    public List<CompanyDTO> getTopCompanies(@RequestParam(defaultValue = "0") Integer pageNo,
                                                      @RequestParam(defaultValue = "6") Integer pageSize,
                                                      @RequestParam(defaultValue = "companyId") String sortBy) {
         return companyService.getTopCompaniesModel(pageNo, pageSize, sortBy);
