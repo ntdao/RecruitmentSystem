@@ -147,4 +147,8 @@ public class RecruitmentService {
     public Integer getCandidateQuantityByJob(Integer jobId) {
         return recruitmentRepository.countByJob(jobId);
     }
+
+    public List<RecruitmentDTO> findAll() {
+        return recruitmentRepository.findAll().stream().map(recruitmentMapper::entityToDto).toList();
+    }
 }

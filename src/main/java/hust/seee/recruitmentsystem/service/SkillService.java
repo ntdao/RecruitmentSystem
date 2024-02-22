@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -91,6 +92,10 @@ public class SkillService {
 
     public Skill findByName(String name) {
         return skillRepository.findByName(name).get();
+    }
+
+    public List<SkillDTO> findAll() {
+        return skillRepository.findAll().stream().map(x -> objectMapper.convertValue(x, SkillDTO.class)).toList();
     }
 }
 

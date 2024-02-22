@@ -67,4 +67,11 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, Intege
 
     @Query("select count(*) from candidate_apply_job where 1 = 1 and job.jobId = :jobId")
     Integer countByJob(Integer jobId);
+
+    @Query("""
+        select r from candidate_apply_job r 
+        left join fetch r.candidate
+        left join fetch r.job
+    """)
+    List<Recruitment> findAll();
 }

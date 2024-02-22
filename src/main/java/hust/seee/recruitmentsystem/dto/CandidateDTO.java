@@ -46,7 +46,7 @@ public class CandidateDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String newPassword;
 
-    private Integer provinceCode;
+    private String provinceCode;
     private String key;
     private Integer page;
     private Integer size;

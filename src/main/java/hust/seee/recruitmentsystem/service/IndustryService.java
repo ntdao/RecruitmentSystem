@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -91,6 +92,10 @@ public class IndustryService {
 
     public Industry findByName(String name) {
         return industryRepository.findByName(name).get();
+    }
+
+    public List<IndustryDTO> findAll() {
+        return industryRepository.findAll().stream().map(x -> objectMapper.convertValue(x, IndustryDTO.class)).toList();
     }
 }
 

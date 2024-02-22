@@ -5,17 +5,21 @@ import hust.seee.recruitmentsystem.dto.CategoryDTO;
 import hust.seee.recruitmentsystem.entity.Category;
 import hust.seee.recruitmentsystem.exception.ResourceAlreadyExistsException;
 import hust.seee.recruitmentsystem.exception.ResourceNotFoundException;
+import hust.seee.recruitmentsystem.pagination.PageDto;
 import hust.seee.recruitmentsystem.repository.CategoryRepository;
 import hust.seee.recruitmentsystem.utils.DataFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
@@ -91,5 +95,31 @@ public class CategoryService {
 
     public Category findByName(String name) {
         return categoryRepository.findByName(name).get();
+    }
+
+    public List<CategoryDTO> findAll() {
+        return categoryRepository.findAll()
+                .stream()
+                .map(c -> objectMapper.convertValue(c, CategoryDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    public List<CategoryDTO> findPaging(PageDto pageDto) {
+        Pageable paging = PageRequest.of(
+                pageDto.getPageNo(),
+                pageDto.getPageSize(),
+                Sort.Direction.fromString(pageDto.getSortDir()),
+                pageDto.getSortBy());
+
+        Page<Category> pagedResult = categoryRepository.findAll(paging);
+
+        if (pagedResult.hasContent()) {
+            return pagedResult.getContent()
+                    .stream()
+                    .map(c -> objectMapper.convertValue(c, CategoryDTO.class))
+                    .collect(Collectors.toList());
+        } else {
+            return null;
+        }
     }
 }

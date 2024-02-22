@@ -134,5 +134,5 @@ public interface CandidateRepository extends JpaRepository<Candidate, Integer> {
             and (:categoryId is null or j.category.id = :categoryId)
             and (:provinceCode is null or j.address.ward.district.province.provinceCode = :provinceCode)
     """)
-    Page<Candidate> findAll(String key, Integer categoryId, Integer provinceCode, Pageable pageable);
+    Page<Candidate> findAll(String key, Integer categoryId, String provinceCode, Pageable pageable);
 }

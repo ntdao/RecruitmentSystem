@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -92,6 +93,10 @@ public class DegreeService {
     public Degree findByName(String name) {
         return degreeRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy bằng cấp!"));
+    }
+
+    public List<DegreeDTO> findAll() {
+        return degreeRepository.findAll().stream().map(x -> objectMapper.convertValue(x, DegreeDTO.class)).toList();
     }
 }
 
