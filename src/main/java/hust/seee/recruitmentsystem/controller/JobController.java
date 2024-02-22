@@ -58,14 +58,24 @@ public class JobController {
         return ResponseEntity.ok(Gender.getAll());
     }
 
-    @GetMapping("/jobs/{companyId}/all")
-    public List<JobDTO> getAllJob(@PathVariable("companyId") Integer id) {
-        return jobService.findJobByCompanyId(id);
+    @PostMapping("/jobs/{companyId}/all")
+    public ResponseEntity<BaseResponse> getAllJob(@PathVariable("companyId") Integer id, @RequestBody JobDTO dto) {
+        BaseResponse baseResponse = new BaseResponse();
+        Page<JobDTO> page = jobService.findJobByCompanyId(id, dto);
+        baseResponse.setAdditionalProperty("data", page.getContent());
+        baseResponse.setAdditionalProperty("total", page.getTotalElements());
+
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
     @GetMapping("/admin/manage/jobs/all")
-    public List<JobDTO> adminGetAllJob() {
-        return jobService.findAllJobsByAdmin();
+    public ResponseEntity<BaseResponse> adminGetAllJob(@RequestBody JobDTO dto) {
+        BaseResponse baseResponse = new BaseResponse();
+        Page<JobDTO> page = jobService.findAllJobsByAdmin(dto);
+        baseResponse.setAdditionalProperty("data", page.getContent());
+        baseResponse.setAdditionalProperty("total", page.getTotalElements());
+
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
     @GetMapping("/manage/jobs/find/{jobId}")
@@ -80,8 +90,13 @@ public class JobController {
     }
 
     @GetMapping("/company/manage/jobs/all")
-    public List<JobDTO> getCompanyJob(Principal connectedUser) {
-        return jobService.findJobByCompany(connectedUser);
+    public ResponseEntity<BaseResponse> getCompanyJob(@RequestBody JobDTO dto, Principal connectedUser) {
+        BaseResponse baseResponse = new BaseResponse();
+        Page<JobDTO> page = jobService.findJobByCompany(dto, connectedUser);
+        baseResponse.setAdditionalProperty("data", page.getContent());
+        baseResponse.setAdditionalProperty("total", page.getTotalElements());
+
+        return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
     @PostMapping("/company/manage/jobs/add")

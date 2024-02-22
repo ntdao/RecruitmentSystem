@@ -43,7 +43,7 @@ public class JobService {
 //        if (authentication.getPrincipal().equals("anonymousUser")) {
         return jobRepository.findAllJob()
                 .stream()
-                .filter(j -> j.getJobStatus() == 0)
+//                .filter(j -> j.getJobStatus() == 0)
                 .map(jobMapper::entityToDto)
                 .collect(Collectors.toList());
 //        }
@@ -55,11 +55,8 @@ public class JobService {
 //                .collect(Collectors.toList());
     }
 
-    public List<JobDTO> findAllJobsByAdmin() {
-        return jobRepository.findAllJob()
-                .stream()
-                .map(jobMapper::entityToDto)
-                .collect(Collectors.toList());
+    public Page<JobDTO> findAllJobsByAdmin(JobDTO dto) {
+        return getJobPaging(dto);
     }
 
     public List<Job> findByCompanyId(Integer companyId) {
@@ -67,20 +64,16 @@ public class JobService {
         return jobRepository.findAllJobByCompany(companyId);
     }
 
-    public List<JobDTO> findJobByCompany(Principal connectedAccount) {
+    public Page<JobDTO> findJobByCompany(JobDTO dto, Principal connectedAccount) {
         Company company = companyService.getCurrentCompany(connectedAccount);
-        return findByCompanyId(company.getCompanyId())
-                .stream()
-                .map(jobMapper::entityToDto)
-                .toList();
+        dto.setCompanyId(company.getCompanyId());
+        return getJobPaging(dto);
     }
 
-    public List<JobDTO> findJobByCompanyId(Integer companyId) {
-        return findByCompanyId(companyId)
-                .stream()
-                .filter(j -> j.getJobStatus() == 0)
-                .map(jobMapper::entityToDto)
-                .toList();
+    public Page<JobDTO> findJobByCompanyId(Integer companyId, JobDTO dto) {
+        dto.setCompanyId(companyId);
+        dto.setJobStatus(0);
+        return getJobPaging(dto);
     }
 
     public Job findById(Integer id) {
@@ -174,6 +167,8 @@ public class JobService {
                         dto.getCategoryId(),
                         dto.getJobTypeId(),
                         dto.getProvinceCode(),
+                        dto.getJobStatus(),
+                        dto.getCompanyId(),
                         pageable)
                 .map(jobMapper::entityToDto);
     }

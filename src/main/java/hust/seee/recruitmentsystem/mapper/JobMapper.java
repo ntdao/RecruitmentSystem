@@ -57,7 +57,7 @@ public class JobMapper {
                 .jobType(objectMapper.convertValue(job.getJobType(), JobTypeDTO.class))
                 .jobStatus(job.getJobStatus())
                 .createDate(job.getCreateDate())
-                .jobExpiredDate(job.getJobExpiredDate().toString())
+                .jobExpiredDate(job.getJobExpiredDate())
                 .category(objectMapper.convertValue(job.getCategory(), CategoryDTO.class))
                 .jobSkill(skillList)
                 .jobAddress(addressMapper.entityToDto(job.getJobAddress()))
@@ -70,9 +70,9 @@ public class JobMapper {
             skill.add(skillService.findById(Integer.parseInt(s)));
         }
 
-        String str = request.getJobExpiredDate() + " 00:00";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
+//        String str = request.getJobExpiredDate() + " 00:00";
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+//        LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
 
         return Job
                 .builder()
@@ -86,7 +86,7 @@ public class JobMapper {
                 .jobType(jobTypeService.findById(request.getJobTypeId()))
                 .jobExperience(request.getJobExperience())
                 .category(categoryService.findById(request.getCategoryId()))
-                .jobExpiredDate(dateTime)
+                .jobExpiredDate(request.getJobExpiredDate())
                 .minEducationLevel(request.getMinEducationLevel())
                 .jobSkills(skill)
                 .build();

@@ -26,7 +26,7 @@ public class JobDTO {
     private String jobExperience;
     private Gender jobGender;
     private Integer jobQuantity;
-    private String jobExpiredDate;
+    private LocalDateTime jobExpiredDate;
     private String jobSalary;
     private String jobDescription;
     private String jobRequirement;
@@ -38,12 +38,12 @@ public class JobDTO {
     private JobTypeDTO jobType;
     private Integer jobStatus;
     private LocalDateTime createDate;
-    //    LocalDateTime jobExpiredDate;
     private CategoryDTO category;
     private List<SkillDTO> jobSkill;
     private Integer jobCandidate;
     private Integer jobPass;
     private String provinceCode;
+    private Integer companyId;
     private Integer size;
     private Integer page;
 

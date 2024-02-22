@@ -86,6 +86,8 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
 
     @Query(value = """
             select j from Company j
+            left join fetch j.industry
+            left join fetch j.account
             left join fetch j.companyAddress
             left join fetch j.companyAddress.ward
             left join fetch j.companyAddress.ward.district
@@ -97,6 +99,8 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
             """,
     countQuery = """
             select j from Company j
+            left join fetch j.industry
+            left join fetch j.account
             left join fetch j.companyAddress
             left join fetch j.companyAddress.ward
             left join fetch j.companyAddress.ward.district
