@@ -76,7 +76,7 @@ public class EmailService {
     }
 
     @Async
-    public void sendNotification(String username, String recipientEmail, String body, String link) {
+    public void sendNotificationCandidate(String username, String recipientEmail, String body, String link) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message);
@@ -85,6 +85,32 @@ public class EmailService {
             helper.setTo(recipientEmail);
 
             String subject = "Kết quả ứng tuyển";
+            String content = "<p>Xin chào " + username + ",</p>"
+                    + "<p>" + body + "</p>"
+                    + "<p>Nhấn <a href=\"" + link + "\">vào đây</a> để xem thông tin chi tiết</p>"
+                    + "<br>"
+                    + "<p>Nếu bạn có bất kỳ câu hỏi, vui lòng liên hệ recruitmentsystemamj@gmail.com để được hỗ trợ.</p>"
+                    + "<p>Trân trọng\n"
+                    + "Đội ngũ ANJ recruitment system</p>";
+            helper.setSubject(subject);
+            helper.setText(content, true);
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            LOGGER.error("failed to send email", e);
+            throw new IllegalStateException("failed to send email");
+        }
+    }
+
+    @Async
+    public void sendNotificationCompany(String username, String recipientEmail, String body, String link) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+
+            helper.setFrom("recruitmentsystemamj@gmail.com");
+            helper.setTo(recipientEmail);
+
+            String subject = "Đã có lượt ứng tuyển mới";
             String content = "<p>Hello " + username + ",</p>"
                     + "<p>" + body + "</p>"
                     + "<p>Nhấn <a href=\"" + link + "\">vào đây</a> để xem thông tin chi tiết</p>"
@@ -130,7 +156,6 @@ public class EmailService {
 
     public String generateHTMLContentForJobs(List<Job> jobs) {
         StringBuilder htmlContent = new StringBuilder();
-
         htmlContent.append("<ul>");
         for (Job job : jobs) {
             htmlContent.append("<li><a href=\"").append("http://localhost:3000/detail_jobs/").append(job.getJobId()).append("\">").append(job.getJobName()).append("</a></li>");

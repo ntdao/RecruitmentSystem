@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -108,19 +107,19 @@ public interface CandidateRepository extends JpaRepository<Candidate, Integer> {
             and (:categoryId is null or j.category.id = :categoryId)
             and (:provinceCode is null or j.address.ward.district.province.provinceCode = :provinceCode)
             """,
-    countQuery = """
-            select j from Candidate j
-            left join fetch j.candidateSkills
-            left join fetch j.candidateEducations
-            left join fetch j.workingHistories
-            left join fetch j.address
-            left join fetch j.address.ward
-            left join fetch j.address.ward.district
-            left join fetch j.address.ward.district.province
-            where 1 = 1 and j.deleteFlag = false
-            and (:key is null or lower(j.fullName) like %:key% or lower(j.account.email) like %:key%)
-            and (:categoryId is null or j.category.id = :categoryId)
-            and (:provinceCode is null or j.address.ward.district.province.provinceCode = :provinceCode)
-    """)
+            countQuery = """
+                            select j from Candidate j
+                            left join fetch j.candidateSkills
+                            left join fetch j.candidateEducations
+                            left join fetch j.workingHistories
+                            left join fetch j.address
+                            left join fetch j.address.ward
+                            left join fetch j.address.ward.district
+                            left join fetch j.address.ward.district.province
+                            where 1 = 1 and j.deleteFlag = false
+                            and (:key is null or lower(j.fullName) like %:key% or lower(j.account.email) like %:key%)
+                            and (:categoryId is null or j.category.id = :categoryId)
+                            and (:provinceCode is null or j.address.ward.district.province.provinceCode = :provinceCode)
+                    """)
     Page<Candidate> findAll(String key, Integer categoryId, String provinceCode, Pageable pageable);
 }

@@ -1,6 +1,5 @@
 package hust.seee.recruitmentsystem.controller;
 
-import hust.seee.recruitmentsystem.dto.CandidateDTO;
 import hust.seee.recruitmentsystem.dto.InterviewDTO;
 import hust.seee.recruitmentsystem.dto.RecruitmentDTO;
 import hust.seee.recruitmentsystem.service.InterviewService;

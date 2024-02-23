@@ -1,7 +1,5 @@
 package hust.seee.recruitmentsystem.controller;
 
-import hust.seee.recruitmentsystem.dto.DegreeDTO;
-import hust.seee.recruitmentsystem.dto.IndustryDTO;
 import hust.seee.recruitmentsystem.dto.JobTypeDTO;
 import hust.seee.recruitmentsystem.response.BaseResponse;
 import hust.seee.recruitmentsystem.service.JobTypeService;

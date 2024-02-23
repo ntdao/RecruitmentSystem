@@ -68,7 +68,7 @@ public class JobController {
         return new ResponseEntity<>(baseResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/admin/manage/jobs/all")
+    @PostMapping("/admin/manage/jobs/all")
     public ResponseEntity<BaseResponse> adminGetAllJob(@RequestBody JobDTO dto) {
         BaseResponse baseResponse = new BaseResponse();
         Page<JobDTO> page = jobService.findAllJobsByAdmin(dto);
@@ -89,7 +89,7 @@ public class JobController {
         jobService.deleteJob(id);
     }
 
-    @GetMapping("/company/manage/jobs/all")
+    @PostMapping("/company/manage/jobs/all")
     public ResponseEntity<BaseResponse> getCompanyJob(@RequestBody JobDTO dto, Principal connectedUser) {
         BaseResponse baseResponse = new BaseResponse();
         Page<JobDTO> page = jobService.findJobByCompany(dto, connectedUser);

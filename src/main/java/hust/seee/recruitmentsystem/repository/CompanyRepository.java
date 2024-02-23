@@ -1,6 +1,5 @@
 package hust.seee.recruitmentsystem.repository;
 
-import hust.seee.recruitmentsystem.dto.CompanyDTO;
 import hust.seee.recruitmentsystem.entity.Company;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -71,11 +69,11 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
             where c.deleteFlag = false
             """,
             countQuery = """
-               select c from Company c 
-               left join fetch c.industry
-               join fetch c.account
-               where c.deleteFlag = false
-               """
+                    select c from Company c 
+                    left join fetch c.industry
+                    join fetch c.account
+                    where c.deleteFlag = false
+                    """
     )
     Page<Company> findTopCompany(Pageable paging);
 
@@ -97,18 +95,18 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
             and (:industryId is null or j.industry.id = :industryId)
             and (:provinceCode is null or j.companyAddress.ward.district.province.provinceCode = :provinceCode)
             """,
-    countQuery = """
-            select j from Company j
-            left join fetch j.industry
-            left join fetch j.account
-            left join fetch j.companyAddress
-            left join fetch j.companyAddress.ward
-            left join fetch j.companyAddress.ward.district
-            left join fetch j.companyAddress.ward.district.province
-            where 1 = 1 and j.deleteFlag = false
-            and (:name is null or lower(j.companyFullName) like %:name% or lower(j.companyShortName) like %:name%)
-            and (:industryId is null or j.industry.id = :industryId)
-            and (:provinceCode is null or j.companyAddress.ward.district.province.provinceCode = :provinceCode)
-    """)
+            countQuery = """
+                            select j from Company j
+                            left join fetch j.industry
+                            left join fetch j.account
+                            left join fetch j.companyAddress
+                            left join fetch j.companyAddress.ward
+                            left join fetch j.companyAddress.ward.district
+                            left join fetch j.companyAddress.ward.district.province
+                            where 1 = 1 and j.deleteFlag = false
+                            and (:name is null or lower(j.companyFullName) like %:name% or lower(j.companyShortName) like %:name%)
+                            and (:industryId is null or j.industry.id = :industryId)
+                            and (:provinceCode is null or j.companyAddress.ward.district.province.provinceCode = :provinceCode)
+                    """)
     Page<Company> findAll(String name, Integer industryId, String provinceCode, Pageable pageable);
 }

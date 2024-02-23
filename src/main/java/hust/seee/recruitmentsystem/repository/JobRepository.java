@@ -135,20 +135,20 @@ public interface JobRepository extends JpaRepository<Job, Integer> {
             and (:jobStatus is null or j.jobStatus = :jobStatus)
             and (:companyId is null or j.company.companyId = :companyId)
             """,
-    countQuery = """
-            select j from Job j
-            left join fetch j.jobSkills
-            left join fetch j.jobAddress
-            left join fetch j.jobAddress.ward
-            left join fetch j.jobAddress.ward.district
-            left join fetch j.jobAddress.ward.district.province
-            where 1 = 1 and j.deleteFlag = false
-            and (:name is null or lower(j.jobName) like %:name%)
-            and (:categoryId is null or j.category.id = :categoryId)
-            and (:jobTypeId is null or j.jobType.id = :jobTypeId)
-            and (:provinceCode is null or j.jobAddress.ward.district.province.provinceCode = :provinceCode)
-            and (:jobStatus is null or j.jobStatus = :jobStatus)
-            and (:companyId is null or j.company.companyId = :companyId)
-    """)
+            countQuery = """
+                            select j from Job j
+                            left join fetch j.jobSkills
+                            left join fetch j.jobAddress
+                            left join fetch j.jobAddress.ward
+                            left join fetch j.jobAddress.ward.district
+                            left join fetch j.jobAddress.ward.district.province
+                            where 1 = 1 and j.deleteFlag = false
+                            and (:name is null or lower(j.jobName) like %:name%)
+                            and (:categoryId is null or j.category.id = :categoryId)
+                            and (:jobTypeId is null or j.jobType.id = :jobTypeId)
+                            and (:provinceCode is null or j.jobAddress.ward.district.province.provinceCode = :provinceCode)
+                            and (:jobStatus is null or j.jobStatus = :jobStatus)
+                            and (:companyId is null or j.company.companyId = :companyId)
+                    """)
     Page<Job> findAll(String name, Integer categoryId, Integer jobTypeId, String provinceCode, Integer jobStatus, Integer companyId, Pageable pageable);
 }

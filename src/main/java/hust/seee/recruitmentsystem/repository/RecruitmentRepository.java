@@ -69,9 +69,9 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, Intege
     Integer countByJob(Integer jobId);
 
     @Query("""
-        select r from candidate_apply_job r 
-        left join fetch r.candidate
-        left join fetch r.job
-    """)
+                select r from candidate_apply_job r 
+                left join fetch r.candidate
+                left join fetch r.job
+            """)
     List<Recruitment> findAll();
 }

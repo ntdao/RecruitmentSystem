@@ -4,7 +4,6 @@ import hust.seee.recruitmentsystem.dto.CategoryDTO;
 import hust.seee.recruitmentsystem.pagination.PageDto;
 import hust.seee.recruitmentsystem.response.BaseResponse;
 import hust.seee.recruitmentsystem.service.CategoryService;
-import jakarta.validation.constraints.DecimalMax;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;

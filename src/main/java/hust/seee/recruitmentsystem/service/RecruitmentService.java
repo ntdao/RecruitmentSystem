@@ -44,8 +44,13 @@ public class RecruitmentService {
                 .createDate(LocalDateTime.now())
                 .build();
         recruitmentRepository.save(recruitment);
+        String link = "http://localhost:3000/login";
         String content = String.format("%s ứng tuyển công việc %s", candidate.getFullName(), job.getJobName());
         notificationService.addNotification(content, job.getCompany().getAccount());
+        emailService.sendNotificationCompany(job.getCompany().getCompanyShortName(),
+                job.getCompany().getAccount().getEmail(),
+                content,
+                link);
     }
 
     public List<RecruitmentDTO> getAllCandidateByJob(String jobId, String statusId) {
@@ -95,7 +100,7 @@ public class RecruitmentService {
         String body = "Đã có kết quả ứng tuyển công việc " + jobName;
         String link = "http://localhost:3000/login";
         notificationService.addNotification(content, recruitment.getCandidate().getAccount());
-        emailService.sendNotification(candidate.getFullName(), candidate.getAccount().getEmail(), body, link);
+        emailService.sendNotificationCandidate(candidate.getFullName(), candidate.getAccount().getEmail(), body, link);
     }
 
     public Recruitment findById(Integer recruitmentId) {
@@ -119,7 +124,7 @@ public class RecruitmentService {
         String content = String.format(message, jobName);
         String link = "http://localhost:3000/login";
         notificationService.addNotification(content, recruitment.getCandidate().getAccount());
-        emailService.sendNotification(candidate.getFullName(), candidate.getAccount().getEmail(), message, link);
+        emailService.sendNotificationCandidate(candidate.getFullName(), candidate.getAccount().getEmail(), message, link);
     }
 
     public List<RecruitmentDTO> getAllByCandidateId(Principal principal) {

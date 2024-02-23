@@ -60,7 +60,8 @@ public class MatchingService {
     }
 
     public double calculateCompatibilityEducation(Job job, Candidate candidate) {
-        if (Objects.equals(candidate.getEducationLevel(), job.getMinEducationLevel())) return MAX_POINT_EDU;
+        if (job.getMinEducationLevel() == null || Objects.equals(candidate.getEducationLevel(), job.getMinEducationLevel()))
+            return MAX_POINT_EDU;
         return 0.0;
     }
 
@@ -94,14 +95,13 @@ public class MatchingService {
             PriorityQueue<Job> topJobs = new PriorityQueue<>(Comparator.comparingDouble(job -> calculateCompatibility(job, candidate)));
             List<Job> candidateJobs = (candidate.getAddress() == null ? jobTop : jobs);
             for (Job job : candidateJobs) {
-//                double compatibility = calculateCompatibility(job, candidate);
                 topJobs.offer(job);
                 if (topJobs.size() > 5) {
                     topJobs.poll();
                 }
             }
             List<Job> recommendedJobs = new ArrayList<>(topJobs);
-            Collections.sort(recommendedJobs, Comparator.comparingDouble(job -> calculateCompatibility(job, candidate)));
+            recommendedJobs.sort(Comparator.comparingDouble(job -> calculateCompatibility(job, candidate)));
             topRecommendedJobsForEachCandidate.put(candidate, recommendedJobs);
             emailService.sendRecommendJob(candidate.getFullName(), candidate.getAccount().getEmail(), recommendedJobs);
         }
